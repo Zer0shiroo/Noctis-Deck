@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Noctis Deck</title>
+<link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="fog-layer" id="fogL"></div>
+<div id="app">
+<div class="screen active" id="s-title">
+  <img src="resources/logo/logo.png" alt="">
+  <div class="t-main">Noctis Deck</div>
+  <div class="t-sub">✦ &nbsp; Roguelike de Cartas &nbsp; ✦</div>
+  <div class="t-quote">"En la ciudad que nunca amanece, solo el Cazador<br>marcado por el pacto antiguo puede sobrevivir."</div>
+  <div class="t-btns">
+    <button class="btn" onclick="goCharSelect()">▶ &nbsp;Nueva Partida</button>
+    <button class="btn" id="btnContinue" onclick="continueGame()" style="display:none">↩ &nbsp;Continuar Partida</button>
+    <div class="save-badge" id="saveBadge" style="display:none"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-sm" onclick="show('custom')">🎨 Personalizar</button>
+      <button class="btn-sm" id="btnDel" onclick="deleteSave()" style="display:none;color:var(--wine2);border-color:var(--wine)">🗑 Borrar guardado</button>
+    </div>
+    <div class="diff-badge" id="diffBadge"></div>
+  </div>
+<!-- 
+  INSTRUCCIONES: Añade esto dentro del <div id="s-title"> de tu index.html,
+  justo antes del </div> de cierre de esa pantalla (abajo a la izquierda).
+  
+  Si tienes un div con posición absoluta para elementos del título,
+  añade este bloque dentro de él.
+-->
+
+<!-- Enlace parche — pegar en el screen de título (s-title) de index.html -->
+<a href="notas_actualizacion.html"
+   style="
+     position:fixed;
+     bottom:22px;
+     left:24px;
+     font-family:'Cinzel',serif;
+     font-size:11px;
+     font-weight:600;
+     letter-spacing:.18em;
+     text-transform:uppercase;
+     color:#c9984a;
+     text-decoration:none;
+     opacity:.75;
+     transition: opacity .2s, text-shadow .2s;
+     text-shadow: 0 0 8px #c9984a44;
+     z-index:100;
+   "
+   onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
+   onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'"
+>
+  ✦ Actualización del Parche
+</a>
+</div>
+<div class="screen" id="s-chars">
+  <div class="page-title">✦ Elige tu Cazador ✦</div>
+  <div class="page-sub">Cada personaje comienza con un mazo y habilidades únicas</div>
+  <div class="chars-row" id="charsRow"></div>
+  <button class="btn" id="btnStart" onclick="startRunWithChar()" style="opacity:.4;pointer-events:none">Comenzar Run ▶</button>
+</div>
+<div class="screen" id="s-map">
+  <div class="page-title">✦ Mapa de la Ciudad ✦</div>
+  <div class="map-acts" id="mapActs"></div>
+  <div style="font-size:12px;color:var(--fog);font-style:italic">Elige tu próximo destino — izquierda o derecha</div>
+</div>
+<div class="screen" id="s-game">
+  <div class="p-left">
+    <div class="portrait" id="portrait"><div class="portrait-glow"></div><div id="portContent"></div></div>
+    <div class="char-badge" id="charBadge">—</div>
+    <div>
+      <div class="stat-lbl">Vitalidad</div>
+      <div class="bar-wrap"><div class="hp-bar" id="hpBar" style="width:100%"></div></div>
+      <div class="stat-nums"><span id="hpNum">70</span><span style="color:var(--dim)" id="hpMax">/70</span></div>
+      <div class="stat-lbl" style="margin-top:5px">Maná Arcano</div>
+      <div class="bar-wrap"><div class="mp-bar" id="mpBar" style="width:100%"></div></div>
+      <div class="stat-nums"><span id="mpNum">3</span><span style="color:var(--dim)" id="mpMax">/3</span></div>
+    </div>
+    <div><div class="stat-lbl">Estados</div><div class="si-wrap" id="pStat"></div></div>
+    <div><div class="p-label">Mazo</div><div class="dk-cnt"><span>Mazo: <span id="dkC">0</span></span><span>Desc: <span id="dsC">0</span></span></div></div>
+    <div><div class="p-label">Oro</div><div class="gold-row">🪙 <span id="goldN">0</span></div></div>
+    <div><div class="p-label">Reliquias</div><div id="relics" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"></div></div>
+  </div>
+  <div class="p-center">
+    <div id="a-combat">
+      <div class="arena-bg"></div>
+      <div class="e-zone">
+        <div class="e-name" id="eName">—</div>
+        <div class="e-sprite" id="eSprite"></div>
+        <div class="e-hp-wrap"><div class="e-hp-bar" id="eHpBar" style="width:100%"></div><div class="e-hp-txt" id="eHpTxt">—/—</div></div>
+        <div class="e-intent" id="eIntent">Observando…</div>
+        <div class="si-wrap" id="eStat" style="justify-content:center"></div>
+      </div>
+      <div class="arena-div"></div>
+      <div class="hand-zone" id="handZone"></div>
+    </div>
+    <div class="bot-bar">
+      <div><div style="font-size:8px;color:var(--dim);font-family:'Cinzel',serif;letter-spacing:2px;margin-bottom:3px">MANÁ</div><div class="mana-wrap" id="manaOrbs"></div></div>
+      <div class="turn-lbl" id="turnLbl">Turno 1</div>
+      <button class="btn-end" onclick="endTurn()">Fin de Turno ▶</button>
+    </div>
+  </div>
+  <div class="p-right">
+    <div class="sec-title">Registro</div>
+    <div class="clog" id="clog"></div>
+    <div class="sec-title" style="margin-top:4px">Pasiva</div>
+    <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
+  </div>
+</div>
+<div class="screen" id="s-reward">
+  <div class="rew-title">✦ Recompensa ✦</div>
+  <div style="font-size:13px;color:var(--fog);font-style:italic">Elige una carta para tu mazo</div>
+  <div class="rew-cards" id="rewCards"></div>
+  <button class="btn-sm" onclick="skipRew()">Continuar sin carta</button>
+</div>
+<div class="screen" id="s-rest">
+  <div class="page-title" style="font-size:17px">🕯 Santuario Olvidado</div>
+  <div style="font-size:13px;color:var(--fog);font-style:italic;max-width:360px;text-align:center;line-height:1.8">Un altar exhala paz. Recupera fuerzas o alivia tu mazo.</div>
+  <div class="rest-opts">
+    <div class="rest-opt" onclick="doHeal()"><div class="r-ico">❤️</div><h3>Curar</h3><p>Recupera 20 HP.</p></div>
+    <div class="rest-opt" onclick="doPurge()"><div class="r-ico">🔥</div><h3>Purgar</h3><p>Elimina un Golpe Sombrío del mazo.</p></div>
+  </div>
+</div>
+<div class="screen" id="s-shop">
+  <div class="page-title" style="font-size:17px">🛒 La Botica del Heraldo</div>
+  <div class="gold-disp">🪙 <span id="shopG">0</span></div>
+  <div class="shop-stock" id="shopSt"></div>
+  <button class="btn-sm" onclick="leaveShop()">Salir</button>
+</div>
+<div class="screen" id="s-chest">
+  <div class="page-title" style="font-size:17px">📦 Cofre Misterioso</div>
+  <div style="font-size:13px;color:var(--fog);font-style:italic;max-width:360px;text-align:center;line-height:1.8">Las sombras ocultan todo tipo de sorpresas...</div>
+  <div id="chestContent" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:10px"></div>
+</div>
+<div class="screen" id="s-over">
+  <div class="over-title">☠ Consumido ☠</div>
+  <div style="color:var(--fog);font-style:italic;font-size:14px;text-align:center;max-width:360px;line-height:1.8">La oscuridad te ha devorado.<br>La ciudad victoriana se cierne sobre tu cuerpo.</div>
+  <div id="overStats" style="font-family:'Cinzel',serif;font-size:11px;color:var(--dim);letter-spacing:2px;margin-top:4px"></div>
+  <button class="btn btn-wine" onclick="goTitle()">↩ Volver al Inicio</button>
+</div>
+<div class="screen" id="s-win">
+  <div class="win-title">✦ La Noche Termina ✦</div>
+  <div style="color:var(--fog);font-style:italic;font-size:13px;text-align:center;max-width:400px;line-height:1.8">Has sobrevivido. La ciudad permanece en silencio.<br>Pero mañana volverá a despertar...</div>
+  <div id="winStats" style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-top:4px"></div>
+  <button class="btn" onclick="goTitle()">↩ Nueva Noche</button>
+</div>
+<!-- CRÉDITOS FINALES -->
+<div class="screen" id="s-credits">
+  <div class="credits-wrap">
+    <div class="cr-line cr-big">✦ La Oscuridad Ha Sido Vencida ✦</div>
+    <div class="cr-line cr-med" id="creditsChar">El Cazador</div>
+    <div class="cr-line cr-sub" id="creditsDiff">Dificultad 1</div>
+    <div class="cr-sep"></div>
+    <div class="cr-line cr-label">— Desarrollado por —</div>
+    <div class="cr-line cr-name">Ángel Pérez Gutiérrez</div>
+    <div class="cr-line cr-name">Francisco Gutiérrez</div>
+    <div class="cr-sep"></div>
+    <div class="cr-line cr-label">Motor y diseño</div>
+    <div class="cr-line cr-small">Noctis Deck · Roguelike de Cartas</div>
+    <div class="cr-line cr-small">Inspirado en Slay the Spire</div>
+    <div class="cr-sep"></div>
+    <div class="cr-line cr-quote">"En la ciudad que nunca amanece,<br>solo el Cazador marcado por el pacto antiguo<br>puede sobrevivir."</div>
+    <div class="cr-line" style="margin-top:32px"><button class="btn" onclick="goTitle()">↩ Nueva Noche</button></div>
+  </div>
+</div>
+<div class="screen" id="s-custom">
+  <div class="page-title">✦ Personalización ✦</div>
+  <div class="page-sub">Arrastra o haz click · PNG recomendado · Las imágenes por defecto se usan si no subes ninguna</div>
+  <div class="csecs">
+    <div class="csec"><div class="csec-t">🗡 Personajes</div><div style="display:flex;gap:11px" id="charDzRow"></div></div>
+    <div class="csec"><div class="csec-t">💀 Enemigos por Tier</div>
+      <div style="display:flex;gap:11px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div class="dz" id="dz-e0" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy0',this)"><div class="dz-ico">🐀</div><div class="dz-lbl">Normal</div><input type="file" accept="image/*" onchange="dzFile(event,'enemy0',this.parentNode)"><button class="dz-clr" onclick="dzClr('enemy0',document.getElementById('dz-e0'),event)">✕</button></div>
+          <div class="dz-cap">Tier 1</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div class="dz" id="dz-e1" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy1',this)"><div class="dz-ico">⚔</div><div class="dz-lbl">Élite</div><input type="file" accept="image/*" onchange="dzFile(event,'enemy1',this.parentNode)"><button class="dz-clr" onclick="dzClr('enemy1',document.getElementById('dz-e1'),event)">✕</button></div>
+          <div class="dz-cap">Tier 2</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div class="dz" id="dz-e2" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy2',this)"><div class="dz-ico">👁</div><div class="dz-lbl">Jefe</div><input type="file" accept="image/*" onchange="dzFile(event,'enemy2',this.parentNode)"><button class="dz-clr" onclick="dzClr('enemy2',document.getElementById('dz-e2'),event)">✕</button></div>
+          <div class="dz-cap">Tier 3</div>
+        </div>
+      </div>
+    </div>
+    <div class="csec" style="max-width:430px"><div class="csec-t">🃏 Arte de Cartas</div><div class="cards-grid" id="cardDzGrid"></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
+    <button class="btn" onclick="saveCustomAndReturn()">✓ &nbsp;Guardar y Volver</button>
+  </div>
+</div>
+</div>
+<script src="noctis_deck.js"></script>
+</body>
+</html>
