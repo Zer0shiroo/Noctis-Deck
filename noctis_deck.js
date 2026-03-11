@@ -19,25 +19,31 @@ const DEFAULT_HERO_NAME = 'Alistair Voss';
 //  IMAGES
 // ═══════════════════════════════════════════════
 const DEFAULT_IMGS = {
-  char_cazador:   'resources/personajes/cazadora.jpg',
-  char_hechicera: 'resources/personajes/maga.jpg',
-  char_espectro:  'resources/personajes/espectro.png',
-  enemy0:         'resources/enemigos/enemigo1.png',
-  enemy1:         'resources/enemigos/enemigo2.png',
-  enemy2:         'resources/enemigos/enemigo3.png',
-  // NUEVO: healer enemy image — coloca tu imagen en resources/enemigos/healer.png
-  enemy_healer:   'resources/enemigos/healer.png',
-  card_strike:    'resources/cartas/golpesombrio.jpg',
-  card_slash:     'resources/cartas/tajocruento.jpg',
-  card_lance:     'resources/cartas/lanzaniebla.png',
-  card_double:    'resources/cartas/Golpe doble.png',
-  card_shield:    'resources/cartas/escudoarcano.jpg',
-  card_mantle:    'resources/cartas/manto de sombras.jpg',
-  card_ritual:    'resources/cartas/ritual of blood.jpg',
-  card_cloud:     'resources/cartas/nube venenosa.jpg',
-  card_smite:     'resources/cartas/golpe sagrado.jpg',
-  card_retaliate: 'resources/cartas/cartarepresalia.jpg',
-  card_mend:      'resources/cartas/susurro vital.jpg',
+  char_cazador:    'resources/personajes/cazadora.jpg',
+  char_hechicera:  'resources/personajes/maga.jpg',
+  char_espectro:   'resources/personajes/espectro.png',
+  char_pistolero:  'resources/personajes/pistolero.png',
+  enemy0:          'resources/enemigos/enemigo1.png',
+  enemy1:          'resources/enemigos/enemigo2.png',
+  enemy2:          'resources/enemigos/enemigo3.png',
+  enemy_healer:    'resources/enemigos/healer.png',
+  card_strike:     'resources/cartas/golpesombrio.jpg',
+  card_slash:      'resources/cartas/tajocruento.jpg',
+  card_lance:      'resources/cartas/lanzaniebla.png',
+  card_double:     'resources/cartas/Golpe doble.png',
+  card_shield:     'resources/cartas/escudoarcano.jpg',
+  card_mantle:     'resources/cartas/manto de sombras.jpg',
+  card_ritual:     'resources/cartas/ritualofblood.jpg',
+  card_cloud:      'resources/cartas/nube venenosa.jpg',
+  card_smite:      'resources/cartas/golpe sagrado.jpg',
+  card_retaliate:  'resources/cartas/cartarepresalia.jpg',
+  card_mend:       'resources/cartas/susurro vital.jpg',
+  // PISTOLERO cards — coloca imágenes en resources/cartas/
+  card_bullet:     'resources/cartas/bullet.jpg',
+  card_quickdraw:  'resources/cartas/quickdraw.jpg',
+  card_headshot:   'resources/cartas/headshot.jpg',
+  card_fanfire:    'resources/cartas/fanfire.jpg',
+  card_smokebomb:  'resources/cartas/smokebomb.jpg',
 };
 let CUSTOM={};
 function getImg(k){return CUSTOM[k]||DEFAULT_IMGS[k]||null}
@@ -46,39 +52,94 @@ function getImg(k){return CUSTOM[k]||DEFAULT_IMGS[k]||null}
 //  CHARACTERS
 // ═══════════════════════════════════════════════
 const CHARS=[
-  {id:'cazador',name:'El Cazador',title:'Maestro del Filo',imgKey:'char_cazador',hp:75,mana:3,
-   passive:'Sangre por Sangre: al aplicar Sangrado, +1 daño extra.',pid:'bleed_bonus',
-   deck:['strike','strike','strike','strike','shield','shield'],
-   stats:{Vida:'75',Maná:'3/turno',Estilo:'Ataque directo'},color:'#c9984a',
+  // Cazador — pasiva reworked: Vampirismo (roba vida al hacer daño directo)
+  {id:'cazador',name:'El Cazador',title:'Maestro del Filo',imgKey:'char_cazador',hp:70,mana:3,
+   passive:'Vampirismo: cada carta de ataque que dañe directamente te cura 2 HP.',pid:'lifesteal',
+   deck:['strike','strike','shield','shield'],
+   stats:{Vida:'70',Maná:'3/turno',Estilo:'Ataque y robo de vida'},color:'#c9984a',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="30" ry="4" fill="#00000044"/><circle cx="50" cy="28" r="14" fill="#1a1228" stroke="#c9984a88" stroke-width="1.5"/><circle cx="50" cy="28" r="10" fill="#2a1838"/><rect x="32" y="43" width="36" height="44" rx="5" fill="#1a1228" stroke="#c9984a66"/><rect x="24" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><rect x="64" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><path d="M32 52 Q16 68 20 88 Q30 78 32 84" fill="#0f0c18" stroke="#c9984a33"/><path d="M68 52 Q84 68 80 88 Q70 78 68 84" fill="#0f0c18" stroke="#c9984a33"/><line x1="82" y1="22" x2="76" y2="82" stroke="#c9984a" stroke-width="2.5"/><circle cx="82" cy="22" r="5" fill="#1a1228" stroke="#c9984a" stroke-width="1.5"/><circle cx="82" cy="22" r="2.5" fill="#c9984a88"/></svg>`},
   {id:'hechicera',name:'La Hechicera',title:'Tejedora de Miasmas',imgKey:'char_hechicera',hp:60,mana:4,
    passive:'Miasma: el veneno que aplicas hace +1 daño extra por turno.',pid:'poison_bonus',
-   deck:['lance','lance','shield','cloud','strike','strike'],
+   deck:['lance','lance','shield','shield'],
    stats:{Vida:'60',Maná:'4/turno',Estilo:'Veneno y control'},color:'#7a3acc',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="28" ry="4" fill="#00000044"/><circle cx="50" cy="26" r="13" fill="#1a1028" stroke="#7a3acc88" stroke-width="1.5"/><ellipse cx="50" cy="22" rx="16" ry="8" fill="#130c1e" stroke="#7a3acc66"/><rect x="33" y="40" width="34" height="48" rx="4" fill="#1a1028" stroke="#7a3acc66"/><path d="M33 50 Q14 60 16 82 Q26 72 33 78" fill="#130c1e" stroke="#7a3acc44"/><path d="M67 50 Q86 60 84 82 Q74 72 67 78" fill="#130c1e" stroke="#7a3acc44"/><circle cx="50" cy="62" r="10" fill="#3a1a5a44" stroke="#9a5aee" stroke-width="1"/><circle cx="50" cy="62" r="5" fill="#7a3acc66"/><path d="M40 90 Q50 108 60 90" fill="#1a0a28" stroke="#7a3acc66"/></svg>`},
   {id:'espectro',name:'El Espectro',title:'Sombra del Pacto',imgKey:'char_espectro',hp:65,mana:3,
    passive:'Forma Etérea: el primer golpe de cada combate es ignorado.',pid:'first_hit',
-   deck:['strike','shield','shield','retaliate','strike','ritual'],
+   deck:['strike','strike','shield','shield'],
    stats:{Vida:'65',Maná:'3/turno',Estilo:'Equilibrio y esquiva'},color:'#4a8aaa',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="26" ry="4" fill="#00000033"/><ellipse cx="50" cy="55" rx="28" ry="50" fill="#1a2a3a88" stroke="#4a8aaa55" stroke-width="1"/><circle cx="50" cy="28" r="14" fill="#1a2a3a" stroke="#4a8aaa88" stroke-width="1.5"/><circle cx="44" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="56" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="44" cy="26" r="2.5" fill="#4a8aaa88"/><circle cx="56" cy="26" r="2.5" fill="#4a8aaa88"/><path d="M30 45 Q14 58 18 80 Q28 70 30 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M70 45 Q86 58 82 80 Q72 70 70 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M36 100 Q50 118 64 100 Q58 112 50 110 Q42 112 36 100Z" fill="#1a2a3a88" stroke="#4a8aaa44"/></svg>`},
+  // PISTOLERO — imagen en resources/personajes/pistolero.png (o sube la tuya en Personalización)
+  {id:'pistolero',name:'El Pistolero',title:'Heraldo del Trueno',imgKey:'char_pistolero',hp:65,mana:3,
+   passive:'Cargador: cada 3 cartas de ataque jugadas en un turno, la siguiente carta de ataque hace el doble de daño.',pid:'gunslinger',
+   deck:['bullet','bullet','shield','shield'],
+   stats:{Vida:'65',Maná:'3/turno',Estilo:'Ráfagas y precisión'},color:'#d4804a',
+   svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="28" ry="4" fill="#00000044"/><circle cx="50" cy="27" r="13" fill="#1a1228" stroke="#d4804a88" stroke-width="1.5"/><rect x="33" y="41" width="34" height="46" rx="5" fill="#1a1228" stroke="#d4804a66"/><rect x="25" y="44" width="11" height="32" rx="4" fill="#13101e" stroke="#d4804a44"/><rect x="64" y="44" width="11" height="32" rx="4" fill="#13101e" stroke="#d4804a44"/><rect x="64" y="56" width="22" height="8" rx="3" fill="#1a1228" stroke="#d4804a88"/><rect x="82" y="57" width="12" height="6" rx="2" fill="#d4804a66"/><circle cx="86" cy="60" r="2" fill="#d4804aaa"/><rect x="65" y="64" width="6" height="14" rx="2" fill="#2a1818" stroke="#d4804a44"/><line x1="78" y1="60" x2="96" y2="58" stroke="#d4804a" stroke-width="1.5"/></svg>`},
 ];
 
 // ═══════════════════════════════════════════════
-//  CARDS
+//  CARDS  (rarity: 'common'|'uncommon'|'rare'|'legendary')
+//  Pesos de rareza para recompensas normales: common 55%, uncommon 30%, rare 12%, legendary 3%
+//  En recompensa élite: common 30%, uncommon 35%, rare 25%, legendary 10%
+//  En recompensa boss (2 cartas): common 20%, uncommon 35%, rare 30%, legendary 15%
 // ═══════════════════════════════════════════════
 const CARDS=[
-  {id:'strike',  name:'Golpe Sombrío',   type:'attack', cost:1,dmg:6, blk:0,bleed:0,psn:0,desc:'Golpe veloz con tu filo.'},
-  {id:'slash',   name:'Tajo Cruento',    type:'attack', cost:2,dmg:10,blk:0,bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
-  {id:'lance',   name:'Lanza de Niebla', type:'attack', cost:1,dmg:4, blk:0,bleed:0,psn:2,desc:'Veneno que consume desde dentro.'},
-  {id:'double',  name:'Golpe Doble',     type:'attack', cost:2,dmg:5, blk:0,bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true},
-  {id:'shield',  name:'Escudo Arcano',   type:'defense',cost:1,dmg:0, blk:7, bleed:0,psn:0,desc:'Barrera mágica.'},
-  {id:'mantle',  name:'Manto de Sombras',type:'defense',cost:2,dmg:0, blk:14,bleed:0,psn:0,desc:'Protección pesada.'},
-  {id:'ritual',  name:'Ritual de Sangre',type:'skill',  cost:2,dmg:0, blk:0, bleed:4,psn:0,desc:'Maldice con sangrado severo.'},
-  {id:'cloud',   name:'Nube Venenosa',   type:'skill',  cost:2,dmg:0, blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
-  {id:'smite',   name:'Golpe Sagrado',   type:'attack', cost:1,dmg:8, blk:0, bleed:0,psn:0,desc:'Luz arcana concentrada.'},
-  {id:'retaliate',name:'Represalia',     type:'skill',  cost:1,dmg:3, blk:4, bleed:0,psn:0,desc:'Ataca y defiende.'},
-  {id:'mend',    name:'Susurro Vital',   type:'skill',  cost:1,dmg:0, blk:0, bleed:0,psn:0,heal:8, desc:'Recupera 8 de Vitalidad.'},
+  // ── COMUNES ──
+  {id:'strike',   name:'Golpe Sombrío',    type:'attack', rarity:'common',    cost:1,dmg:6,  blk:0, bleed:0,psn:0,desc:'Golpe veloz con tu filo.'},
+  {id:'shield',   name:'Escudo Arcano',    type:'defense',rarity:'common',    cost:1,dmg:0,  blk:7, bleed:0,psn:0,desc:'Barrera mágica.'},
+  {id:'lance',    name:'Lanza de Niebla',  type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:0,psn:2,desc:'Veneno que consume desde dentro.'},
+  {id:'retaliate',name:'Represalia',       type:'skill',  rarity:'common',    cost:1,dmg:3,  blk:4, bleed:0,psn:0,desc:'Ataca y defiende.'},
+  {id:'mend',     name:'Susurro Vital',    type:'skill',  rarity:'common',    cost:1,dmg:0,  blk:0, bleed:0,psn:0,heal:8, desc:'Recupera 8 de Vitalidad.'},
+  {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:'Disparo certero y rápido.'},
+  // ── INFRECUENTES ──
+  {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
+  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:5,  blk:0, bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true},
+  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:14,bleed:0,psn:0,desc:'Protección pesada.'},
+  {id:'cloud',    name:'Nube Venenosa',    type:'skill',  rarity:'uncommon',  cost:2,dmg:0,  blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
+  {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Dos disparos instantáneos.',dbl:true},
+  {id:'smokebomb',name:'Bomba de Humo',    type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:10,bleed:0,psn:2,desc:'Escudo y envenena al enemigo.'},
+  // ── RARAS ──
+  {id:'smite',    name:'Golpe Sagrado',    type:'attack', rarity:'rare',      cost:1,dmg:8,  blk:0, bleed:0,psn:0,desc:'Luz arcana concentrada.'},
+  {id:'ritual',   name:'Ritual de Sangre', type:'skill',  rarity:'rare',      cost:2,dmg:0,  blk:0, bleed:4,psn:0,desc:'Maldice con sangrado severo.'},
+  {id:'fanfire',  name:'Fuego Cerrado',    type:'attack', rarity:'rare',      cost:2,dmg:6,  blk:0, bleed:0,psn:0,desc:'Dispara tres veces consecutivas.',triple:true},
+  // ── LEGENDARIAS ──
+  {id:'headshot', name:'Disparo Certero',  type:'attack', rarity:'legendary', cost:3,dmg:28, blk:0, bleed:0,psn:0,desc:'Un disparo. El fin.'},
+  {id:'bloodpact',name:'Pacto de Sangre',  type:'skill',  rarity:'legendary', cost:2,dmg:0,  blk:0, bleed:6,psn:0,heal:14,desc:'Cura con la sangre del enemigo.'},
+  {id:'nightmare',name:'Pesadilla Eterna', type:'attack', rarity:'legendary', cost:3,dmg:14, blk:0, bleed:3,psn:3,desc:'Inflige todos los males.'},
 ];
+
+// Rareza → peso base y elite
+const RARITY_WEIGHTS = {
+  common:    {base:55, elite:30, boss:20},
+  uncommon:  {base:30, elite:35, boss:35},
+  rare:      {base:12, elite:25, boss:30},
+  legendary: {base:3,  elite:10, boss:15},
+};
+const RARITY_COLORS = {
+  common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44'
+};
+const RARITY_LABELS = {
+  common:'COMÚN', uncommon:'INFREC.', rare:'RARA', legendary:'LEGENDARIA'
+};
+
+// Weighted random card pick for rewards
+function pickRewardCards(count, tier) {
+  // tier: 0=normal, 1=elite, 2=boss
+  const tierKey = tier===2?'boss':tier===1?'elite':'base';
+  const pool = CARDS.filter(c=>!['strike','shield','bullet'].includes(c.id));
+  const weighted = [];
+  pool.forEach(card=>{
+    const w = RARITY_WEIGHTS[card.rarity]?.[tierKey] || 5;
+    for(let i=0;i<w;i++) weighted.push(card);
+  });
+  shuf(weighted);
+  const picked=[];
+  const seen=new Set();
+  for(const c of weighted){
+    if(!seen.has(c.id)){seen.add(c.id);picked.push(c);}
+    if(picked.length>=count)break;
+  }
+  return picked;
+}
 
 // ═══════════════════════════════════════════════
 //  ENEMIES
@@ -303,7 +364,6 @@ let G={difficulty:0};
 let selChar=null;
 
 const MAX_HAND = 6;
-const MAX_SAME = 2;
 
 function newRun(cid, heroName){
   const ch=CHARS.find(c=>c.id===cid);
@@ -680,7 +740,16 @@ function enterInfiniteNode(type) {
 
 function advanceInfinite() {
   saveG();
-  showInfiniteMap();
+  const enc = G.infiniteEncounters || 0;
+  // Every 10 encounters in infinite mode → deck editor
+  if(enc > 0 && enc % 10 === 0 && !G._deckEditedAt || G._pendingDeckEdit){
+    G._deckEditedAt = enc;
+    G._pendingDeckEdit = false;
+    saveG();
+    showDeckEditor('infinite');
+  } else {
+    showInfiniteMap();
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -690,9 +759,8 @@ function countInHand(cardId) {
   return G.player.hand.filter(id => id === cardId).length;
 }
 function canAddToHand(cardId) {
-  if(G.player.hand.length >= MAX_HAND) return false;
-  if(countInHand(cardId) >= MAX_SAME) return false;
-  return true;
+  // Sin límite de duplicados — solo limita tamaño de mano
+  return G.player.hand.length < MAX_HAND;
 }
 function drawUpTo(target) {
   const p = G.player;
@@ -735,6 +803,7 @@ function getMaxHand() {
 function startCombat(tier, isInfinite){
   const infiniteMult = (G.infiniteMode || isInfinite) ? getInfiniteMultiplier() : 1;
   G.enemies = buildEnemyGroup(tier, infiniteMult);
+  G._combatTier = tier; // 0=normal, 1=elite, 2=boss
   G.targetIdx = 0;
   G.turn = 1;
   combatTurn = 0;
@@ -753,10 +822,13 @@ function startCombat(tier, isInfinite){
     document.getElementById('passiveInfo').textContent = (ch ? ch.passive + '\n' : '') +
       `🌑 Modo Infinito · Encuentro ${G.infiniteEncounters} · ${mult.toFixed(1)}×`;
   }
+  _gunslingerAttacks = 0;
+  _gunslingerReady   = false;
   renderEnemies();
   renderHand();
   renderPS();
   updMana();
+  updateGunslingerHUD();
   document.getElementById('turnLbl').textContent = 'Turno 1';
   document.getElementById('clog').innerHTML = '';
   addLog(`¡Combate! ${G.enemies.map(e=>e.name).join(', ')}`, 'ene');
@@ -889,6 +961,10 @@ function getCArt(card){
 // ═══════════════════════════════════════════════
 //  PLAY CARD
 // ═══════════════════════════════════════════════
+// Gunslinger counter: cada 3 ataques jugados, siguiente ataque hace doble daño
+let _gunslingerAttacks = 0;
+let _gunslingerReady   = false;
+
 function playCard(hi){
   const p=G.player;
   const id=p.hand[hi];
@@ -908,17 +984,48 @@ function playCard(hi){
   let msg=`Jugaste: ${card.name}`;
 
   if(card.dmg){
-    let d=card.dbl?card.dmg*2:card.dmg;
-    if(card.bleed&&G.charId==='cazador')d++;
-    const ab=Math.min(target.block,d);
-    target.block=Math.max(0,target.block-d);
-    const nd=d-ab;
-    target.hp=Math.max(0,target.hp-nd);
-    msg+=` · ${nd} daño`;
-    // Track stats
-    runTotalDmg += nd;
-    if(nd > runHighDmg) runHighDmg = nd;
-    animateAttack(G.targetIdx, nd);
+    // Gunslinger passive: every 3 attacks → next attack deals double
+    let bonusMult = 1;
+    if(G.charId==='pistolero' && card.type==='attack'){
+      if(_gunslingerReady){
+        bonusMult = 2;
+        _gunslingerReady = false;
+        _gunslingerAttacks = 0;
+        addLog('¡Cargador activo! Daño doble 🔥','sta');
+      } else {
+        _gunslingerAttacks++;
+        if(_gunslingerAttacks>=3){_gunslingerReady=true;_gunslingerAttacks=0;}
+        updateGunslingerHUD();
+      }
+    }
+
+    let hits = card.triple ? 3 : (card.dbl ? 2 : 1);
+    let totalDmgDealt = 0;
+    for(let h=0;h<hits;h++){
+      let d = card.dmg * bonusMult;
+      const ab=Math.min(target.block,d);
+      target.block=Math.max(0,target.block-d);
+      const nd=d-ab;
+      target.hp=Math.max(0,target.hp-nd);
+      totalDmgDealt+=nd;
+      animateAttack(G.targetIdx, nd);
+      if(target.hp<=0)break;
+    }
+    msg+=` · ${totalDmgDealt} daño${hits>1?' (×'+hits+')':''}`;
+    runTotalDmg += totalDmgDealt;
+    if(totalDmgDealt > runHighDmg) runHighDmg = totalDmgDealt;
+
+    // Cazador lifesteal: 2 HP per attack card that deals direct damage
+    if(G.charId==='cazador' && totalDmgDealt>0){
+      const steal=2;
+      const healed=Math.min(p.maxHp,p.hp+steal)-p.hp;
+      if(healed>0){
+        p.hp+=healed;
+        msg+=` · ❤ +${healed}`;
+        runDmgHealed+=healed;
+        animateHeal(healed);
+      }
+    }
   }
   if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');}
   if(card.bleed){target.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`;}
@@ -945,6 +1052,17 @@ function playCard(hi){
   }
 
   renderHand();renderEnemies();renderPS();updMana();
+}
+
+function updateGunslingerHUD(){
+  const el=document.getElementById('gunslingerHUD');
+  if(!el)return;
+  if(G.charId!=='pistolero'){el.style.display='none';return;}
+  el.style.display='flex';
+  const needed=3-_gunslingerAttacks;
+  el.innerHTML=_gunslingerReady
+    ? `<span style="color:#ffcc44;font-size:10px;letter-spacing:1px;font-family:'Cinzel',serif">🔥 ¡CARGADO!</span>`
+    : `<span style="font-size:9px;letter-spacing:1px;color:var(--dim)">🔫 ${_gunslingerAttacks}/3</span>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -1037,6 +1155,7 @@ function endTurn(){
         addLog(`${e.name} golpea por ${nd}`,'ene');
         spawnN(nd,'pl');
         runDmgTanked += nd;
+        animatePlayerHit();
       }
     }
   });
@@ -1136,12 +1255,37 @@ function animateHit(e) {
   if(el){el.classList.add('hit-flash');setTimeout(()=>el.classList.remove('hit-flash'),400);}
 }
 
+function animatePlayerHit(){
+  // Red vignette flash over entire combat screen
+  let vfx = document.getElementById('playerHitVFX');
+  if(!vfx){
+    vfx = document.createElement('div');
+    vfx.id = 'playerHitVFX';
+    vfx.style.cssText = `
+      position:fixed;inset:0;z-index:8000;pointer-events:none;
+      background:radial-gradient(ellipse at center, transparent 40%, #c0304088 100%);
+      opacity:0;transition:opacity .08s ease-in;
+    `;
+    document.body.appendChild(vfx);
+  }
+  // Portrait shake
+  const port = document.getElementById('portrait');
+  if(port){port.classList.add('hit-flash');setTimeout(()=>port.classList.remove('hit-flash'),400);}
+  // Vignette flash
+  vfx.style.opacity='1';
+  setTimeout(()=>{ vfx.style.transition='opacity .45s ease-out'; vfx.style.opacity='0'; }, 100);
+  setTimeout(()=>{ vfx.style.transition='opacity .08s ease-in'; }, 600);
+  // Screen shake on left panel
+  const panel = document.getElementById('s-game');
+  if(panel){panel.classList.add('shake');setTimeout(()=>panel.classList.remove('shake'),300);}
+}
+
 function combatWin(){
   const totalRw = G.enemies.reduce((sum,e)=>sum+(e.rw||0),0);
   G.gold+=totalRw;
   addLog(`¡Victoria! +${totalRw} oro`,'heal');
   saveG();
-  showRew();
+  showRew(G._combatTier||0);
 }
 
 // ═══════════════════════════════════════════════
@@ -1207,30 +1351,174 @@ function spawnN(n,type,refEl){
 // ═══════════════════════════════════════════════
 //  REWARD / REST / SHOP
 // ═══════════════════════════════════════════════
-function showRew(){
-  const opts=shuf(CARDS.filter(c=>!['strike','shield'].includes(c.id))).slice(0,3);
-  const c=document.getElementById('rewCards');c.innerHTML='';
+function buildCardHTML(card, w, h, showDesc){
+  const ds = card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg;
+  let fx='';
+  if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;
+  if(card.blk)fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
+  if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;
+  if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
+  if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
+  const rc = RARITY_COLORS[card.rarity]||'#a0a0b0';
+  const rl = RARITY_LABELS[card.rarity]||'';
+  const desc = showDesc ? `<div style="font-size:8px;color:var(--dim);padding:0 4px 4px;text-align:center;line-height:1.4;font-style:italic">${card.desc}</div>` : '';
+  return `<div class="gcard ${card.type} playable" style="width:${w}px;height:${h}px;cursor:pointer;position:relative;border-top:2px solid ${rc}">
+    <div class="c-bar"></div>
+    <div class="c-cost">${card.cost}</div>
+    <div style="position:absolute;bottom:${h-16}px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:1.5px;color:${rc};font-family:'Cinzel',serif;opacity:.95;text-shadow:0 0 6px ${rc}44">${rl}</div>
+    <div class="c-art" style="padding:9px 5px 3px">${getCArt(card)}</div>
+    <div class="c-name">${card.name}</div>
+    <div class="c-fx">${fx}</div>
+    ${desc}
+  </div>`;
+}
+
+function showRew(tier){
+  tier = tier ?? 0;
+  const isBoss = (tier === 2);
+  const count = isBoss ? 2 : 1; // boss: pick 2, others: pick 1 from 3
+  const opts = pickRewardCards(isBoss ? 4 : 3, tier);
+
+  const c = document.getElementById('rewCards'); c.innerHTML='';
+  // Title update
+  const rt = document.getElementById('rewTitle');
+  if(rt){
+    if(isBoss) rt.textContent = '✦ Victoria sobre el Jefe ✦';
+    else if(tier===1) rt.textContent = '✦ Recompensa de Élite ✦';
+    else rt.textContent = '✦ Elige una Recompensa ✦';
+  }
+
+  // Sub-hint for boss
+  const subEl = document.getElementById('rewSub');
+  if(subEl) subEl.textContent = isBoss ? 'Elige 2 cartas' : 'Elige 1 carta (o sáltate)';
+
+  let bossChosen = 0;
   opts.forEach(card=>{
-    const w=document.createElement('div');w.className='rew-wrap';
-    const ds=card.dbl?card.dmg*2:card.dmg;let fx='';
-    if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;if(card.blk)fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
-    if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
-    if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
-    w.innerHTML=`<div class="gcard ${card.type} playable" style="width:104px;height:155px;cursor:pointer"><div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art" style="padding:9px 5px 3px">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div><div style="font-size:8px;color:var(--dim);padding:0 4px 5px;text-align:center;line-height:1.4;font-style:italic">${card.desc}</div></div>`;
-    w.addEventListener('click',()=>{
-      G.player.deck.push(card.id);
-      saveG();
-      if(G.infiniteMode) advanceInfinite();
-      else advance();
+    const w = document.createElement('div'); w.className='rew-wrap';
+    w.innerHTML = buildCardHTML(card, 126, 190, true);
+    w.addEventListener('click', ()=>{
+      if(isBoss){
+        if(bossChosen >= 2) return;
+        G.player.deck.push(card.id);
+        bossChosen++;
+        w.style.opacity='.3'; w.style.pointerEvents='none';
+        const subEl=document.getElementById('rewSub');
+        if(subEl) subEl.textContent=`${2-bossChosen} carta(s) restante(s)`;
+        if(bossChosen>=2){ saveG(); setTimeout(()=>doAdvance(),600); }
+      } else {
+        G.player.deck.push(card.id);
+        saveG();
+        doAdvance();
+      }
     });
     c.appendChild(w);
   });
   show('reward');
 }
 
+function doAdvance(){
+  // After boss fight, offer deck editing before advancing
+  const {row} = G.path;
+  if(row===6 && !G.infiniteMode){
+    showDeckEditor('post-boss');
+  } else if(G.infiniteMode) {
+    advanceInfinite();
+  } else {
+    advance();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  DECK EDITOR — al final de acto (boss) y modo infinito cada 10
+// ═══════════════════════════════════════════════
+function showDeckEditor(context){
+  // context: 'post-boss' | 'infinite'
+  let discarded = 0;
+  const MAX_DISCARD = 5;
+  const MIN_DECK = 4;
+
+  // Combinar TODAS las cartas del jugador: mazo + mano + descarte
+  const allCards = [
+    ...G.player.deck,
+    ...G.player.hand,
+    ...G.player.discard
+  ];
+  let pending = [...allCards];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'deckEditorOverlay';
+  overlay.style.cssText = `position:fixed;inset:0;z-index:9000;background:#080610ee;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s`;
+
+  function buildUI(){
+    const canDiscard = discarded < MAX_DISCARD && pending.length > MIN_DECK;
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid var(--gold);border-radius:14px;padding:28px 24px;max-width:860px;width:96%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 80px #c9984a33">
+        <div style="font-family:'Cinzel Decorative',cursive;font-size:18px;color:var(--gold);text-align:center;letter-spacing:2px">✦ Editar Mazo ✦</div>
+        <div style="font-size:12px;color:var(--dim);text-align:center;font-style:italic">
+          ${context==='infinite'?'Cada 10 encuentros puedes editar tu mazo.':'Antes de continuar puedes descartar cartas.'}
+          <br><span style="color:var(--fog)">Cartas totales: <b style="color:var(--gold)">${pending.length}</b></span>
+          &nbsp;·&nbsp; Descartadas: <span id="deCount" style="color:#c0304a">${discarded}</span> / ${MAX_DISCARD}
+          &nbsp;·&nbsp; Mínimo: ${MIN_DECK}
+        </div>
+        <div id="deDeckGrid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:8px 0"></div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:4px">
+          <button class="btn" onclick="confirmDeckEdit()">Confirmar y Continuar →</button>
+        </div>
+      </div>`;
+
+    const grid = overlay.querySelector('#deDeckGrid');
+    pending.forEach((cardId, idx)=>{
+      const card = cById(cardId);
+      if(!card) return;
+      const stillCanDiscard = discarded < MAX_DISCARD && pending.length > MIN_DECK;
+      const item = document.createElement('div');
+      item.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;cursor:${stillCanDiscard?'pointer':'default'};transition:all .2s;position:relative;opacity:1`;
+      item.dataset.idx = idx;
+      item.innerHTML = buildCardHTML(card, 92, 138, false) +
+        `<div class="de-discard-btn" style="font-size:9px;letter-spacing:1px;color:${stillCanDiscard?'#c0304a':'#444'};font-family:'Cinzel',serif;opacity:${stillCanDiscard?'.8':'.3'};border:1px solid ${stillCanDiscard?'#c0304a44':'#33333344'};border-radius:3px;padding:2px 6px">DESCARTAR</div>`;
+      if(stillCanDiscard){
+        item.addEventListener('click',()=>{
+          pending.splice(idx, 1);
+          discarded++;
+          buildUI();
+        });
+        item.addEventListener('mouseenter',()=>{ item.style.transform='translateY(-6px)'; });
+        item.addEventListener('mouseleave',()=>{ item.style.transform=''; });
+      }
+      grid.appendChild(item);
+    });
+  }
+
+  buildUI();
+  document.body.appendChild(overlay);
+  overlay.style.opacity='0';
+  requestAnimationFrame(()=>{ overlay.style.transition='opacity .3s'; overlay.style.opacity='1'; });
+
+  window.confirmDeckEdit = function(){
+    // Rebuild player state: pending becomes new deck, clear hand and discard
+    G.player.deck    = pending;
+    G.player.hand    = [];
+    G.player.discard = [];
+    saveG();
+    overlay.style.opacity='0';
+    setTimeout(()=>{
+      overlay.remove();
+      delete window.confirmDeckEdit;
+      if(context==='infinite') advanceInfinite();
+      else advance();
+    },300);
+  };
+}
+
 function skipRew(){
-  if(G.infiniteMode) advanceInfinite();
-  else advance();
+  if(G._combatTier===2){
+    // Boss skip still goes to deck editor
+    showDeckEditor('post-boss');
+  } else if(G.infiniteMode) {
+    advanceInfinite();
+  } else {
+    advance();
+  }
 }
 function doHeal(){const p=G.player;p.hp=Math.min(p.maxHp,p.hp+20);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
 function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck.splice(i,1);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
@@ -1540,7 +1828,55 @@ function injectMobileLogBtn() {
   if(!isMobile()) return;
   if(document.getElementById('mobileLogBtn')) return;
 
-  // Floating log button
+  // ── Portrait button (left side) ──────────────
+  const portBtn = document.createElement('button');
+  portBtn.id = 'mobilePortBtn';
+  portBtn.innerHTML = '👤';
+  portBtn.style.cssText = `
+    position:fixed;bottom:68px;left:12px;
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,#1a1228,#0e0b18);
+    border:1px solid var(--border);color:var(--fog);
+    font-size:18px;cursor:pointer;z-index:500;
+    box-shadow:0 0 14px #4a2a6a44;
+    display:none;align-items:center;justify-content:center;
+    transition:all .2s;overflow:hidden;padding:0;
+  `;
+  portBtn.onclick = toggleMobilePortrait;
+  document.body.appendChild(portBtn);
+
+  // Portrait full-screen overlay
+  const portOverlay = document.createElement('div');
+  portOverlay.id = 'mobilePortOverlay';
+  portOverlay.style.cssText = `
+    position:fixed;inset:0;z-index:700;
+    background:#080610ee;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+  `;
+  portOverlay.innerHTML = `
+    <div id="mobilePortContent" style="
+      width:min(340px,88vw);
+      border:1px solid var(--gold);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 0 60px #c9984a44;
+      aspect-ratio:3/4;
+      background:#0e0b18;
+      display:flex;align-items:center;justify-content:center;
+    "></div>
+    <div id="mobilePortName" style="font-family:'Cinzel Decorative',cursive;font-size:16px;color:var(--gold);letter-spacing:3px;text-shadow:0 0 20px #c9984a88"></div>
+    <div id="mobilePortPassive" style="font-size:11px;color:var(--dim);font-style:italic;max-width:300px;text-align:center;line-height:1.6;padding:0 20px"></div>
+    <div id="mobilePortStats" style="display:flex;gap:16px;font-size:12px;color:var(--fog);font-family:'Cinzel',serif"></div>
+    <button class="btn-sm" onclick="toggleMobilePortrait()" style="margin-top:8px">Cerrar</button>
+  `;
+  portOverlay.addEventListener('click', e=>{ if(e.target===portOverlay) toggleMobilePortrait(); });
+  document.body.appendChild(portOverlay);
+
+  // ── Log button (right side) ───────────────────
   const btn = document.createElement('button');
   btn.id = 'mobileLogBtn';
   btn.innerHTML = '📜';
@@ -1610,9 +1946,58 @@ function toggleMobileLog() {
   }
 }
 
+function toggleMobilePortrait(){
+  const ov = document.getElementById('mobilePortOverlay');
+  if(!ov) return;
+  const open = ov.style.display === 'flex';
+  if(!open){
+    // Populate with current character data
+    const ch = chById(G.charId);
+    const p  = G.player;
+    const content = document.getElementById('mobilePortContent');
+    const img = ch ? getImg(ch.imgKey) : null;
+    if(content){
+      if(img) content.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover">`;
+      else if(ch) content.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform:scale(1.8)">${ch.svg}</div>`;
+    }
+    const nameEl = document.getElementById('mobilePortName');
+    if(nameEl && ch) nameEl.textContent = G.heroName || ch.name;
+    const passEl = document.getElementById('mobilePortPassive');
+    if(passEl && ch) passEl.textContent = ch.passive;
+    const statsEl = document.getElementById('mobilePortStats');
+    if(statsEl && p){
+      statsEl.innerHTML = `
+        <span>❤ ${p.hp}/${p.maxHp}</span>
+        <span>◆ ${p.mana}/${p.maxMana}</span>
+        <span>🪙 ${G.gold}</span>
+        ${p.block?`<span>🛡 ${p.block}</span>`:''}
+        ${p.bleed?`<span>🩸 ${p.bleed}</span>`:''}
+        ${p.poison?`<span>☠ ${p.poison}</span>`:''}
+      `;
+    }
+    // Update portrait button image
+    const portBtn = document.getElementById('mobilePortBtn');
+    if(portBtn && img){
+      portBtn.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    }
+    ov.style.display='flex';
+    ov.style.opacity='0';
+    requestAnimationFrame(()=>{ ov.style.transition='opacity .25s'; ov.style.opacity='1'; });
+  } else {
+    ov.style.opacity='0';
+    setTimeout(()=>{ ov.style.display='none'; },250);
+  }
+}
+
 function showMobileLogBtn(visible) {
-  const btn = document.getElementById('mobileLogBtn');
-  if(btn) btn.style.display = visible ? 'flex' : 'none';
+  const btn  = document.getElementById('mobileLogBtn');
+  const pbtn = document.getElementById('mobilePortBtn');
+  if(btn)  btn.style.display  = visible ? 'flex' : 'none';
+  if(pbtn) pbtn.style.display = visible ? 'flex' : 'none';
+  if(!visible){
+    const ov = document.getElementById('mobilePortOverlay');
+    if(ov) { ov.style.display='none'; }
+  }
 }
 
 // ─── RELICS MOBILE OVERLAY ─────────────────────
@@ -1704,9 +2089,3 @@ updateTitle();
 injectStatsButton();
 initMobile();
 
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if(e.key === 'F12') e.preventDefault();
-  if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault();
-  if(e.ctrlKey && e.key === 'U') e.preventDefault();
-});

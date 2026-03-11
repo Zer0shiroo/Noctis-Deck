@@ -2,21 +2,21 @@
  * Noctis Deck — © 2026 Ángel Pérez Gutiérrez & Francisco Gutiérrez
  * Todos los derechos reservados. Prohibida su copia, distribución o
  * modificación sin autorización expresa de los autores.
- * Contacto: [tu email]
+ * Contacto: [angelpegu2005@gmail.com]
  */-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080610">
 <title>Noctis Deck</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="style_scale.css">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"/>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#080610">
 </head>
 <body>
 <div class="fog-layer" id="fogL"></div>
@@ -55,7 +55,7 @@
      style="position:fixed;bottom:22px;left:24px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9984a;text-decoration:none;opacity:.75;transition:opacity .2s,text-shadow .2s;text-shadow:0 0 8px #c9984a44;z-index:100;"
      onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
      onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'">
-    ✦ Actualización del Parche
+    ✦ Notas del Parche (v0.0.4)
   </a>
 </div>
 
@@ -99,6 +99,10 @@
     <div><div class="p-label">Mazo</div><div class="dk-cnt"><span>Mazo: <span id="dkC">0</span></span><span>Desc: <span id="dsC">0</span></span><span>Mano: <span id="handC">0/6</span></span></div></div>
     <div><div class="p-label">Oro</div><div class="gold-row">🪙 <span id="goldN">0</span></div></div>
     <div><div class="p-label">Reliquias</div><div id="relics" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"></div></div>
+    <!-- HUD Pistolero — se muestra solo cuando juegas con El Pistolero -->
+    <div id="gunslingerHUD" style="display:none"></div>
+    <div class="sec-title" style="margin-top:6px">Pasiva</div>
+    <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
   </div>
 
   <div class="p-center">
@@ -119,16 +123,16 @@
   <div class="p-right">
     <div class="sec-title">Registro</div>
     <div class="clog" id="clog"></div>
-    <div class="sec-title" style="margin-top:4px">Pasiva</div>
-    <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
     <div class="sec-title" style="margin-top:4px">Objetivos</div>
     <div id="targetHints" style="font-size:9px;color:var(--fog);font-style:italic;line-height:1.6">Pulsa en un enemigo<br>para seleccionarlo</div>
   </div>
 </div>
 
 <div class="screen" id="s-reward">
-  <div class="rew-title">✦ Recompensa ✦</div>
-  <div style="font-size:13px;color:var(--fog);font-style:italic">Elige una carta para tu mazo</div>
+  <!-- id="rewTitle" → el JS lo actualiza según el tipo de combate (normal/élite/boss) -->
+  <div class="rew-title" id="rewTitle">✦ Recompensa ✦</div>
+  <!-- id="rewSub" → el JS lo actualiza ("Elige 1 carta", "Elige 2 cartas", etc.) -->
+  <div id="rewSub" style="font-size:12px;color:#6a5a7a;text-align:center;font-style:italic;margin-bottom:8px">Elige 1 carta (o sáltate)</div>
   <div class="rew-cards" id="rewCards"></div>
   <button class="btn-sm" onclick="skipRew()">Continuar sin carta</button>
 </div>
@@ -192,9 +196,9 @@
   <div class="page-title">✦ Personalización ✦</div>
   <div class="page-sub">Arrastra o haz click · PNG recomendado · Las imágenes por defecto se usan si no subes ninguna</div>
   <div class="csecs">
-    <div class="csec"><div class="csec-t">🗡 Personajes</div><div style="display:flex;gap:11px" id="charDzRow"></div></div>
+    <div class="csec"><div class="csec-t">🗡 Personajes</div><div style="display:flex;gap:11px;flex-wrap:wrap" id="charDzRow"></div></div>
     <div class="csec"><div class="csec-t">💀 Enemigos por Tier</div>
-      <div style="display:flex;gap:11px">
+      <div style="display:flex;gap:11px;flex-wrap:wrap">
         <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
           <div class="dz" id="dz-e0" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy0',this)"><div class="dz-ico">🐀</div><div class="dz-lbl">Normal</div><input type="file" accept="image/*" onchange="dzFile(event,'enemy0',this.parentNode)"><button class="dz-clr" onclick="dzClr('enemy0',document.getElementById('dz-e0'),event)">✕</button></div>
           <div class="dz-cap">Tier 1</div>
@@ -207,6 +211,7 @@
           <div class="dz" id="dz-e2" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy2',this)"><div class="dz-ico">👁</div><div class="dz-lbl">Jefe</div><input type="file" accept="image/*" onchange="dzFile(event,'enemy2',this.parentNode)"><button class="dz-clr" onclick="dzClr('enemy2',document.getElementById('dz-e2'),event)">✕</button></div>
           <div class="dz-cap">Tier 3</div>
         </div>
+        <!-- Slot Sanadora — inyectado automáticamente por JS (ensureHealerDz) -->
       </div>
     </div>
     <div class="csec" style="max-width:430px"><div class="csec-t">🃏 Arte de Cartas</div><div class="cards-grid" id="cardDzGrid"></div></div>

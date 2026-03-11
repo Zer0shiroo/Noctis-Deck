@@ -81,8 +81,20 @@
 .mconn-h  { height: 20px !important; width: 2px !important; }
 
 /* ── RECOMPENSA ── */
-.rew-title { font-size: 28px !important; }
-.rew-cards { gap: 24px !important; }
+.rew-title  { font-size: 32px !important; margin-bottom: 4px !important; }
+.rew-cards  { gap: 28px !important; align-items: flex-start !important; }
+
+/* Cartas de recompensa más grandes */
+#s-reward .gcard     { width: 130px !important; height: 196px !important; }
+#s-reward .c-cost    { width: 28px !important; height: 28px !important; font-size: 14px !important; }
+#s-reward .c-name    { font-size: 11px !important; letter-spacing: 1px !important; padding: 4px !important; }
+#s-reward .c-art     { padding: 10px 6px 4px !important; }
+#s-reward .c-fx      { gap: 4px !important; padding: 3px 5px 6px !important; }
+#s-reward .fx        { font-size: 11px !important; padding: 3px 7px !important; }
+#s-reward .c-bar     { height: 6px !important; }
+/* Texto rareza y descripción */
+#s-reward .gcard > div[style*="font-size:6px"] { font-size: 8px !important; }
+#s-reward .gcard > div[style*="font-style:italic"] { font-size: 10px !important; }
 
 /* ── TIENDA ── */
 .shop-price { font-size: 14px !important; margin-top: 7px !important; }
@@ -489,4 +501,60 @@
   .n-ico   { font-size: 19px !important; }
   .char-card { width: 152px !important; min-width: 152px !important; }
   .rest-opt { width: 230px !important; }
+}
+
+/* ── RAREZA DE CARTAS ── */
+.gcard[style*="border-top"] { transition: box-shadow .2s !important; }
+.gcard[style*="border-top"]:hover { box-shadow: 0 0 18px currentColor !important; }
+
+/* ── EDITOR DE MAZO ── */
+#deckEditorOverlay .de-discard-btn {
+  font-size: 9px !important;
+  letter-spacing: 1px !important;
+  color: #c0304a !important;
+  font-family: 'Cinzel', serif !important;
+  transition: opacity .2s !important;
+  padding: 2px 4px !important;
+  border: 1px solid #c0304a44 !important;
+  border-radius: 3px !important;
+}
+#deckEditorOverlay .de-discard-btn:hover { opacity: 1 !important; color: #ff4060 !important; }
+#deckEditorOverlay div[data-idx]:hover { transform: translateY(-6px) !important; }
+
+/* ── EFECTO GOLPE JUGADOR ── */
+@keyframes playerHitVignette {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+#playerHitVFX { pointer-events: none !important; }
+
+/* ── HUD PISTOLERO ── */
+#gunslingerHUD {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  transition: all .2s;
+}
+
+/* ── RECOMPENSA — rareza coloreada ── */
+.rew-title { font-size: 28px !important; }
+#rewSub {
+  font-size: 12px !important;
+  color: var(--dim) !important;
+  font-style: italic !important;
+  text-align: center !important;
+  margin-top: -4px !important;
+  margin-bottom: 6px !important;
+}
+
+/* Entrada animada del overlay de mazo */
+@keyframes fadeIn { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } }
+
+/* ── MÓVIL: portrait overlay ── */
+#mobilePortOverlay { transition: opacity .25s !important; }
+#mobilePortBtn {
+  transition: border-color .3s !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 14px #c9984a44 !important;
 }
