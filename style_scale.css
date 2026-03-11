@@ -1,8 +1,12 @@
 /* ═══════════════════════════════════════════════
-   NOCTIS DECK v0.0.3 — ESCALA DE INTERFAZ
-   Añade <link rel="stylesheet" href="style_scale.css">
-   DESPUÉS de style.css en el <head> de index.html
+   NOCTIS DECK v0.0.3 — ESCALA + MÓVIL COMPLETO
+   <link rel="stylesheet" href="style_scale.css">
+   DESPUÉS de style.css en index.html
    ═══════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════
+   DESKTOP (todo lo que ya funcionaba, sin cambios)
+   ════════════════════════════════════════════════ */
 
 /* ── TÍTULO ── */
 .t-main  { font-size: clamp(42px, 6.5vw, 82px) !important; }
@@ -23,10 +27,9 @@
 .char-stat     { font-size: 12px !important; }
 .char-passive  { font-size: 12px !important; padding: 7px 9px !important; }
 
-/* ── LAYOUT COMBATE: columnas más anchas ── */
+/* ── LAYOUT COMBATE ── */
 .p-left  { width: 250px !important; min-width: 250px !important; padding: 14px 13px !important; gap: 12px !important; }
 .p-right { width: 206px !important; min-width: 206px !important; padding: 14px 11px !important; }
-
 .char-badge   { font-size: 10px !important; letter-spacing: 3px !important; }
 .stat-lbl     { font-size: 10px !important; letter-spacing: 3px !important; }
 .bar-wrap     { height: 13px !important; border-radius: 3px !important; }
@@ -43,30 +46,30 @@
 /* ── ENEMIGOS ── */
 .e-zone { gap: 18px !important; padding: 12px 0 !important; }
 .enemy-wrap { padding: 10px !important; gap: 7px !important; }
-.enemy-wrap .e-name   { font-size: 14px !important; letter-spacing: 1px !important; }
+.enemy-wrap .e-name   { font-size: 14px !important; }
 .enemy-wrap .e-sprite { width: 130px !important; height: 172px !important; }
 .enemy-wrap .e-intent { font-size: 12px !important; }
 .enemy-wrap .e-hp-wrap{ height: 14px !important; border-radius: 3px !important; }
-.enemy-wrap .e-hp-txt { font-size: 10px !important; letter-spacing: 1px !important; }
+.enemy-wrap .e-hp-txt { font-size: 10px !important; }
 .target-indicator     { font-size: 9px !important; min-height: 14px !important; }
 .si { font-size: 11px !important; padding: 3px 8px !important; }
 
-/* ── MANO DE CARTAS ── */
+/* ── CARTAS ── */
 .hand-zone { height: 210px !important; padding: 0 20px 12px !important; }
 .gcard     { width: 110px !important; height: 166px !important; }
 .c-cost    { width: 24px !important; height: 24px !important; font-size: 12px !important; top: 5px !important; right: 5px !important; }
-.c-name    { font-size: 9.5px !important; letter-spacing: 1.2px !important; padding: 3px 3px !important; }
+.c-name    { font-size: 9.5px !important; letter-spacing: 1.2px !important; padding: 3px !important; }
 .c-art     { padding: 7px 5px 4px !important; }
 .c-fx      { padding: 3px 4px 6px !important; gap: 3px !important; }
 .fx        { font-size: 9px !important; padding: 2px 5px !important; }
 .c-bar     { height: 5px !important; }
 
 /* ── BARRA INFERIOR ── */
-.bot-bar { height: 64px !important; padding: 0 22px !important; }
-.morb    { width: 30px !important; height: 30px !important; font-size: 13px !important; }
+.bot-bar   { height: 64px !important; padding: 0 22px !important; }
+.morb      { width: 30px !important; height: 30px !important; font-size: 13px !important; }
 .mana-wrap { gap: 5px !important; }
-.btn-end { font-size: 12px !important; padding: 11px 26px !important; }
-.turn-lbl{ font-size: 12px !important; letter-spacing: 2.5px !important; }
+.btn-end   { font-size: 12px !important; padding: 11px 26px !important; }
+.turn-lbl  { font-size: 12px !important; letter-spacing: 2.5px !important; }
 
 /* ── MAPA ── */
 .map-acts { gap: 48px !important; padding: 10px 0 !important; }
@@ -87,16 +90,16 @@
 .shop-stock { gap: 16px !important; }
 
 /* ── DESCANSO ── */
-.rest-opt    { width: 200px !important; padding: 22px 15px !important; }
+.rest-opt        { width: 200px !important; padding: 22px 15px !important; }
 .rest-opt .r-ico { font-size: 32px !important; }
-.rest-opt h3 { font-size: 15px !important; }
-.rest-opt p  { font-size: 12px !important; }
+.rest-opt h3     { font-size: 15px !important; }
+.rest-opt p      { font-size: 12px !important; }
 
 /* ── ESCUDO ── */
-.shield-panel      { padding: 10px 12px !important; gap: 10px !important; }
-.shield-icon-big   { font-size: 36px !important; }
-.shield-value      { font-size: 30px !important; }
-.shield-label      { font-size: 8px !important; letter-spacing: 3px !important; }
+.shield-panel    { padding: 10px 12px !important; gap: 10px !important; }
+.shield-icon-big { font-size: 36px !important; }
+.shield-value    { font-size: 30px !important; }
+.shield-label    { font-size: 8px !important; letter-spacing: 3px !important; }
 
 /* ── FINALES ── */
 .over-title { font-size: 52px !important; }
@@ -104,6 +107,386 @@
 .cr-big     { font-size: clamp(20px, 3.5vw, 34px) !important; }
 .cr-med     { font-size: 22px !important; }
 .cr-name    { font-size: 26px !important; }
-
-/* ── OVERLAY STATS ── */
 #statsOverlay > div { max-width: 640px !important; }
+
+
+/* ════════════════════════════════════════════════
+   TABLET (≤ 900px) — ligero reajuste
+   ════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .p-left  { width: 200px !important; min-width: 200px !important; }
+  .p-right { width: 170px !important; min-width: 170px !important; }
+  .enemy-wrap .e-sprite { width: 110px !important; height: 145px !important; }
+  .gcard  { width: 98px !important; height: 148px !important; }
+  .mnode  { width: 88px !important; height: 72px !important; }
+  .map-acts { gap: 30px !important; }
+}
+
+
+/* ════════════════════════════════════════════════
+   MÓVIL (≤ 640px) — rediseño completo en vertical
+   ════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+
+  /* ── Base y scroll ── */
+  body { overflow: hidden !important; }
+  #app { overflow: hidden !important; }
+
+  /* Todas las pantallas ocupan 100% */
+  .screen { position: fixed !important; inset: 0 !important; overflow: hidden !important; }
+
+  /* ── PANTALLA TÍTULO ── */
+  #s-title { justify-content: center !important; padding: 0 24px !important; gap: 0 !important; }
+  #s-title img { width: 72px !important; height: 72px !important; margin-bottom: 10px !important; }
+  .t-main  { font-size: clamp(32px, 10vw, 52px) !important; letter-spacing: 3px !important; }
+  .t-sub   { font-size: 11px !important; letter-spacing: 5px !important; margin-top: 4px !important; }
+  .t-quote { font-size: 13px !important; margin-top: 14px !important; max-width: 290px !important; line-height: 1.7 !important; }
+  .t-btns  { gap: 10px !important; margin-top: 22px !important; }
+  .btn     { font-size: 13px !important; padding: 13px 32px !important; }
+  .btn-sm  { font-size: 11px !important; padding: 8px 18px !important; }
+  .save-badge { font-size: 11px !important; padding: 5px 12px !important; text-align: center !important; max-width: 280px !important; }
+
+  /* Enlace patch notes abajo */
+  a[href="notas_actualizacion.html"] {
+    font-size: 10px !important;
+    bottom: 14px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  /* ── SELECCIÓN DE PERSONAJE ── */
+  #s-chars { padding: 16px 12px 80px !important; gap: 12px !important; justify-content: flex-start !important; overflow-y: auto !important; }
+  .page-title { font-size: 18px !important; letter-spacing: 2px !important; }
+  .page-sub   { font-size: 12px !important; text-align: center !important; }
+  .chars-row  {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 14px !important;
+    padding: 8px 4px 16px !important;
+    width: 100% !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .char-card {
+    width: 168px !important;
+    min-width: 168px !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: center !important;
+    padding: 14px !important;
+  }
+  .char-name    { font-size: 13px !important; }
+  .char-title   { font-size: 11px !important; }
+  .char-stat    { font-size: 11px !important; }
+  .char-passive { font-size: 11px !important; }
+  #btnStart     { margin-top: 4px !important; font-size: 12px !important; padding: 12px 28px !important; }
+
+  /* ── MAPA ── */
+  #s-map {
+    flex-direction: column !important;
+    padding: 12px 8px 16px !important;
+    gap: 10px !important;
+    overflow: auto !important;
+    align-items: center !important;
+  }
+  #s-map .page-title { font-size: 16px !important; flex-shrink: 0 !important; }
+  .map-acts {
+    flex-direction: row !important;
+    gap: 20px !important;
+    padding: 6px 4px !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    align-items: flex-start !important;
+  }
+  .map-act { scroll-snap-align: center !important; flex-shrink: 0 !important; }
+  .act-lbl  { font-size: 10px !important; letter-spacing: 2px !important; }
+  .map-row  { gap: 10px !important; }
+  .mnode    { width: 76px !important; height: 62px !important; border-radius: 7px !important; }
+  .n-ico    { font-size: 22px !important; }
+  .n-lbl    { font-size: 8px !important; letter-spacing: 1.5px !important; }
+  .mconn-h  { height: 14px !important; }
+
+  /* ── COMBATE — layout vertical completo ── */
+  #s-game {
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  /* Panel izquierdo → barra horizontal compacta arriba */
+  .p-left {
+    width: 100% !important;
+    min-width: unset !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: linear-gradient(90deg, #0e0b18, #0a0812) !important;
+  }
+
+  /* En móvil ocultar elementos secundarios del panel izquierdo */
+  .p-left .portrait     { display: none !important; }
+  .p-left .char-badge   { display: none !important; }
+  .p-left .p-label      { display: none !important; }
+  .p-left #relics       { display: none !important; }
+  .p-left #shieldDisplay{ display: none !important; }
+
+  /* Stats HP/Mana en horizontal compacto */
+  .p-left > div:nth-child(3) {
+    flex: 1 !important;
+    min-width: 130px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+  .stat-lbl  { font-size: 8px !important; margin-bottom: 1px !important; }
+  .bar-wrap  { height: 9px !important; }
+  .stat-nums { font-size: 12px !important; }
+
+  /* Estados (veneno/sangrado) en horizontal */
+  .p-left > div:nth-child(4) { flex-shrink: 0 !important; }
+  .si-wrap { flex-wrap: nowrap !important; gap: 3px !important; }
+  .si { font-size: 10px !important; padding: 2px 6px !important; }
+
+  /* Oro compacto */
+  .p-left > div:nth-child(6) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+  .gold-row { font-size: 13px !important; }
+
+  /* Mazo compacto */
+  .dk-cnt { font-size: 10px !important; gap: 4px !important; flex-wrap: nowrap !important; }
+
+  /* Panel derecho → oculto en móvil, info mostrada en overlay on-demand */
+  .p-right { display: none !important; }
+
+  /* Centro expandido */
+  .p-center {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  /* Arena de combate */
+  #a-combat {
+    flex: 1 !important;
+    padding: 8px 10px 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  /* Zona de enemigos — scroll horizontal si hay muchos */
+  .e-zone {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    padding: 4px 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .enemy-wrap {
+    padding: 7px !important;
+    gap: 4px !important;
+    min-width: 100px !important;
+    flex-shrink: 0 !important;
+  }
+  .enemy-wrap .e-name   { font-size: 11px !important; }
+  .enemy-wrap .e-sprite { width: 90px !important; height: 118px !important; }
+  .enemy-wrap .e-intent { font-size: 10px !important; }
+  .enemy-wrap .e-hp-wrap{ height: 11px !important; }
+  .enemy-wrap .e-hp-txt { font-size: 8px !important; }
+  .target-indicator     { font-size: 8px !important; min-height: 11px !important; }
+
+  .arena-div { margin: 3px 0 !important; }
+
+  /* Mano de cartas — scroll horizontal con snap */
+  .hand-zone {
+    height: 175px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding: 0 12px 10px !important;
+    gap: 8px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .hand-zone::-webkit-scrollbar { display: none !important; }
+
+  /* En móvil las cartas van en fila plana sin rotación */
+  .c-slot {
+    transform: none !important;
+    margin-left: 0 !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: center !important;
+  }
+  .c-slot:hover {
+    transform: translateY(-14px) scale(1.06) !important;
+  }
+
+  .gcard {
+    width: 100px !important;
+    height: 152px !important;
+  }
+  .c-cost { width: 22px !important; height: 22px !important; font-size: 11px !important; }
+  .c-name { font-size: 8.5px !important; padding: 2px !important; }
+  .c-art  { padding: 6px 4px 3px !important; }
+  .c-fx   { padding: 2px 3px 5px !important; gap: 2px !important; }
+  .fx     { font-size: 8px !important; padding: 1px 4px !important; }
+
+  /* Barra inferior */
+  .bot-bar {
+    height: 56px !important;
+    padding: 0 12px !important;
+    gap: 8px !important;
+  }
+  .morb      { width: 26px !important; height: 26px !important; font-size: 11px !important; }
+  .mana-wrap { gap: 3px !important; }
+  .turn-lbl  { font-size: 10px !important; letter-spacing: 1.5px !important; }
+  .btn-end   { font-size: 11px !important; padding: 9px 16px !important; }
+
+  /* ── LOG FLOTANTE en móvil (botón ℹ que abre un overlay) ── */
+  /* Se inyecta desde JS — ver abajo */
+
+  /* ── RECOMPENSA ── */
+  #s-reward {
+    padding: 20px 14px 80px !important;
+    gap: 14px !important;
+    overflow-y: auto !important;
+  }
+  .rew-title { font-size: 22px !important; }
+  #s-reward > div:nth-child(2) { font-size: 12px !important; }
+  .rew-cards {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 14px !important;
+  }
+  .rew-wrap .gcard {
+    width: 115px !important;
+    height: 172px !important;
+  }
+
+  /* ── TIENDA ── */
+  #s-shop {
+    padding: 20px 14px 80px !important;
+    gap: 14px !important;
+    overflow-y: auto !important;
+  }
+  .shop-stock {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 14px !important;
+  }
+  .gold-disp { font-size: 16px !important; }
+  .shop-price { font-size: 13px !important; }
+
+  /* ── DESCANSO ── */
+  #s-rest { gap: 14px !important; padding: 20px !important; }
+  #s-rest > div:nth-child(2) { font-size: 13px !important; text-align: center !important; }
+  .rest-opts { flex-direction: column !important; gap: 12px !important; align-items: center !important; }
+  .rest-opt  { width: 260px !important; padding: 18px 16px !important; }
+  .rest-opt .r-ico { font-size: 30px !important; }
+  .rest-opt h3     { font-size: 15px !important; }
+  .rest-opt p      { font-size: 13px !important; }
+
+  /* ── COFRE ── */
+  #s-chest { padding: 20px 16px !important; gap: 14px !important; }
+  .chest-title { font-size: 18px !important; }
+  .chest-desc  { font-size: 13px !important; }
+
+  /* ── FIN / GAME OVER ── */
+  #s-over, #s-win { padding: 20px !important; gap: 12px !important; }
+  .over-title { font-size: 38px !important; }
+  .win-title  { font-size: 28px !important; }
+  #overStats, #winStats { font-size: 10px !important; letter-spacing: 1.5px !important; text-align: center !important; }
+
+  /* ── CRÉDITOS ── */
+  #s-credits { padding: 20px !important; }
+  .credits-wrap { padding: 20px 14px !important; gap: 8px !important; }
+  .cr-big  { font-size: clamp(16px, 5vw, 24px) !important; }
+  .cr-med  { font-size: 17px !important; }
+  .cr-name { font-size: 18px !important; }
+  .cr-sub  { font-size: 9px !important; letter-spacing: 3px !important; }
+  .cr-quote{ font-size: 13px !important; line-height: 1.8 !important; }
+
+  /* ── PERSONALIZACIÓN ── */
+  #s-custom { padding: 14px 10px 80px !important; overflow-y: auto !important; }
+  .csecs { flex-direction: column !important; gap: 12px !important; }
+  .csec  { padding: 12px !important; width: 100% !important; }
+  .csec-t{ font-size: 8px !important; }
+  .cards-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
+
+  /* ── OVERLAYS (stats, post-act3) ── */
+  #statsOverlay > div {
+    max-width: 96vw !important;
+    max-height: 88vh !important;
+    padding: 20px 16px !important;
+    margin: 0 8px !important;
+  }
+  #statsOverlay > div > div { font-size: 10px !important; }
+  #statsOverlay > div > div > div { font-size: 10px !important; }
+
+  #postAct3Overlay > div {
+    max-width: 94vw !important;
+    padding: 28px 20px !important;
+  }
+
+  /* Name overlay */
+  .name-modal { padding: 28px 20px !important; max-width: 94vw !important; }
+  .name-title { font-size: 17px !important; }
+  .name-input { font-size: 13px !important; padding: 9px 12px !important; }
+
+  /* ── SCROLLBARS ocultos globalmente en móvil ── */
+  * { scrollbar-width: none !important; }
+  *::-webkit-scrollbar { display: none !important; }
+}
+
+
+/* ════════════════════════════════════════════════
+   MÓVIL LANDSCAPE (≤ 640px ancho, orientación horizontal)
+   ════════════════════════════════════════════════ */
+@media (max-width: 640px) and (orientation: landscape) {
+  /* En landscape el juego es más cómodo con sprites más pequeños */
+  .enemy-wrap .e-sprite { width: 80px !important; height: 106px !important; }
+  .hand-zone { height: 158px !important; }
+  .gcard     { width: 92px !important; height: 140px !important; }
+  .e-zone    { flex: 1 !important; }
+
+  /* El panel izquierdo ocupa menos altura */
+  .p-left { padding: 5px 10px !important; gap: 5px !important; }
+  .bar-wrap{ height: 7px !important; }
+  .stat-nums { font-size: 11px !important; }
+  .bot-bar { height: 50px !important; }
+}
+
+
+/* ════════════════════════════════════════════════
+   MÓVIL MUY PEQUEÑO (≤ 380px, iPhone SE, etc.)
+   ════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .t-main  { font-size: 30px !important; }
+  .gcard   { width: 90px !important; height: 138px !important; }
+  .enemy-wrap .e-sprite { width: 82px !important; height: 108px !important; }
+  .mnode   { width: 68px !important; height: 58px !important; }
+  .n-ico   { font-size: 19px !important; }
+  .char-card { width: 152px !important; min-width: 152px !important; }
+  .rest-opt { width: 230px !important; }
+}

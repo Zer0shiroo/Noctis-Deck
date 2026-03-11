@@ -1530,16 +1530,180 @@ function injectStatsButton() {
 }
 
 // ═══════════════════════════════════════════════
+//  MOBILE ENHANCEMENTS
+// ═══════════════════════════════════════════════
+const isMobile = () => window.innerWidth <= 640;
+
+// ─── LOG OVERLAY BUTTON (mobile only) ──────────
+// Shows the combat log in a bottom sheet since p-right is hidden
+function injectMobileLogBtn() {
+  if(!isMobile()) return;
+  if(document.getElementById('mobileLogBtn')) return;
+
+  // Floating log button
+  const btn = document.createElement('button');
+  btn.id = 'mobileLogBtn';
+  btn.innerHTML = '📜';
+  btn.style.cssText = `
+    position:fixed;bottom:68px;right:12px;
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,#1a1228,#0e0b18);
+    border:1px solid var(--gold);color:var(--gold);
+    font-size:20px;cursor:pointer;z-index:500;
+    box-shadow:0 0 14px #c9984a44;
+    display:none;align-items:center;justify-content:center;
+    transition:all .2s;
+  `;
+  btn.onclick = toggleMobileLog;
+  document.body.appendChild(btn);
+
+  // Bottom sheet overlay
+  const sheet = document.createElement('div');
+  sheet.id = 'mobileLogSheet';
+  sheet.style.cssText = `
+    position:fixed;bottom:0;left:0;right:0;
+    background:linear-gradient(0deg,#0e0b18,#13101e);
+    border-top:1px solid var(--border);
+    border-radius:16px 16px 0 0;
+    padding:16px 16px 24px;
+    z-index:600;
+    max-height:55vh;
+    overflow-y:auto;
+    transform:translateY(100%);
+    transition:transform .32s cubic-bezier(.32,1,.28,1);
+    display:block;
+  `;
+  sheet.innerHTML = `
+    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;"></div>
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:10px">📜 Registro de Combate</div>
+    <div id="mobileLogContent" style="font-size:12px;color:var(--fog);display:flex;flex-direction:column;gap:4px;"></div>
+    <div style="margin-top:12px;text-align:center">
+      <button class="btn-sm" onclick="toggleMobileLog()">Cerrar</button>
+    </div>
+  `;
+  document.body.appendChild(sheet);
+
+  // Backdrop
+  const bd = document.createElement('div');
+  bd.id = 'mobileLogBackdrop';
+  bd.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:595;display:none;';
+  bd.onclick = toggleMobileLog;
+  document.body.appendChild(bd);
+}
+
+function toggleMobileLog() {
+  const sheet = document.getElementById('mobileLogSheet');
+  const bd    = document.getElementById('mobileLogBackdrop');
+  const log   = document.getElementById('clog');
+  if(!sheet) return;
+
+  const open = sheet.style.transform === 'translateY(0px)' || sheet.style.transform === 'translateY(0%)';
+  if(!open) {
+    // Sync content from main log
+    const content = document.getElementById('mobileLogContent');
+    if(content && log) content.innerHTML = log.innerHTML;
+    sheet.style.transform = 'translateY(0)';
+    bd.style.display = 'block';
+  } else {
+    sheet.style.transform = 'translateY(100%)';
+    bd.style.display = 'none';
+  }
+}
+
+function showMobileLogBtn(visible) {
+  const btn = document.getElementById('mobileLogBtn');
+  if(btn) btn.style.display = visible ? 'flex' : 'none';
+}
+
+// ─── RELICS MOBILE OVERLAY ─────────────────────
+// On mobile, relics are hidden from left panel; show them via tapping gold area
+function injectMobileRelicsIndicator() {
+  if(!isMobile()) return;
+  // Append a small relics peek to the top bar when in combat
+  // handled by CSS showing gold row compact
+}
+
+// ─── SWIPE TO DISMISS OVERLAYS ─────────────────
+function addSwipeHandlers() {
+  let startY = 0;
+  document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    const sheet = document.getElementById('mobileLogSheet');
+    if(sheet && dy > 60 && sheet.style.transform === 'translateY(0)') {
+      toggleMobileLog();
+    }
+  }, {passive:true});
+}
+
+// ─── PATCH show() TO SHOW/HIDE MOBILE LOG BTN ──
+const _origShow = show;
+window.show = function(id) {
+  _origShow(id);
+  showMobileLogBtn(id === 'game');
+  // Close log sheet when leaving combat
+  if(id !== 'game') {
+    const sheet = document.getElementById('mobileLogSheet');
+    const bd    = document.getElementById('mobileLogBackdrop');
+    if(sheet) sheet.style.transform = 'translateY(100%)';
+    if(bd)    bd.style.display = 'none';
+  }
+};
+
+// ─── PREVENT DOUBLE-TAP ZOOM ON BUTTONS ────────
+function preventDoubleTapZoom() {
+  let lastTap = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if(now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, {passive:false});
+}
+
+// ─── VIEWPORT HEIGHT FIX (100vh on mobile) ─────
+function fixMobileVh() {
+  const setVh = () => {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  };
+  setVh();
+  window.addEventListener('resize', setVh);
+  window.addEventListener('orientationchange', () => setTimeout(setVh, 200));
+}
+
+// ─── INIT MOBILE ───────────────────────────────
+function initMobile() {
+  if(!isMobile()) return;
+  injectMobileLogBtn();
+  addSwipeHandlers();
+  preventDoubleTapZoom();
+  fixMobileVh();
+  // Patch body height to use real viewport height
+  document.body.style.height = '100dvh';
+  document.getElementById('app').style.height = '100dvh';
+}
+
+// ═══════════════════════════════════════════════
+//  INJECT STATS BUTTON INTO TITLE + PATCH HTML
+// ═══════════════════════════════════════════════
+function injectStatsButton() {
+  const tBtns = document.querySelector('.t-btns');
+  if(!tBtns || document.getElementById('btnStats')) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-top:4px';
+  row.innerHTML = `<button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>`;
+  const smRow = tBtns.querySelector('div');
+  if(smRow) tBtns.insertBefore(row, smRow);
+  else tBtns.appendChild(row);
+}
+
+// ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
 loadCustom();
 updateTitle();
 injectStatsButton();
+initMobile();
 
-
-
-
-//deshabilitar inspeccion
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
   if(e.key === 'F12') e.preventDefault();
