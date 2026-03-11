@@ -2088,4 +2088,4 @@ loadCustom();
 updateTitle();
 injectStatsButton();
 initMobile();
-
+document.addEventListener('contextmenu', e => e.preventDefault()); document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault(); if(e.ctrlKey && e.key === 'U') e.preventDefault(); }); 
