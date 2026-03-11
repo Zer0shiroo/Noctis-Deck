@@ -1,5 +1,23 @@
+// ═══════════════════════════════════════════════
+//  FOG PARTICLES
+// ═══════════════════════════════════════════════
 (()=>{const l=document.getElementById('fogL');for(let i=0;i<8;i++){const p=document.createElement('div');p.className='fog-p';const s=180+Math.random()*380;p.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:-${s}px;animation-duration:${22+Math.random()*26}s;animation-delay:${Math.random()*16}s`;l.appendChild(p)}})();
 
+// ═══════════════════════════════════════════════
+//  VICTORIAN GOTHIC NAMES
+// ═══════════════════════════════════════════════
+const GOTHIC_NAMES = [
+  'Alistair Voss','Seraphina Mourne','Dorian Ashwick','Isolde Blackthorn',
+  'Edmund Graye','Vivienne Croft','Ambrose Sinclair','Morwenna Drake',
+  'Cornelius Fenn','Lady Maria','Barnabas Crow','Lucinda Hex',
+  'Thaddeus Wren','Rosalind Grimm','Aldous Night','Cecelia Dusk',
+  'Flavian Morte','Arabella Tomb','Gideon Pale','Constance Webb'
+];
+const DEFAULT_HERO_NAME = 'Alistair Voss';
+
+// ═══════════════════════════════════════════════
+//  IMAGES
+// ═══════════════════════════════════════════════
 const DEFAULT_IMGS = {
   char_cazador:   'resources/personajes/cazadora.jpg',
   char_hechicera: 'resources/personajes/maga.jpg',
@@ -17,12 +35,14 @@ const DEFAULT_IMGS = {
   card_cloud:     'resources/cartas/nube venenosa.jpg',
   card_smite:     'resources/cartas/golpe sagrado.jpg',
   card_retaliate: 'resources/cartas/cartarepresalia.jpg',
-  card_mend:      'resources/cartas/susurro vital.jpg',   // ← pon aquí tu ruta de imagen para "Susurro Vital"
+  card_mend:      'resources/cartas/susurro vital.jpg',
 };
-
 let CUSTOM={};
 function getImg(k){return CUSTOM[k]||DEFAULT_IMGS[k]||null}
 
+// ═══════════════════════════════════════════════
+//  CHARACTERS
+// ═══════════════════════════════════════════════
 const CHARS=[
   {id:'cazador',name:'El Cazador',title:'Maestro del Filo',imgKey:'char_cazador',hp:75,mana:3,
    passive:'Sangre por Sangre: al aplicar Sangrado, +1 daño extra.',pid:'bleed_bonus',
@@ -41,6 +61,9 @@ const CHARS=[
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="26" ry="4" fill="#00000033"/><ellipse cx="50" cy="55" rx="28" ry="50" fill="#1a2a3a88" stroke="#4a8aaa55" stroke-width="1"/><circle cx="50" cy="28" r="14" fill="#1a2a3a" stroke="#4a8aaa88" stroke-width="1.5"/><circle cx="44" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="56" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="44" cy="26" r="2.5" fill="#4a8aaa88"/><circle cx="56" cy="26" r="2.5" fill="#4a8aaa88"/><path d="M30 45 Q14 58 18 80 Q28 70 30 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M70 45 Q86 58 82 80 Q72 70 70 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M36 100 Q50 118 64 100 Q58 112 50 110 Q42 112 36 100Z" fill="#1a2a3a88" stroke="#4a8aaa44"/></svg>`},
 ];
 
+// ═══════════════════════════════════════════════
+//  CARDS
+// ═══════════════════════════════════════════════
 const CARDS=[
   {id:'strike',  name:'Golpe Sombrío',   type:'attack', cost:1,dmg:6, blk:0,bleed:0,psn:0,desc:'Golpe veloz con tu filo.'},
   {id:'slash',   name:'Tajo Cruento',    type:'attack', cost:2,dmg:10,blk:0,bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
@@ -55,22 +78,60 @@ const CARDS=[
   {id:'mend',    name:'Susurro Vital',   type:'skill',  cost:1,dmg:0, blk:0, bleed:0,psn:0,heal:8, desc:'Recupera 8 de Vitalidad.'},
 ];
 
-const ENM={
-  0:[{name:'Rata Espectral',hp:22,dmg:6,bleed:0,psn:0,rw:10},{name:'Mendigo Maldito',hp:20,dmg:7,bleed:0,psn:0,rw:10},{name:'Sombra Errante',hp:24,dmg:5,bleed:2,psn:0,rw:12}],
-  1:[{name:'Guardia Corrompido',hp:40,dmg:11,bleed:0,psn:0,rw:20},{name:'Heraldo de Niebla',hp:36,dmg:12,bleed:0,psn:2,rw:22},{name:'Vampiro Menor',hp:44,dmg:10,bleed:3,psn:0,rw:20}],
-  2:[{name:'El Conde Sombrío',hp:80,dmg:18,bleed:3,psn:0,rw:50},{name:'Madre de Niebla',hp:75,dmg:15,bleed:0,psn:4,rw:50}],
+// ═══════════════════════════════════════════════
+//  ENEMIES — grupos: normal 2-3, elite 2 normales+1 elite o 2 elites, boss solo
+// ═══════════════════════════════════════════════
+const ENM_TEMPLATES = {
+  normal: [
+    {name:'Rata Espectral',   hp:18,dmg:5, bleed:0,psn:0,rw:6},
+    {name:'Mendigo Maldito',  hp:16,dmg:6, bleed:0,psn:0,rw:6},
+    {name:'Sombra Errante',   hp:20,dmg:4, bleed:1,psn:0,rw:7},
+    {name:'Lacayo Corrupto',  hp:17,dmg:5, bleed:0,psn:1,rw:6},
+    {name:'Espectro Callejero',hp:15,dmg:7,bleed:0,psn:0,rw:7},
+  ],
+  elite: [
+    {name:'Guardia Corrompido',hp:38,dmg:11,bleed:0,psn:0,rw:18},
+    {name:'Heraldo de Niebla', hp:34,dmg:12,bleed:0,psn:2,rw:20},
+    {name:'Vampiro Menor',     hp:40,dmg:10,bleed:3,psn:0,rw:18},
+  ],
+  boss: [
+    {name:'El Conde Sombrío',  hp:80,dmg:18,bleed:3,psn:0,rw:50},
+    {name:'Madre de Niebla',   hp:75,dmg:15,bleed:0,psn:4,rw:50},
+  ]
 };
+
+function buildEnemyGroup(tier) {
+  const rnd = t => ENM_TEMPLATES[t][Math.floor(Math.random()*ENM_TEMPLATES[t].length)];
+  const mkE = (tpl, ti) => ({...tpl, maxHp:tpl.hp, block:0, bleed:0, poison:0, tier:ti, dead:false});
+
+  if(tier === 0) {
+    // Normal: grupo de 2 o 3
+    const count = Math.random() < 0.4 ? 3 : 2;
+    return Array.from({length:count}, () => mkE(rnd('normal'), 0));
+  } else if(tier === 1) {
+    // Elite: 2 normales + 1 elite, o 2 elites
+    if(Math.random() < 0.5) {
+      return [mkE(rnd('normal'),0), mkE(rnd('normal'),0), mkE(rnd('elite'),1)];
+    } else {
+      return [mkE(rnd('elite'),1), mkE(rnd('elite'),1)];
+    }
+  } else {
+    // Boss: siempre solo
+    return [mkE(rnd('boss'), 2)];
+  }
+}
 
 // ═══════════════════════════════════════════════
 //  SAVE / LOAD
 // ═══════════════════════════════════════════════
-const SK='noctis_v3';
+const SK='noctis_v4';
 function saveG(){
   if(!G||!G.player)return;
   try{
     localStorage.setItem(SK,JSON.stringify({
       difficulty:G.difficulty,
       charId:G.charId,
+      heroName:G.heroName,
       turn:G.turn,
       gold:G.gold,
       player:{
@@ -113,11 +174,16 @@ function loadCustom(){
 let G={difficulty:0};
 let selChar=null;
 
-function newRun(cid){
+// Mano persistente entre turnos — max 6, max 2 iguales
+const MAX_HAND = 6;
+const MAX_SAME = 2;
+
+function newRun(cid, heroName){
   const ch=CHARS.find(c=>c.id===cid);
   G={
     difficulty:G.difficulty||0,
     charId:cid,
+    heroName: heroName||DEFAULT_HERO_NAME,
     turn:1,
     gold:0,
     player:{
@@ -125,9 +191,10 @@ function newRun(cid){
       block:0,bleed:0,poison:0,
       deck:[...ch.deck],hand:[],discard:[]
     },
-    enemy:null,
+    enemies:[],
+    targetIdx:0,
     map:genMap(),
-    path:{act:0,row:0,col:null},  // col=null → pendiente de elegir
+    path:{act:0,row:0,col:null},
     firstHitUsed:false
   };
   saveG();
@@ -137,6 +204,7 @@ function restoreRun(d){
   G={
     difficulty:d.difficulty||0,
     charId:d.charId,
+    heroName:d.heroName||DEFAULT_HERO_NAME,
     turn:d.turn,
     gold:d.gold,
     player:{
@@ -151,7 +219,8 @@ function restoreRun(d){
       hand:[...(d.player.hand||[])],
       discard:[...(d.player.discard||[])]
     },
-    enemy:null,
+    enemies:[],
+    targetIdx:0,
     map:d.map,
     path:d.path||{act:0,row:0,col:null},
     firstHitUsed:false
@@ -159,9 +228,7 @@ function restoreRun(d){
 }
 
 // ═══════════════════════════════════════════════
-//  MAP GENERATION — Slay the Spire style
-//  Cada acto: 6 filas de 2 nodos + jefe final
-//  El jugador elige uno de los dos nodos por fila
+//  MAP GENERATION
 // ═══════════════════════════════════════════════
 function pickType(row, actNum){
   const d=G.difficulty||0;
@@ -180,8 +247,6 @@ function pickType(row, actNum){
 }
 
 function genMap(){
-  // Estructura: array de actos, cada acto = {rows:[[nodeL,nodeR],...6], boss:node}
-  // G.path = {act, row, col}  col=null mientras no elige
   return Array.from({length:3},(_,ai)=>({
     rows: Array.from({length:6},(_,ri)=>[
       {type:pickType(ri,ai),visited:false},
@@ -209,18 +274,47 @@ function goTitle(){updateTitle();show('title')}
 function updateTitle(){
   const sv=loadG();
   const bc=document.getElementById('btnContinue'),sb=document.getElementById('saveBadge'),bd=document.getElementById('btnDel'),db=document.getElementById('diffBadge');
-  if(sv){bc.style.display='';sb.style.display='';bd.style.display='';const ch=chById(sv.charId);const p=sv.path||{act:0,row:0};sb.textContent=`${ch?ch.name:'?'}  ·  Acto ${(p.act||0)+1}  ·  ${sv.savedAt}`}
+  if(sv){bc.style.display='';sb.style.display='';bd.style.display='';const ch=chById(sv.charId);const p=sv.path||{act:0,row:0};sb.textContent=`${sv.heroName||ch?.name||'?'}  ·  Acto ${(p.act||0)+1}  ·  ${sv.savedAt}`}
   else{bc.style.display='none';sb.style.display='none';bd.style.display='none'}
   db.textContent=(G.difficulty||0)>0?`Dificultad: ${G.difficulty}`:'';
 }
 function goCharSelect(){renderChars();show('chars')}
 
-// FIX BUG 1: Al continuar, restauramos el run y mostramos el mapa sin marcar el nodo como visitado
 function continueGame(){
   const d=loadG();
   if(!d)return;
   restoreRun(d);
   showMap();
+}
+
+// ═══════════════════════════════════════════════
+//  NAME SELECTION SCREEN
+// ═══════════════════════════════════════════════
+function showNameSelect(charId) {
+  const overlay = document.getElementById('nameOverlay');
+  const input   = document.getElementById('nameInput');
+  input.value   = DEFAULT_HERO_NAME;
+  overlay.style.display = 'flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add('active')));
+  overlay.dataset.charId = charId;
+}
+
+function rollRandomName() {
+  const input = document.getElementById('nameInput');
+  const used  = input.value;
+  let name;
+  do { name = GOTHIC_NAMES[Math.floor(Math.random()*GOTHIC_NAMES.length)]; }
+  while(name === used && GOTHIC_NAMES.length > 1);
+  input.value = name;
+}
+
+function confirmName() {
+  const overlay = document.getElementById('nameOverlay');
+  const input   = document.getElementById('nameInput');
+  const charId  = overlay.dataset.charId;
+  const name    = input.value.trim() || DEFAULT_HERO_NAME;
+  overlay.classList.remove('active');
+  setTimeout(()=>{ overlay.style.display='none'; newRun(charId, name); showMap(); }, 350);
 }
 
 // ═══════════════════════════════════════════════
@@ -239,16 +333,13 @@ function renderChars(){
     row.appendChild(card);
   });
 }
-function startRunWithChar(){if(!selChar)return;newRun(selChar);showMap()}
+function startRunWithChar(){if(!selChar)return; showNameSelect(selChar);}
 
 // ═══════════════════════════════════════════════
 //  MAP
 // ═══════════════════════════════════════════════
 function showMap(){renderMap();show('map')}
 
-// ═══════════════════════════════════════════════
-//  MAP RENDER — bifurcaciones estilo Slay the Spire
-// ═══════════════════════════════════════════════
 function renderMap(){
   const c=document.getElementById('mapActs');c.innerHTML='';
   const IC={combat:'⚔',elite:'💀',rest:'🕯',shop:'🛒',boss:'👁',chest:'📦'};
@@ -261,47 +352,28 @@ function renderMap(){
 
     actData.rows.forEach((rowPair,ri)=>{
       const rowEl=document.createElement('div');rowEl.className='map-row';
-
       rowPair.forEach((node,ci)=>{
         const el=document.createElement('div');el.className='mnode';
         if(node.type==='elite')el.classList.add('elite');
         if(node.type==='chest')el.classList.add('chest');
-
-        // Nodo es "elegible ahora" si: es el acto/fila actual Y el jugador aún no eligió (col===null)
         const isChoosable = ai===curAct && ri===curRow && curCol===null;
-        // Nodo es "el elegido actualmente" (jugador entró pero no terminó, ej: cargó partida mid-combat)
         const isActive    = ai===curAct && ri===curRow && curCol===ci && !node.visited;
         const isVis       = node.visited;
-        // El otro nodo de la misma fila fue elegido (esta fila ya está resuelta)
         const siblingChosen = rowPair[1-ci]&&rowPair[1-ci].visited;
-
-        if(isVis){
-          el.classList.add('vis');
-        } else if(isActive){
-          // Nodo actual seleccionado (partida cargada mid-combat) — resaltado especial
-          el.classList.add('cur','cur-active');
-        } else if(isChoosable && !siblingChosen){
-          // Nodo elegible — puede hacer click
-          el.classList.add('cur');
-        } else {
-          el.classList.add('lkd');
-        }
-
+        if(isVis){el.classList.add('vis');}
+        else if(isActive){el.classList.add('cur','cur-active');}
+        else if(isChoosable && !siblingChosen){el.classList.add('cur');}
+        else{el.classList.add('lkd');}
         el.innerHTML=`<div class="n-ico">${IC[node.type]||'?'}</div><div class="n-lbl">${LABEL[node.type]||node.type}</div>`;
-
-        if((isChoosable && !siblingChosen) || isActive){
-          el.addEventListener('click',()=>enterNode(ai,ri,ci));
-        }
+        if((isChoosable && !siblingChosen) || isActive){el.addEventListener('click',()=>enterNode(ai,ri,ci));}
         rowEl.appendChild(el);
       });
-
       col.appendChild(rowEl);
       if(ri<actData.rows.length-1){
         const cn=document.createElement('div');cn.className='mconn-h';col.appendChild(cn);
       }
     });
 
-    // Conector y jefe
     const cnBoss=document.createElement('div');cnBoss.className='mconn-h';col.appendChild(cnBoss);
     const bossEl=document.createElement('div');bossEl.className='mnode boss';
     const isBossCur    = ai===curAct && curRow===6 && curCol===null;
@@ -314,7 +386,6 @@ function renderMap(){
     bossEl.innerHTML=`<div class="n-ico">👁</div><div class="n-lbl">JEFE</div>`;
     if(isBossCur||isBossActive)bossEl.addEventListener('click',()=>enterNode(ai,6,0));
     col.appendChild(bossEl);
-
     c.appendChild(col);
   });
 }
@@ -337,16 +408,12 @@ function enterNode(ai,ri,ci){
 
 function advance(){
   const {act,row,col}=G.path;
-  // Marcar nodo actual como visitado
   if(row===6){G.map[act].boss.visited=true;}
   else if(col!==null){G.map[act].rows[row][col].visited=true;}
-
   const nextRow=row+1;
-  // ¿Acaba el acto? (jefe completado = row 6)
   if(row===6){
     const nextAct=act+1;
     if(nextAct>=G.map.length){
-      // Victoria — mostrar créditos
       G.difficulty++;
       localStorage.removeItem(SK);
       showCredits();
@@ -361,30 +428,83 @@ function advance(){
 }
 
 // ═══════════════════════════════════════════════
+//  DRAW — persistent hand, max 6, max 2 same
+// ═══════════════════════════════════════════════
+function countInHand(cardId) {
+  return G.player.hand.filter(id => id === cardId).length;
+}
+
+function canAddToHand(cardId) {
+  if(G.player.hand.length >= MAX_HAND) return false;
+  if(countInHand(cardId) >= MAX_SAME) return false;
+  return true;
+}
+
+// Draw up to fill, respecting constraints
+function drawUpTo(target) {
+  const p = G.player;
+  let attempts = 0;
+  const maxAttempts = (p.deck.length + p.discard.length) * 2 + 10;
+
+  while(p.hand.length < target && attempts < maxAttempts) {
+    attempts++;
+    if(!p.deck.length) {
+      if(!p.discard.length) break;
+      p.deck = shuf([...p.discard]);
+      p.discard = [];
+      addLog('Mazo repuesto.','sta');
+    }
+    // Peek top card
+    const nextId = p.deck[p.deck.length - 1];
+    if(canAddToHand(nextId)) {
+      p.hand.push(p.deck.pop());
+    } else {
+      // Try to find an eligible card in the deck
+      let found = false;
+      for(let i = p.deck.length - 2; i >= 0; i--) {
+        if(canAddToHand(p.deck[i])) {
+          p.hand.push(p.deck.splice(i, 1)[0]);
+          found = true;
+          break;
+        }
+      }
+      if(!found) break; // Can't add more, all eligible slots filled
+    }
+  }
+}
+
+// Max hand size based on total cards available
+function getMaxHand() {
+  const p = G.player;
+  const totalCards = p.deck.length + p.discard.length + p.hand.length;
+  if(totalCards <= 2) return 4;   // 2 cartas → max 4 en mano (2 de c/u)
+  return MAX_HAND;
+}
+
+// ═══════════════════════════════════════════════
 //  COMBAT
 // ═══════════════════════════════════════════════
 function startCombat(tier){
-  const pool=ENM[tier];const t=pool[Math.floor(Math.random()*pool.length)];
-  G.enemy={...t,maxHp:t.hp,block:0,bleed:0,poison:0,tier};
-  G.turn=1;G.firstHitUsed=false;
-  const p=G.player;
-  p.block=0;
-  p.mana=p.maxMana;
-  // FIX BUG 2: Al iniciar combate, si hay cartas en mano las devolvemos al mazo
-  // (por si se cargó partida con cartas en mano de un turno anterior)
-  if(p.hand.length>0){
-    p.discard.push(...p.hand);
-    p.hand=[];
-  }
-  draw(5);
+  G.enemies = buildEnemyGroup(tier);
+  G.targetIdx = 0;
+  G.turn = 1;
+  G.firstHitUsed = false;
+  const p = G.player;
+  p.block = 0;
+  p.mana = p.maxMana;
+  // Keep hand between combats — just draw up to fill
+  drawUpTo(getMaxHand());
   applyPort();
-  const ch=chById(G.charId);
-  document.getElementById('passiveInfo').textContent=ch?ch.passive:'';
-  document.getElementById('charBadge').textContent=ch?ch.name:'';
-  renderE();renderHand();renderPS();updMana();
-  document.getElementById('turnLbl').textContent='Turno 1';
-  document.getElementById('clog').innerHTML='';
-  addLog(`¡${G.enemy.name} aparece!`,'ene');
+  const ch = chById(G.charId);
+  document.getElementById('passiveInfo').textContent = ch ? ch.passive : '';
+  document.getElementById('charBadge').textContent = G.heroName || (ch ? ch.name : '');
+  renderEnemies();
+  renderHand();
+  renderPS();
+  updMana();
+  document.getElementById('turnLbl').textContent = 'Turno 1';
+  document.getElementById('clog').innerHTML = '';
+  addLog(`¡Combate! ${G.enemies.map(e=>e.name).join(', ')}`, 'ene');
   show('game');
 }
 
@@ -395,41 +515,54 @@ function applyPort(){
   pc.innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${ch.svg}</div>`;
 }
 
-function draw(n=5){
-  const p=G.player;
-  for(let i=0;i<n;i++){
-    if(!p.deck.length){
-      if(!p.discard.length)break;
-      // FIX BUG 2: Al barajar el descarte, usamos spread para crear un nuevo array independiente
-      p.deck=shuf([...p.discard]);
-      p.discard=[];
-      addLog('Mazo repuesto.','sta');
-    }
-    p.hand.push(p.deck.pop());
-  }
-}
+// ═══════════════════════════════════════════════
+//  RENDER ENEMIES (multi-target)
+// ═══════════════════════════════════════════════
+function renderEnemies() {
+  const zone = document.getElementById('eZone');
+  if(!zone) return;
+  zone.innerHTML = '';
+  G.enemies.forEach((e, i) => {
+    if(e.dead) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'enemy-wrap' + (i === G.targetIdx ? ' enemy-targeted' : '');
+    wrap.dataset.idx = i;
 
-function renderE(){
-  const e=G.enemy;
-  document.getElementById('eName').textContent=e.name;
-  document.getElementById('eHpBar').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
-  document.getElementById('eHpTxt').textContent=`${Math.max(0,e.hp)} / ${e.maxHp}`;
-  document.getElementById('eIntent').textContent=`⚔ Prepara ataque de ${e.dmg}`;
-  document.getElementById('eSprite').innerHTML=getESVG(e.name,e.tier||0);
-  const st=document.getElementById('eStat');st.innerHTML='';
-  if(e.block)st.innerHTML+=`<span class="si si-bk">🛡 ${e.block}</span>`;
-  if(e.bleed)st.innerHTML+=`<span class="si si-bl">🩸 ${e.bleed}</span>`;
-  if(e.poison)st.innerHTML+=`<span class="si si-ps">☠ ${e.poison}</span>`;
+    const hpPct = Math.max(0, e.hp / e.maxHp * 100);
+    const imgHtml = getImg('enemy' + (e.tier||0))
+      ? `<img src="${getImg('enemy'+(e.tier||0))}" style="width:100%;height:100%;object-fit:contain">`
+      : getESVG(e.name, e.tier||0);
+
+    let statusHtml = '';
+    if(e.block)  statusHtml += `<span class="si si-bk">🛡 ${e.block}</span>`;
+    if(e.bleed)  statusHtml += `<span class="si si-bl">🩸 ${e.bleed}</span>`;
+    if(e.poison) statusHtml += `<span class="si si-ps">☠ ${e.poison}</span>`;
+
+    wrap.innerHTML = `
+      <div class="e-name">${e.name}</div>
+      <div class="e-sprite" id="eSprite${i}">${imgHtml}</div>
+      <div class="e-hp-wrap">
+        <div class="e-hp-bar" id="eHpBar${i}" style="width:${hpPct}%"></div>
+        <div class="e-hp-txt">${Math.max(0,e.hp)} / ${e.maxHp}</div>
+      </div>
+      <div class="e-intent">⚔ Ataque: ${e.dmg}</div>
+      <div class="si-wrap" style="justify-content:center;margin-top:3px">${statusHtml}</div>
+      <div class="target-indicator">${i===G.targetIdx?'▼ OBJETIVO ▼':''}</div>
+    `;
+    wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
+    zone.appendChild(wrap);
+  });
 }
 
 function getESVG(name,tier){
-  const img=getImg('enemy'+tier);
-  if(img)return`<img src="${img}" style="width:100%;height:100%;object-fit:contain">`;
   if(tier===2)return`<svg viewBox="0 0 130 168" fill="none"><ellipse cx="65" cy="134" rx="42" ry="7" fill="#00000066"/><rect x="38" y="64" width="54" height="74" rx="7" fill="#1a0a28" stroke="#7a1f3566" stroke-width="1.5"/><path d="M38 79 Q18 69 16 95 Q26 85 38 91" fill="#130820"/><path d="M92 79 Q112 69 114 95 Q104 85 92 91" fill="#130820"/><ellipse cx="65" cy="53" rx="22" ry="24" fill="#1a0a28" stroke="#7a1f3588" stroke-width="1.5"/><circle cx="55" cy="49" r="7" fill="#0a0510" stroke="#c0304066"/><circle cx="75" cy="49" r="7" fill="#0a0510" stroke="#c0304066"/><circle cx="55" cy="49" r="4" fill="#c0304088"/><circle cx="75" cy="49" r="4" fill="#c0304088"/><path d="M52 64 Q65 72 78 64" stroke="#7a1f35" stroke-width="1.5" fill="none"/><path d="M43 30 Q65 14 87 30" stroke="#c9984a66" stroke-width="1.5" fill="none"/><line x1="52" y1="30" x2="44" y2="14" stroke="#c9984a55"/><line x1="78" y1="30" x2="86" y2="14" stroke="#c9984a55"/><line x1="65" y1="30" x2="65" y2="10" stroke="#c9984a55"/></svg>`;
   if(tier===1)return`<svg viewBox="0 0 130 168" fill="none"><ellipse cx="65" cy="137" rx="36" ry="6" fill="#00000066"/><rect x="40" y="74" width="50" height="65" rx="6" fill="#1a1028" stroke="#3a1a4a66" stroke-width="1.5"/><path d="M40 85 Q22 77 20 99 Q32 91 40 97" fill="#130c1e"/><path d="M90 85 Q108 77 110 99 Q98 91 90 97" fill="#130c1e"/><ellipse cx="65" cy="59" rx="20" ry="22" fill="#1a1028" stroke="#3a1a4a88" stroke-width="1.5"/><circle cx="56" cy="55" r="6" fill="#0a0812" stroke="#5a1a7a66"/><circle cx="74" cy="55" r="6" fill="#0a0812" stroke="#5a1a7a66"/><circle cx="56" cy="55" r="3" fill="#7a40aa88"/><circle cx="74" cy="55" r="3" fill="#7a40aa88"/><path d="M58 67 Q65 73 72 67" stroke="#5a1a7a" stroke-width="1.5" fill="none"/><line x1="62" y1="69" x2="60" y2="74" stroke="#c0304088" stroke-width="1.5"/><line x1="68" y1="69" x2="70" y2="74" stroke="#c0304088" stroke-width="1.5"/></svg>`;
   return`<svg viewBox="0 0 130 168" fill="none"><ellipse cx="65" cy="141" rx="28" ry="5" fill="#00000066"/><circle cx="65" cy="64" r="28" fill="#1a1428" stroke="#2a1a3a88" stroke-width="1.5"/><circle cx="55" cy="59" r="7" fill="#0a0810" stroke="#4a2a6a66"/><circle cx="75" cy="59" r="7" fill="#0a0810" stroke="#4a2a6a66"/><circle cx="55" cy="59" r="3.5" fill="#5a3a8888"/><circle cx="75" cy="59" r="3.5" fill="#5a3a8888"/><path d="M53 72 Q65 80 77 72" stroke="#3a1a4a" stroke-width="1.5" fill="none"/><rect x="47" y="92" width="36" height="40" rx="4" fill="#13101e" stroke="#2a1a3a66"/><path d="M47 102 Q32 94 30 112 Q38 106 47 110" fill="#0f0c1a"/><path d="M83 102 Q98 94 100 112 Q92 106 83 110" fill="#0f0c1a"/></svg>`;
 }
 
+// ═══════════════════════════════════════════════
+//  RENDER HAND
+// ═══════════════════════════════════════════════
 function renderHand(){
   const zone=document.getElementById('handZone');zone.innerHTML='';
   const p=G.player,n=p.hand.length;
@@ -463,78 +596,255 @@ function getCArt(card){
   return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="18" fill="#3a1a5a44" stroke="#7a3acc" stroke-width="1.5"/><circle cx="30" cy="30" r="8" fill="#7a3acc44" stroke="#9a5aee" stroke-width="1"/>${card.id==='ritual'?'<path d="M22 38 Q30 28 38 38 Q34 45 30 42 Q26 45 22 38Z" fill="#c0304044" stroke="#c03040"/>':''}${card.id==='cloud'?'<circle cx="20" cy="35" r="5" fill="#5a8a3044"/><circle cx="30" cy="32" r="7" fill="#5a8a3066"/><circle cx="40" cy="35" r="5" fill="#5a8a3044"/>':''}</svg>`;
 }
 
+// ═══════════════════════════════════════════════
+//  PLAY CARD
+// ═══════════════════════════════════════════════
 function playCard(hi){
-  const p=G.player,e=G.enemy,id=p.hand[hi],card=cById(id);
+  const p=G.player;
+  const id=p.hand[hi];
+  const card=cById(id);
+  const e=G.enemies[G.targetIdx];
   if(!card||card.cost>p.mana)return;
+  if(!e||e.dead){
+    // Auto-select alive enemy
+    const alive = G.enemies.findIndex(en=>!en.dead);
+    if(alive>=0) G.targetIdx=alive;
+    else return;
+  }
+  const target = G.enemies[G.targetIdx];
+
   p.mana-=card.cost;
-  // FIX BUG 2: Eliminamos exactamente UN elemento en la posición hi (no usamos filter que podría eliminar duplicados)
   p.hand.splice(hi,1);
   p.discard.push(id);
   let msg=`Jugaste: ${card.name}`;
-  if(card.dmg){let d=card.dbl?card.dmg*2:card.dmg;if(card.bleed&&G.charId==='cazador')d++;const ab=Math.min(e.block,d);e.block=Math.max(0,e.block-d);const nd=d-ab;e.hp=Math.max(0,e.hp-nd);msg+=` · ${nd} daño`;spawnN(nd,'en')}
-  if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk')}
-  if(card.bleed){e.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`}
-  if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;e.poison+=ps;msg+=` · ${ps} veneno`}
-  if(card.heal){const h=Math.min(p.maxHp,p.hp+card.heal)-p.hp;p.hp+=h;msg+=` · +${h} vida`;spawnN(h,'hl')}
-  addLog(msg,'sta');renderHand();renderE();renderPS();updMana();
-  if(e.hp<=0)setTimeout(()=>combatWin(),400);
+
+  if(card.dmg){
+    let d=card.dbl?card.dmg*2:card.dmg;
+    if(card.bleed&&G.charId==='cazador')d++;
+    const ab=Math.min(target.block,d);
+    target.block=Math.max(0,target.block-d);
+    const nd=d-ab;
+    target.hp=Math.max(0,target.hp-nd);
+    msg+=` · ${nd} daño`;
+    animateAttack(G.targetIdx, nd);
+  }
+  if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');}
+  if(card.bleed){target.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`;}
+  if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;target.poison+=ps;msg+=` · ${ps} veneno`;}
+  if(card.heal){
+    const h=Math.min(p.maxHp,p.hp+card.heal)-p.hp;
+    p.hp+=h;
+    msg+=` · +${h} vida`;
+    animateHeal(h);
+  }
+  addLog(msg,'sta');
+
+  // Check if targeted enemy died
+  if(target.hp<=0){
+    target.dead=true;
+    const alive=G.enemies.filter(en=>!en.dead);
+    if(alive.length===0){
+      renderHand();renderEnemies();renderPS();updMana();
+      setTimeout(()=>combatWin(),400);
+      return;
+    } else {
+      // Move target to next alive
+      G.targetIdx=G.enemies.findIndex(en=>!en.dead);
+    }
+  }
+
+  renderHand();renderEnemies();renderPS();updMana();
 }
 
+// ═══════════════════════════════════════════════
+//  ANIMATIONS
+// ═══════════════════════════════════════════════
+function animateAttack(enemyIdx, dmg) {
+  const spriteEl = document.getElementById('eSprite' + enemyIdx);
+  if(spriteEl) {
+    spriteEl.classList.add('hit-flash');
+    setTimeout(()=>spriteEl.classList.remove('hit-flash'), 500);
+  }
+  // Slash effect overlay
+  const slash = document.createElement('div');
+  slash.className = 'slash-fx';
+  const ref = spriteEl ? spriteEl.getBoundingClientRect() : {left:200,top:200,width:100,height:100};
+  slash.style.left = (ref.left + ref.width/2 - 30) + 'px';
+  slash.style.top  = (ref.top  + ref.height/2 - 30) + 'px';
+  slash.innerHTML = `<svg viewBox="0 0 60 60" fill="none">
+    <line x1="10" y1="10" x2="50" y2="50" stroke="#ff4060" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <line x1="18" y1="8" x2="52" y2="42" stroke="#ff8090" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  </svg>`;
+  document.body.appendChild(slash);
+  setTimeout(()=>slash.remove(), 500);
+
+  spawnN(dmg, 'en', spriteEl);
+}
+
+function animateHeal(amount) {
+  const hpBar = document.getElementById('hpBar');
+  if(hpBar) {
+    const wrap = hpBar.parentElement.parentElement;
+    const healPulse = document.createElement('div');
+    healPulse.className = 'heal-pulse';
+    wrap.style.position = 'relative';
+    wrap.appendChild(healPulse);
+    setTimeout(()=>healPulse.remove(), 800);
+  }
+  // Green particles
+  const portrait = document.getElementById('portrait');
+  if(portrait) {
+    const r = portrait.getBoundingClientRect();
+    for(let i=0;i<5;i++){
+      setTimeout(()=>{
+        const p = document.createElement('div');
+        p.className = 'heal-particle';
+        p.style.left = (r.left + Math.random()*r.width) + 'px';
+        p.style.top  = (r.top  + Math.random()*r.height) + 'px';
+        p.textContent = '✦';
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(), 800);
+      }, i*80);
+    }
+  }
+  spawnN(amount, 'hl');
+}
+
+// ═══════════════════════════════════════════════
+//  END TURN — persistent hand
+// ═══════════════════════════════════════════════
 function endTurn(){
-  const p=G.player,e=G.enemy;
-  // FIX BUG 2: Usamos spread al mover la mano al descarte para no mutar arrays por referencia
-  p.discard.push(...p.hand);
-  p.hand=[];
-  if(e.bleed>0){const d=2;e.hp=Math.max(0,e.hp-d);e.bleed--;addLog(`${e.name} sangra (-${d})`,'ene');spawnN(d,'en')}
-  if(e.poison>0){const d=e.poison;e.hp=Math.max(0,e.hp-d);e.poison=Math.max(0,e.poison-1);addLog(`${e.name} envenena (-${d})`,'ene');spawnN(d,'en')}
-  if(e.hp<=0){renderE();setTimeout(()=>combatWin(),400);return}
-  let actualDmg=e.dmg;
-  if(G.charId==='espectro'&&!G.firstHitUsed){G.firstHitUsed=true;actualDmg=0;addLog('Forma Etérea: golpe evitado!','sta')}
-  const ab=Math.min(p.block,actualDmg);p.block=Math.max(0,p.block-actualDmg);const nd=actualDmg-ab;p.hp=Math.max(0,p.hp-nd);
-  if(nd>0){addLog(`${e.name} golpea por ${nd}`,'ene');spawnN(nd,'pl')}
-  if(p.bleed>0){p.hp=Math.max(0,p.hp-2);p.bleed--}
-  if(p.poison>0){p.hp=Math.max(0,p.hp-p.poison);p.poison=Math.max(0,p.poison-1)}
-  if(p.hp<=0){renderPS();document.getElementById('s-game').classList.add('shake');setTimeout(()=>{document.getElementById('s-game').classList.remove('shake');localStorage.removeItem(SK);document.getElementById('overStats').textContent=`${chById(G.charId).name}  ·  Turno ${G.turn}  ·  Oro: ${G.gold}`;show('over')},400);return}
-  G.turn++;p.block=0;p.mana=p.maxMana;draw(5);
+  const p=G.player;
+  const aliveEnemies = G.enemies.filter(e=>!e.dead);
+
+  // Discard played cards (already done in playCard), keep remaining hand
+  // Apply enemy DoTs
+  aliveEnemies.forEach(e=>{
+    if(e.bleed>0){const d=2;e.hp=Math.max(0,e.hp-d);e.bleed--;addLog(`${e.name} sangra (-${d})`,'ene');animateHit(e);}
+    if(e.poison>0){const d=e.poison+(G.charId==='hechicera'?1:0);e.hp=Math.max(0,e.hp-d);e.poison=Math.max(0,e.poison-1);addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);}
+    if(e.hp<=0)e.dead=true;
+  });
+
+  if(G.enemies.filter(e=>!e.dead).length===0){
+    renderEnemies();
+    setTimeout(()=>combatWin(),400);
+    return;
+  }
+
+  // Each alive enemy attacks
+  aliveEnemies.filter(e=>!e.dead).forEach(e=>{
+    let actualDmg=e.dmg;
+    if(G.charId==='espectro'&&!G.firstHitUsed){
+      G.firstHitUsed=true;actualDmg=0;
+      addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const ab=Math.min(p.block,actualDmg);
+    p.block=Math.max(0,p.block-actualDmg);
+    const nd=actualDmg-ab;
+    p.hp=Math.max(0,p.hp-nd);
+    if(nd>0){addLog(`${e.name} golpea por ${nd}`,'ene');spawnN(nd,'pl');}
+  });
+
+  // Player DoTs
+  if(p.bleed>0){p.hp=Math.max(0,p.hp-2);p.bleed--;}
+  if(p.poison>0){p.hp=Math.max(0,p.hp-p.poison);p.poison=Math.max(0,p.poison-1);}
+
+  if(p.hp<=0){
+    renderPS();
+    document.getElementById('s-game').classList.add('shake');
+    setTimeout(()=>{
+      document.getElementById('s-game').classList.remove('shake');
+      localStorage.removeItem(SK);
+      document.getElementById('overStats').textContent=`${G.heroName}  ·  Turno ${G.turn}  ·  Oro: ${G.gold}`;
+      show('over');
+    },400);
+    return;
+  }
+
+  G.turn++;
+  p.block=0;
+  p.mana=p.maxMana;
+
+  // Draw to fill hand (persistent cards stay, draw to max)
+  drawUpTo(getMaxHand());
+
   document.getElementById('turnLbl').textContent=`Turno ${G.turn}`;
-  saveG();renderHand();renderE();renderPS();updMana();
+  saveG();renderHand();renderEnemies();renderPS();updMana();
+}
+
+function animateHit(e) {
+  const idx = G.enemies.indexOf(e);
+  const el = document.getElementById('eSprite'+idx);
+  if(el){el.classList.add('hit-flash');setTimeout(()=>el.classList.remove('hit-flash'),400);}
 }
 
 function combatWin(){
-  G.gold+=G.enemy.rw;
-  addLog(`¡Victoria! +${G.enemy.rw} oro`,'heal');
+  const totalRw = G.enemies.reduce((sum,e)=>sum+(e.rw||0),0);
+  G.gold+=totalRw;
+  addLog(`¡Victoria! +${totalRw} oro`,'heal');
   saveG();
   showRew();
 }
 
+// ═══════════════════════════════════════════════
+//  RENDER PLAYER STATS + SHIELD DISPLAY
+// ═══════════════════════════════════════════════
 function renderPS(){
   const p=G.player;
   document.getElementById('hpBar').style.width=(p.hp/p.maxHp*100)+'%';
   document.getElementById('hpNum').textContent=Math.max(0,p.hp);
   document.getElementById('mpBar').style.width=(p.mana/p.maxMana*100)+'%';
   document.getElementById('mpNum').textContent=p.mana;
-  // Actualiza el máximo de maná dinámicamente según el personaje
   const mpMax=document.getElementById('mpMax');
   if(mpMax)mpMax.textContent='/'+p.maxMana;
   const st=document.getElementById('pStat');st.innerHTML='';
-  if(p.block)st.innerHTML+=`<span class="si si-bk">🛡 ${p.block}</span>`;
+  if(p.block){
+    st.innerHTML+=`<span class="si si-bk si-shield-big">🛡 ${p.block}</span>`;
+  }
   if(p.bleed)st.innerHTML+=`<span class="si si-bl">🩸 ${p.bleed}</span>`;
   if(p.poison)st.innerHTML+=`<span class="si si-ps">☠ ${p.poison}</span>`;
+
+  // Shield sidebar display
+  const shieldDisp = document.getElementById('shieldDisplay');
+  if(shieldDisp){
+    if(p.block > 0){
+      shieldDisp.style.display='flex';
+      document.getElementById('shieldVal').textContent=p.block;
+      shieldDisp.classList.add('shield-active');
+    } else {
+      shieldDisp.style.display='none';
+      shieldDisp.classList.remove('shield-active');
+    }
+  }
+
   document.getElementById('dkC').textContent=p.deck.length;
   document.getElementById('dsC').textContent=p.discard.length;
   document.getElementById('goldN').textContent=G.gold;
+  document.getElementById('handC').textContent=p.hand.length+'/'+getMaxHand();
 }
 
 function updMana(){const p=G.player;let h='';for(let i=0;i<p.maxMana;i++)h+=`<div class="morb ${i<p.mana?'f':'e'}">${i<p.mana?'◆':'◇'}</div>`;document.getElementById('manaOrbs').innerHTML=h}
-function addLog(msg,cls=''){const el=document.getElementById('clog');if(!el)return;const d=document.createElement('div');d.className='log-e '+cls;d.textContent=msg;el.appendChild(d);el.scrollTop=el.scrollHeight}
-function spawnN(n,type){
+
+function addLog(msg,cls=''){
+  const el=document.getElementById('clog');if(!el)return;
+  const d=document.createElement('div');d.className='log-e '+cls;d.textContent=msg;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function spawnN(n,type,refEl){
   const el=document.createElement('div');el.className='dmg-num '+type;
-  const refs={en:'eSprite',pl:'hpBar',bk:'mpBar',hl:'hpBar'};
-  const ref=document.getElementById(refs[type]||'eSprite');
-  const r=ref?ref.getBoundingClientRect():{left:200,top:200,width:100,height:50};
+  let ref;
+  if(refEl){ref=refEl.getBoundingClientRect();}
+  else{
+    const refs={en:'eZone',pl:'hpBar',bk:'mpBar',hl:'portrait'};
+    const r=document.getElementById(refs[type]||'eZone');
+    ref=r?r.getBoundingClientRect():{left:200,top:200,width:100,height:50};
+  }
   el.textContent=(type==='hl'?'+':'-')+n;
-  el.style.left=(r.left+r.width/2+(Math.random()*40-20))+'px';el.style.top=(r.top+r.height/2)+'px';
-  document.body.appendChild(el);setTimeout(()=>el.remove(),1200);
+  el.style.left=(ref.left+ref.width/2+(Math.random()*40-20))+'px';
+  el.style.top=(ref.top+ref.height/2)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
 }
 
 // ═══════════════════════════════════════════════
@@ -550,12 +860,7 @@ function showRew(){
     if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
     if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
     w.innerHTML=`<div class="gcard ${card.type} playable" style="width:104px;height:155px;cursor:pointer"><div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art" style="padding:9px 5px 3px">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div><div style="font-size:8px;color:var(--dim);padding:0 4px 5px;text-align:center;line-height:1.4;font-style:italic">${card.desc}</div></div>`;
-    // FIX BUG 2: Añadimos la carta al mazo correctamente y guardamos antes de avanzar
-    w.addEventListener('click',()=>{
-      G.player.deck.push(card.id);
-      saveG();
-      advance();
-    });
+    w.addEventListener('click',()=>{G.player.deck.push(card.id);saveG();advance();});
     c.appendChild(w);
   });
   show('reward');
@@ -578,10 +883,8 @@ function showShop(){
     w.addEventListener('click',()=>{
       if(G.gold<price)return;
       G.gold-=price;
-      // FIX BUG 2: Añadimos carta al mazo con push correcto
       G.player.deck.push(card.id);
-      w.style.opacity='.2';
-      w.style.pointerEvents='none';
+      w.style.opacity='.2';w.style.pointerEvents='none';
       document.getElementById('shopG').textContent=G.gold;
       saveG();
     });
@@ -599,42 +902,34 @@ function showChest(){
   const roll=Math.random();
   const el=document.getElementById('chestContent');
   el.innerHTML='';
-
   if(roll<0.1){
-    // Mímic / emboscada
     el.innerHTML=`<div class="chest-bad"><div style="font-size:44px">💀</div><div class="chest-title" style="color:var(--wine2)">¡Era una trampa!</div><div class="chest-desc">El cofre cobraba vida. Un mímic te ataca.</div><button class="btn btn-wine" onclick="chestMimic()">Combatir al Mímic</button></div>`;
   } else if(roll<0.5){
-    // Monedas
     const coins=Math.floor(15+Math.random()*25);
     el.innerHTML=`<div class="chest-good"><div style="font-size:44px">🪙</div><div class="chest-title">¡Oro encontrado!</div><div class="chest-desc">Encuentras <span style="color:var(--gold);font-weight:bold">${coins} monedas</span> entre las sombras.</div><button class="btn" onclick="chestGold(${coins})">Tomar el oro</button></div>`;
   } else {
-    // Carta
     el.innerHTML=`<div class="chest-good"><div style="font-size:44px">🃏</div><div class="chest-title">¡Carta encontrada!</div><div class="chest-desc">Un grimorio yace en el cofre. Elige una carta para tu mazo.</div><button class="btn" onclick="chestCard()">Abrir el grimorio</button></div>`;
   }
   show('chest');
 }
 function chestGold(n){G.gold+=n;saveG();advance()}
-function chestCard(){showRew();}  // showRew llama advance() al elegir carta o skipRew
+function chestCard(){showRew();}
 function chestMimic(){
-  // Enemigo especial mímic — usa tier 1 pero con nombre especial
-  G._mimicOverride={name:'Mímic Devorador',hp:38,maxHp:38,dmg:13,bleed:2,psn:0,block:0,bleed:0,poison:0,tier:1,rw:25};
-  startCombatCustom(G._mimicOverride);
-}
-function startCombatCustom(enemy){
-  G.enemy={...enemy};
+  const mimic={name:'Mímic Devorador',hp:38,maxHp:38,dmg:13,bleed:2,psn:0,block:0,poison:0,tier:1,rw:25,dead:false};
+  G.enemies=[mimic];
+  G.targetIdx=0;
   G.turn=1;G.firstHitUsed=false;
   const p=G.player;
   p.block=0;p.mana=p.maxMana;
-  if(p.hand.length>0){p.discard.push(...p.hand);p.hand=[];}
-  draw(5);
+  drawUpTo(getMaxHand());
   applyPort();
   const ch=chById(G.charId);
   document.getElementById('passiveInfo').textContent=ch?ch.passive:'';
-  document.getElementById('charBadge').textContent=ch?ch.name:'';
-  renderE();renderHand();renderPS();updMana();
+  document.getElementById('charBadge').textContent=G.heroName||(ch?ch.name:'');
+  renderEnemies();renderHand();renderPS();updMana();
   document.getElementById('turnLbl').textContent='Turno 1';
   document.getElementById('clog').innerHTML='';
-  addLog(`¡${G.enemy.name} emerge del cofre!`,'ene');
+  addLog(`¡El Mímic emerge del cofre!`,'ene');
   show('game');
 }
 
@@ -699,82 +994,34 @@ function dzClr(key,el,e){e.stopPropagation();delete CUSTOM[key];const i=el.query
 function saveCustomAndReturn(){saveCustom();goTitle()}
 
 // ═══════════════════════════════════════════════
-//  CRÉDITOS
+//  CREDITS
 // ═══════════════════════════════════════════════
 function showCredits(){
   const charName = chById(G.charId)?chById(G.charId).name:'Cazador';
-  document.getElementById('creditsChar').textContent=charName;
+  document.getElementById('creditsChar').textContent=`${G.heroName||charName} — ${charName}`;
   document.getElementById('creditsDiff').textContent=`Dificultad ${G.difficulty}`;
   const el=document.getElementById('s-credits');
-  // Reiniciar animación
   el.querySelectorAll('.cr-line').forEach((l,i)=>{l.style.animationDelay=`${0.4+i*0.35}s`});
   show('credits');
 }
 
 // ═══════════════════════════════════════════════
-//  DEV MODE — herramientas de desarrollador
-//  Uso desde la consola del navegador (F12):
-//    DEV.invincible()   → activa/desactiva invencibilidad
-//    DEV.winCombat()    → gana el combate actual al instante
-//    DEV.addGold(n)     → añade n monedas (defecto: 999)
-//    DEV.skipNode()     → salta el nodo actual y avanza en el mapa
-//    DEV.status()       → muestra el estado actual del juego
+//  DEV MODE
 // ═══════════════════════════════════════════════
 const DEV = {
   _invincible: false,
-  invincible(){
-    this._invincible = !this._invincible;
-    console.log(`%c[DEV] Invencibilidad: ${this._invincible?'✅ ON':'❌ OFF'}`, 'color:#c9984a;font-size:14px;font-weight:bold');
-  },
-  winCombat(){
-    if(!G.enemy){console.warn('[DEV] No hay combate activo.');return;}
-    console.log('%c[DEV] Combate ganado al instante.','color:#6aee90;font-weight:bold');
-    G.enemy.hp=0;
-    combatWin();
-  },
-  addGold(n=999){
-    G.gold+=(n|0);
-    if(document.getElementById('goldN'))document.getElementById('goldN').textContent=G.gold;
-    saveG();
-    console.log(`%c[DEV] +${n} oro → Total: ${G.gold}`,'color:#e8b460;font-weight:bold');
-  },
-  skipNode(){
-    if(!G.path){console.warn('[DEV] No hay run activo.');return;}
-    console.log('%c[DEV] Nodo saltado.','color:#8abaee;font-weight:bold');
-    advance();
-  },
-  status(){
-    console.log('%c[DEV] Estado actual:','color:#c9984a;font-weight:bold');
-    console.table({
-      Personaje: G.charId,
-      HP: `${G.player?.hp}/${G.player?.maxHp}`,
-      Maná: `${G.player?.mana}/${G.player?.maxMana}`,
-      Oro: G.gold,
-      Acto: G.path?.act+1,
-      Fila: G.path?.row,
-      Columna: G.path?.col,
-      Invencible: DEV._invincible
-    });
-  }
+  invincible(){this._invincible=!this._invincible;console.log(`%c[DEV] Invencibilidad: ${this._invincible?'✅ ON':'❌ OFF'}`, 'color:#c9984a;font-size:14px;font-weight:bold');},
+  winCombat(){if(!G.enemies){console.warn('[DEV] No hay combate activo.');return;}G.enemies.forEach(e=>e.hp=0);combatWin();},
+  addGold(n=999){G.gold+=(n|0);if(document.getElementById('goldN'))document.getElementById('goldN').textContent=G.gold;saveG();console.log(`%c[DEV] +${n} oro → Total: ${G.gold}`,'color:#e8b460;font-weight:bold');},
+  skipNode(){if(!G.path){console.warn('[DEV] No hay run activo.');return;}advance();},
+  status(){console.log('%c[DEV] Estado actual:','color:#c9984a;font-weight:bold');console.table({Personaje:G.charId,Héroe:G.heroName,HP:`${G.player?.hp}/${G.player?.maxHp}`,Maná:`${G.player?.mana}/${G.player?.maxMana}`,Oro:G.gold,Acto:G.path?.act+1,Fila:G.path?.row,Invencible:DEV._invincible});}
 };
-// Intercepta el daño al jugador si invencibilidad está activa
-const _origEndTurn = endTurn;
-window.endTurn = function(){
-  if(DEV._invincible && G.player){
-    const origHp=G.player.hp;
-    _origEndTurn();
-    if(G.player && G.player.hp<origHp && G.player.hp>0){
-      G.player.hp=origHp;
-      renderPS&&renderPS();
-    } else if(G.player && G.player.hp<=0){
-      G.player.hp=G.player.maxHp;
-      renderPS&&renderPS();
-    }
-  } else {
-    _origEndTurn();
-  }
+const _origEndTurn=endTurn;
+window.endTurn=function(){
+  if(DEV._invincible&&G.player){const origHp=G.player.hp;_origEndTurn();if(G.player&&G.player.hp<origHp&&G.player.hp>0){G.player.hp=origHp;renderPS&&renderPS();}else if(G.player&&G.player.hp<=0){G.player.hp=G.player.maxHp;renderPS&&renderPS();}}
+  else{_origEndTurn();}
 };
-console.log('%c[NOCTIS DECK] Herramientas de desarrollador disponibles → escribe DEV en la consola para ver los comandos.','color:#c9984a;font-style:italic');
+console.log('%c[NOCTIS DECK] Herramientas de desarrollador → escribe DEV en la consola.','color:#c9984a;font-style:italic');
 
 // ═══════════════════════════════════════════════
 //  INIT

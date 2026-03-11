@@ -10,6 +10,21 @@
 </head>
 <body>
 <div class="fog-layer" id="fogL"></div>
+
+<!-- NAME SELECTION OVERLAY -->
+<div id="nameOverlay" style="display:none">
+  <div class="name-modal">
+    <div class="name-title">✦ Nombra a tu Cazador ✦</div>
+    <div class="name-sub">El nombre que portarás en la ciudad que nunca amanece</div>
+    <div class="name-row">
+      <input id="nameInput" class="name-input" type="text" maxlength="28" placeholder="Nombre del héroe..." value="Alistair Voss"/>
+      <button class="name-dice" onclick="rollRandomName()" title="Nombre aleatorio">🎲</button>
+    </div>
+    <div class="name-hint">10 nombres victorianos disponibles · Pulsa 🎲 para aleatorio</div>
+    <button class="btn" onclick="confirmName()">⚔ &nbsp;Comenzar la Cacería</button>
+  </div>
+</div>
+
 <div id="app">
 <div class="screen active" id="s-title">
   <img src="resources/logo/logo.png" alt="">
@@ -26,49 +41,27 @@
     </div>
     <div class="diff-badge" id="diffBadge"></div>
   </div>
-<!-- 
-  INSTRUCCIONES: Añade esto dentro del <div id="s-title"> de tu index.html,
-  justo antes del </div> de cierre de esa pantalla (abajo a la izquierda).
-  
-  Si tienes un div con posición absoluta para elementos del título,
-  añade este bloque dentro de él.
--->
-
-<!-- Enlace parche — pegar en el screen de título (s-title) de index.html -->
-<a href="notas_actualizacion.html"
-   style="
-     position:fixed;
-     bottom:22px;
-     left:24px;
-     font-family:'Cinzel',serif;
-     font-size:11px;
-     font-weight:600;
-     letter-spacing:.18em;
-     text-transform:uppercase;
-     color:#c9984a;
-     text-decoration:none;
-     opacity:.75;
-     transition: opacity .2s, text-shadow .2s;
-     text-shadow: 0 0 8px #c9984a44;
-     z-index:100;
-   "
-   onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
-   onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'"
->
-  ✦ Actualización del Parche
-</a>
+  <a href="notas_actualizacion.html"
+     style="position:fixed;bottom:22px;left:24px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9984a;text-decoration:none;opacity:.75;transition:opacity .2s,text-shadow .2s;text-shadow:0 0 8px #c9984a44;z-index:100;"
+     onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
+     onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'">
+    ✦ Actualización del Parche
+  </a>
 </div>
+
 <div class="screen" id="s-chars">
   <div class="page-title">✦ Elige tu Cazador ✦</div>
   <div class="page-sub">Cada personaje comienza con un mazo y habilidades únicas</div>
   <div class="chars-row" id="charsRow"></div>
   <button class="btn" id="btnStart" onclick="startRunWithChar()" style="opacity:.4;pointer-events:none">Comenzar Run ▶</button>
 </div>
+
 <div class="screen" id="s-map">
   <div class="page-title">✦ Mapa de la Ciudad ✦</div>
   <div class="map-acts" id="mapActs"></div>
   <div style="font-size:12px;color:var(--fog);font-style:italic">Elige tu próximo destino — izquierda o derecha</div>
 </div>
+
 <div class="screen" id="s-game">
   <div class="p-left">
     <div class="portrait" id="portrait"><div class="portrait-glow"></div><div id="portContent"></div></div>
@@ -82,20 +75,27 @@
       <div class="stat-nums"><span id="mpNum">3</span><span style="color:var(--dim)" id="mpMax">/3</span></div>
     </div>
     <div><div class="stat-lbl">Estados</div><div class="si-wrap" id="pStat"></div></div>
-    <div><div class="p-label">Mazo</div><div class="dk-cnt"><span>Mazo: <span id="dkC">0</span></span><span>Desc: <span id="dsC">0</span></span></div></div>
+    <!-- Shield display -->
+    <div id="shieldDisplay" style="display:none">
+      <div class="shield-panel">
+        <div class="shield-icon-big">🛡</div>
+        <div class="shield-info">
+          <div class="shield-label">ESCUDO</div>
+          <div class="shield-value" id="shieldVal">0</div>
+        </div>
+        <div class="shield-ring"><div class="shield-ring-inner" id="shieldVal2"></div></div>
+      </div>
+    </div>
+    <div><div class="p-label">Mazo</div><div class="dk-cnt"><span>Mazo: <span id="dkC">0</span></span><span>Desc: <span id="dsC">0</span></span><span>Mano: <span id="handC">0/6</span></span></div></div>
     <div><div class="p-label">Oro</div><div class="gold-row">🪙 <span id="goldN">0</span></div></div>
     <div><div class="p-label">Reliquias</div><div id="relics" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"></div></div>
   </div>
+
   <div class="p-center">
     <div id="a-combat">
       <div class="arena-bg"></div>
-      <div class="e-zone">
-        <div class="e-name" id="eName">—</div>
-        <div class="e-sprite" id="eSprite"></div>
-        <div class="e-hp-wrap"><div class="e-hp-bar" id="eHpBar" style="width:100%"></div><div class="e-hp-txt" id="eHpTxt">—/—</div></div>
-        <div class="e-intent" id="eIntent">Observando…</div>
-        <div class="si-wrap" id="eStat" style="justify-content:center"></div>
-      </div>
+      <!-- ENEMY ZONE — multiple enemies -->
+      <div class="e-zone" id="eZone"></div>
       <div class="arena-div"></div>
       <div class="hand-zone" id="handZone"></div>
     </div>
@@ -105,19 +105,24 @@
       <button class="btn-end" onclick="endTurn()">Fin de Turno ▶</button>
     </div>
   </div>
+
   <div class="p-right">
     <div class="sec-title">Registro</div>
     <div class="clog" id="clog"></div>
     <div class="sec-title" style="margin-top:4px">Pasiva</div>
     <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
+    <div class="sec-title" style="margin-top:4px">Objetivos</div>
+    <div id="targetHints" style="font-size:9px;color:var(--fog);font-style:italic;line-height:1.6">Pulsa en un enemigo<br>para seleccionarlo</div>
   </div>
 </div>
+
 <div class="screen" id="s-reward">
   <div class="rew-title">✦ Recompensa ✦</div>
   <div style="font-size:13px;color:var(--fog);font-style:italic">Elige una carta para tu mazo</div>
   <div class="rew-cards" id="rewCards"></div>
   <button class="btn-sm" onclick="skipRew()">Continuar sin carta</button>
 </div>
+
 <div class="screen" id="s-rest">
   <div class="page-title" style="font-size:17px">🕯 Santuario Olvidado</div>
   <div style="font-size:13px;color:var(--fog);font-style:italic;max-width:360px;text-align:center;line-height:1.8">Un altar exhala paz. Recupera fuerzas o alivia tu mazo.</div>
@@ -126,30 +131,34 @@
     <div class="rest-opt" onclick="doPurge()"><div class="r-ico">🔥</div><h3>Purgar</h3><p>Elimina un Golpe Sombrío del mazo.</p></div>
   </div>
 </div>
+
 <div class="screen" id="s-shop">
   <div class="page-title" style="font-size:17px">🛒 La Botica del Heraldo</div>
   <div class="gold-disp">🪙 <span id="shopG">0</span></div>
   <div class="shop-stock" id="shopSt"></div>
   <button class="btn-sm" onclick="leaveShop()">Salir</button>
 </div>
+
 <div class="screen" id="s-chest">
   <div class="page-title" style="font-size:17px">📦 Cofre Misterioso</div>
   <div style="font-size:13px;color:var(--fog);font-style:italic;max-width:360px;text-align:center;line-height:1.8">Las sombras ocultan todo tipo de sorpresas...</div>
   <div id="chestContent" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:10px"></div>
 </div>
+
 <div class="screen" id="s-over">
   <div class="over-title">☠ Consumido ☠</div>
   <div style="color:var(--fog);font-style:italic;font-size:14px;text-align:center;max-width:360px;line-height:1.8">La oscuridad te ha devorado.<br>La ciudad victoriana se cierne sobre tu cuerpo.</div>
   <div id="overStats" style="font-family:'Cinzel',serif;font-size:11px;color:var(--dim);letter-spacing:2px;margin-top:4px"></div>
   <button class="btn btn-wine" onclick="goTitle()">↩ Volver al Inicio</button>
 </div>
+
 <div class="screen" id="s-win">
   <div class="win-title">✦ La Noche Termina ✦</div>
   <div style="color:var(--fog);font-style:italic;font-size:13px;text-align:center;max-width:400px;line-height:1.8">Has sobrevivido. La ciudad permanece en silencio.<br>Pero mañana volverá a despertar...</div>
   <div id="winStats" style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-top:4px"></div>
   <button class="btn" onclick="goTitle()">↩ Nueva Noche</button>
 </div>
-<!-- CRÉDITOS FINALES -->
+
 <div class="screen" id="s-credits">
   <div class="credits-wrap">
     <div class="cr-line cr-big">✦ La Oscuridad Ha Sido Vencida ✦</div>
@@ -168,6 +177,7 @@
     <div class="cr-line" style="margin-top:32px"><button class="btn" onclick="goTitle()">↩ Nueva Noche</button></div>
   </div>
 </div>
+
 <div class="screen" id="s-custom">
   <div class="page-title">✦ Personalización ✦</div>
   <div class="page-sub">Arrastra o haz click · PNG recomendado · Las imágenes por defecto se usan si no subes ninguna</div>
@@ -196,6 +206,7 @@
   </div>
 </div>
 </div>
+
 <script src="noctis_deck.js"></script>
 </body>
 </html>
