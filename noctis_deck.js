@@ -25,6 +25,8 @@ const DEFAULT_IMGS = {
   enemy0:         'resources/enemigos/enemigo1.png',
   enemy1:         'resources/enemigos/enemigo2.png',
   enemy2:         'resources/enemigos/enemigo3.png',
+  // NUEVO: healer enemy image — coloca tu imagen en resources/enemigos/healer.png
+  enemy_healer:   'resources/enemigos/healer.png',
   card_strike:    'resources/cartas/golpesombrio.jpg',
   card_slash:     'resources/cartas/tajocruento.jpg',
   card_lance:     'resources/cartas/lanzaniebla.png',
@@ -79,7 +81,7 @@ const CARDS=[
 ];
 
 // ═══════════════════════════════════════════════
-//  ENEMIES — grupos: normal 2-3, elite 2 normales+1 elite o 2 elites, boss solo
+//  ENEMIES
 // ═══════════════════════════════════════════════
 const ENM_TEMPLATES = {
   normal: [
@@ -94,31 +96,111 @@ const ENM_TEMPLATES = {
     {name:'Heraldo de Niebla', hp:34,dmg:12,bleed:0,psn:2,rw:20},
     {name:'Vampiro Menor',     hp:40,dmg:10,bleed:3,psn:0,rw:18},
   ],
+  // HEALER — aparece en grupos normales y elite, nunca en boss
+  // Imagen: resources/enemigos/healer.png
+  healer: [
+    {name:'Sanadora Espectral', hp:22,dmg:3, bleed:0,psn:0,rw:12, isHealer:true,
+     healAmt:8, shieldAmt:6, debuffChance:0.4},
+    {name:'Médium Corrupta',    hp:25,dmg:2, bleed:0,psn:0,rw:14, isHealer:true,
+     healAmt:10,shieldAmt:8, debuffChance:0.5},
+    {name:'Hechicera Pálida',   hp:20,dmg:4, bleed:0,psn:0,rw:13, isHealer:true,
+     healAmt:7, shieldAmt:5, debuffChance:0.35},
+  ],
   boss: [
     {name:'El Conde Sombrío',  hp:80,dmg:18,bleed:3,psn:0,rw:50},
     {name:'Madre de Niebla',   hp:75,dmg:15,bleed:0,psn:4,rw:50},
   ]
 };
 
-function buildEnemyGroup(tier) {
+// healer action cycle: heal → shield → debuff → attack → repeat
+function getHealerAction(e, turnInCombat) {
+  const cycle = turnInCombat % 4;
+  if(cycle === 0) return 'heal';
+  if(cycle === 1) return 'shield';
+  if(cycle === 2) return 'debuff';
+  return 'attack';
+}
+
+function buildEnemyGroup(tier, infiniteMultiplier) {
+  const mult = infiniteMultiplier || 1;
   const rnd = t => ENM_TEMPLATES[t][Math.floor(Math.random()*ENM_TEMPLATES[t].length)];
-  const mkE = (tpl, ti) => ({...tpl, maxHp:tpl.hp, block:0, bleed:0, poison:0, tier:ti, dead:false});
+  const mkE = (tpl, ti) => ({
+    ...tpl,
+    hp: Math.round(tpl.hp * mult),
+    maxHp: Math.round(tpl.hp * mult),
+    dmg: Math.round(tpl.dmg * mult),
+    block:0, bleed:0, poison:0, tier:ti, dead:false,
+    healAmt: tpl.healAmt ? Math.round(tpl.healAmt * mult) : 0,
+    shieldAmt: tpl.shieldAmt ? Math.round(tpl.shieldAmt * mult) : 0,
+    healerTurn: 0
+  });
+
+  // 20% chance to include a healer in normal/elite groups
+  const includeHealer = (tier < 2) && Math.random() < 0.20;
 
   if(tier === 0) {
-    // Normal: grupo de 2 o 3
     const count = Math.random() < 0.4 ? 3 : 2;
-    return Array.from({length:count}, () => mkE(rnd('normal'), 0));
+    let group = Array.from({length: includeHealer ? count-1 : count}, () => mkE(rnd('normal'), 0));
+    if(includeHealer) group.push(mkE(rnd('healer'), 0));
+    return group;
   } else if(tier === 1) {
-    // Elite: 2 normales + 1 elite, o 2 elites
     if(Math.random() < 0.5) {
-      return [mkE(rnd('normal'),0), mkE(rnd('normal'),0), mkE(rnd('elite'),1)];
+      let group = [mkE(rnd('normal'),0), mkE(rnd('normal'),0), mkE(rnd('elite'),1)];
+      if(includeHealer) { group.splice(1,1); group.push(mkE(rnd('healer'),0)); }
+      return group;
     } else {
-      return [mkE(rnd('elite'),1), mkE(rnd('elite'),1)];
+      let group = [mkE(rnd('elite'),1), mkE(rnd('elite'),1)];
+      if(includeHealer) { group.splice(1,1); group.push(mkE(rnd('healer'),0)); }
+      return group;
     }
   } else {
-    // Boss: siempre solo
     return [mkE(rnd('boss'), 2)];
   }
+}
+
+// ═══════════════════════════════════════════════
+//  STATISTICS
+// ═══════════════════════════════════════════════
+const STATS_KEY = 'noctis_stats_v1';
+const LB_KEY    = 'noctis_lb_v1';
+
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY) || 'null') || initStats(); }
+  catch(e) { return initStats(); }
+}
+function initStats() {
+  return {
+    totalRuns: 0,
+    totalPlaytime: 0,        // seconds
+    bestRunEncounters: 0,
+    bestRunTime: 0,
+    highestSingleDmg: 0,
+    bestRunTotalDmg: 0,      // total dmg in best-dmg run
+    mostDmgTanked: 0,
+    mostDmgHealed: 0,
+  };
+}
+function saveStats(s) {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch(e) {}
+}
+function loadLeaderboard() {
+  try { return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveLeaderboard(lb) {
+  try { localStorage.setItem(LB_KEY, JSON.stringify(lb)); } catch(e) {}
+}
+function addLeaderboardEntry(heroName, charId, encounters, runTimeSeconds, infiniteMode) {
+  const lb = loadLeaderboard();
+  lb.push({
+    heroName, charId,
+    charName: chById(charId)?.name || charId,
+    encounters,
+    runTime: runTimeSeconds,
+    infiniteMode: infiniteMode || false,
+    date: new Date().toLocaleDateString('es-ES')
+  });
+  lb.sort((a,b) => b.encounters - a.encounters);
+  saveLeaderboard(lb.slice(0, 20)); // keep top 20
 }
 
 // ═══════════════════════════════════════════════
@@ -148,6 +230,8 @@ function saveG(){
       },
       map:G.map,
       path:G.path,
+      infiniteMode: G.infiniteMode || false,
+      infiniteEncounters: G.infiniteEncounters || 0,
       savedAt:new Date().toLocaleString('es-ES')
     }));
   }catch(e){}
@@ -169,12 +253,55 @@ function loadCustom(){
 }
 
 // ═══════════════════════════════════════════════
+//  RUN TRACKING
+// ═══════════════════════════════════════════════
+let runStartTime = null;
+let runEncounters = 0;
+let runTotalDmg = 0;
+let runDmgTanked = 0;
+let runDmgHealed = 0;
+let runHighDmg = 0;
+let combatTurn = 0; // turn counter within current combat
+let runFinalized = false; // guard: prevent double leaderboard entries
+
+function startRunTracking() {
+  runStartTime = Date.now();
+  runEncounters = 0;
+  runTotalDmg = 0;
+  runDmgTanked = 0;
+  runDmgHealed = 0;
+  runHighDmg = 0;
+  runFinalized = false;
+}
+function getRunTime() {
+  if(!runStartTime) return 0;
+  return Math.floor((Date.now() - runStartTime) / 1000);
+}
+function finalizeRunStats(survived) {
+  if(runFinalized) return; // guard: only once per run
+  runFinalized = true;
+  const stats = loadStats();
+  stats.totalRuns++;
+  const rt = getRunTime();
+  stats.totalPlaytime += rt;
+  if(runEncounters > stats.bestRunEncounters) {
+    stats.bestRunEncounters = runEncounters;
+    stats.bestRunTime = rt;
+    stats.bestRunTotalDmg = runTotalDmg;
+  }
+  if(runHighDmg > stats.highestSingleDmg) stats.highestSingleDmg = runHighDmg;
+  if(runDmgTanked > stats.mostDmgTanked)  stats.mostDmgTanked = runDmgTanked;
+  if(runDmgHealed > stats.mostDmgHealed)  stats.mostDmgHealed = runDmgHealed;
+  saveStats(stats);
+  addLeaderboardEntry(G.heroName||'Cazador', G.charId, runEncounters, rt, G.infiniteMode||false);
+}
+
+// ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
 let G={difficulty:0};
 let selChar=null;
 
-// Mano persistente entre turnos — max 6, max 2 iguales
 const MAX_HAND = 6;
 const MAX_SAME = 2;
 
@@ -195,8 +322,11 @@ function newRun(cid, heroName){
     targetIdx:0,
     map:genMap(),
     path:{act:0,row:0,col:null},
-    firstHitUsed:false
+    firstHitUsed:false,
+    infiniteMode:false,
+    infiniteEncounters:0
   };
+  startRunTracking();
   saveG();
 }
 
@@ -223,8 +353,11 @@ function restoreRun(d){
     targetIdx:0,
     map:d.map,
     path:d.path||{act:0,row:0,col:null},
-    firstHitUsed:false
+    firstHitUsed:false,
+    infiniteMode: d.infiniteMode||false,
+    infiniteEncounters: d.infiniteEncounters||0
   };
+  startRunTracking();
 }
 
 // ═══════════════════════════════════════════════
@@ -273,10 +406,11 @@ function show(id){
 function goTitle(){updateTitle();show('title')}
 function updateTitle(){
   const sv=loadG();
-  const bc=document.getElementById('btnContinue'),sb=document.getElementById('saveBadge'),bd=document.getElementById('btnDel'),db=document.getElementById('diffBadge');
-  if(sv){bc.style.display='';sb.style.display='';bd.style.display='';const ch=chById(sv.charId);const p=sv.path||{act:0,row:0};sb.textContent=`${sv.heroName||ch?.name||'?'}  ·  Acto ${(p.act||0)+1}  ·  ${sv.savedAt}`}
+  const bc=document.getElementById('btnContinue'),sb=document.getElementById('saveBadge'),bd=document.getElementById('btnDel');
+  if(sv){bc.style.display='';sb.style.display='';bd.style.display='';const ch=chById(sv.charId);const p=sv.path||{act:0,row:0};sb.textContent=`${sv.heroName||ch?.name||'?'}  ·  ${sv.infiniteMode?'Modo Infinito':'Acto '+(p.act||0+1)}  ·  ${sv.savedAt}`}
   else{bc.style.display='none';sb.style.display='none';bd.style.display='none'}
-  db.textContent=(G.difficulty||0)>0?`Dificultad: ${G.difficulty}`:'';
+  const db=document.getElementById('diffBadge');
+  if(db) db.textContent='';
 }
 function goCharSelect(){renderChars();show('chars')}
 
@@ -284,11 +418,12 @@ function continueGame(){
   const d=loadG();
   if(!d)return;
   restoreRun(d);
-  showMap();
+  if(G.infiniteMode) showInfiniteMap();
+  else showMap();
 }
 
 // ═══════════════════════════════════════════════
-//  NAME SELECTION SCREEN
+//  NAME SELECTION
 // ═══════════════════════════════════════════════
 function showNameSelect(charId) {
   const overlay = document.getElementById('nameOverlay');
@@ -298,7 +433,6 @@ function showNameSelect(charId) {
   requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add('active')));
   overlay.dataset.charId = charId;
 }
-
 function rollRandomName() {
   const input = document.getElementById('nameInput');
   const used  = input.value;
@@ -307,7 +441,6 @@ function rollRandomName() {
   while(name === used && GOTHIC_NAMES.length > 1);
   input.value = name;
 }
-
 function confirmName() {
   const overlay = document.getElementById('nameOverlay');
   const input   = document.getElementById('nameInput');
@@ -396,6 +529,7 @@ function enterNode(ai,ri,ci){
   const node = ri===6 ? G.map[ai].boss : G.map[ai].rows[ri][ci];
   if(!node)return;
   if(['combat','elite','boss'].includes(node.type)){
+    runEncounters++;
     startCombat(node.type==='combat'?0:node.type==='elite'?1:2);
   } else if(node.type==='rest'){
     show('rest');
@@ -414,9 +548,9 @@ function advance(){
   if(row===6){
     const nextAct=act+1;
     if(nextAct>=G.map.length){
-      G.difficulty++;
+      // Completed act 3 — ask about infinite mode
       localStorage.removeItem(SK);
-      showCredits();
+      showPostAct3();
       return;
     }
     G.path={act:nextAct,row:0,col:null};
@@ -428,24 +562,142 @@ function advance(){
 }
 
 // ═══════════════════════════════════════════════
-//  DRAW — persistent hand, max 6, max 2 same
+//  POST-ACT 3 — Menu or Infinite Mode
+// ═══════════════════════════════════════════════
+function showPostAct3() {
+  // Build the prompt overlay
+  let overlay = document.getElementById('postAct3Overlay');
+  if(!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'postAct3Overlay';
+    overlay.style.cssText = `position:fixed;inset:0;z-index:9999;background:#080610ee;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s`;
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #e8b460;border-radius:12px;padding:40px 44px;max-width:460px;width:90%;box-shadow:0 0 80px #c9984a44;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+        <div style="font-family:'Cinzel Decorative',cursive;font-size:22px;color:#e8b460;text-shadow:0 0 40px #c9984a99;letter-spacing:3px">✦ La Noche Continúa ✦</div>
+        <div style="font-size:13px;color:#b8a8c8;font-style:italic;line-height:1.8;max-width:340px">Has sobrevivido los tres actos.<br>La ciudad no duerme... <span style="color:#e8b460">¿Seguirás combatiendo?</span></div>
+        <div style="font-size:11px;color:#9a2f45;font-family:'Cinzel',serif;letter-spacing:1.5px;background:#9a2f4522;border:1px solid #9a2f4566;padding:8px 16px;border-radius:4px">⚠ Modo Infinito · Los enemigos son 1.5× más fuertes<br>y se refuerzan cada 10 encuentros</div>
+        <div style="display:flex;gap:12px;margin-top:6px">
+          <button class="btn" onclick="startInfiniteMode()" style="font-size:11px;padding:10px 22px">🌑 &nbsp;Modo Infinito</button>
+          <button class="btn btn-wine" onclick="goTitleFromAct3()" style="font-size:11px;padding:10px 22px">↩ &nbsp;Menú Principal</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.style.opacity='1'));
+}
+
+function goTitleFromAct3() {
+  finalizeRunStats(true);
+  const ov = document.getElementById('postAct3Overlay');
+  if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
+  showCredits();
+}
+
+function startInfiniteMode() {
+  const ov = document.getElementById('postAct3Overlay');
+  if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
+  G.infiniteMode = true;
+  G.infiniteEncounters = 0;
+  saveG();
+  showInfiniteMap();
+}
+
+// ═══════════════════════════════════════════════
+//  INFINITE MODE MAP
+// ═══════════════════════════════════════════════
+function getInfiniteMultiplier() {
+  if(!G.infiniteMode) return 1;
+  const bonus = Math.floor((G.infiniteEncounters || 0) / 10) * 0.5;
+  return 1.5 + bonus;
+}
+
+function showInfiniteMap() {
+  renderInfiniteMap();
+  show('map');
+}
+
+function renderInfiniteMap() {
+  const c = document.getElementById('mapActs');
+  c.innerHTML = '';
+
+  const mult = getInfiniteMultiplier();
+  const enc  = G.infiniteEncounters || 0;
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:20px';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-family:"Cinzel Decorative",cursive;font-size:16px;color:#9a2f45;letter-spacing:3px;text-shadow:0 0 30px #c0305066';
+  title.textContent = '🌑 Modo Infinito — La Oscuridad Sin Fin';
+  wrapper.appendChild(title);
+
+  const info = document.createElement('div');
+  info.style.cssText = 'font-family:"Cinzel",serif;font-size:10px;color:#b8a8c8;letter-spacing:2px;text-align:center';
+  info.innerHTML = `Encuentros: <span style="color:#e8b460">${enc}</span> · Multiplicador: <span style="color:#cc4060">${mult.toFixed(1)}×</span>`;
+  wrapper.appendChild(info);
+
+  const btnsRow = document.createElement('div');
+  btnsRow.style.cssText = 'display:flex;gap:14px;flex-wrap:wrap;justify-content:center';
+
+  const types = [
+    {type:'combat', ico:'⚔', lbl:'COMBATE'},
+    {type:'elite',  ico:'💀', lbl:'ÉLITE'},
+    {type:'rest',   ico:'🕯', lbl:'DESCANSO'},
+    {type:'shop',   ico:'🛒', lbl:'TIENDA'},
+  ];
+  types.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'mnode cur' + (t.type==='elite'?' elite':'');
+    btn.style.cssText = 'width:90px;height:72px;cursor:pointer';
+    btn.innerHTML = `<div class="n-ico">${t.ico}</div><div class="n-lbl">${t.lbl}</div>`;
+    btn.addEventListener('click', () => enterInfiniteNode(t.type));
+    btnsRow.appendChild(btn);
+  });
+  wrapper.appendChild(btnsRow);
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:11px;color:#5a5070;font-style:italic';
+  hint.textContent = 'La ciudad nunca duerme. Elige tu próximo destino.';
+  wrapper.appendChild(hint);
+
+  c.appendChild(wrapper);
+}
+
+function enterInfiniteNode(type) {
+  if(['combat','elite'].includes(type)) {
+    G.infiniteEncounters = (G.infiniteEncounters||0) + 1;
+    runEncounters++;
+    saveG();
+    startCombat(type==='combat'?0:1, true);
+  } else if(type==='rest') {
+    show('rest');
+  } else if(type==='shop') {
+    showShop();
+  }
+}
+
+function advanceInfinite() {
+  saveG();
+  showInfiniteMap();
+}
+
+// ═══════════════════════════════════════════════
+//  DRAW
 // ═══════════════════════════════════════════════
 function countInHand(cardId) {
   return G.player.hand.filter(id => id === cardId).length;
 }
-
 function canAddToHand(cardId) {
   if(G.player.hand.length >= MAX_HAND) return false;
   if(countInHand(cardId) >= MAX_SAME) return false;
   return true;
 }
-
-// Draw up to fill, respecting constraints
 function drawUpTo(target) {
   const p = G.player;
   let attempts = 0;
   const maxAttempts = (p.deck.length + p.discard.length) * 2 + 10;
-
   while(p.hand.length < target && attempts < maxAttempts) {
     attempts++;
     if(!p.deck.length) {
@@ -454,12 +706,10 @@ function drawUpTo(target) {
       p.discard = [];
       addLog('Mazo repuesto.','sta');
     }
-    // Peek top card
     const nextId = p.deck[p.deck.length - 1];
     if(canAddToHand(nextId)) {
       p.hand.push(p.deck.pop());
     } else {
-      // Try to find an eligible card in the deck
       let found = false;
       for(let i = p.deck.length - 2; i >= 0; i--) {
         if(canAddToHand(p.deck[i])) {
@@ -468,36 +718,41 @@ function drawUpTo(target) {
           break;
         }
       }
-      if(!found) break; // Can't add more, all eligible slots filled
+      if(!found) break;
     }
   }
 }
-
-// Max hand size based on total cards available
 function getMaxHand() {
   const p = G.player;
   const totalCards = p.deck.length + p.discard.length + p.hand.length;
-  if(totalCards <= 2) return 4;   // 2 cartas → max 4 en mano (2 de c/u)
+  if(totalCards <= 2) return 4;
   return MAX_HAND;
 }
 
 // ═══════════════════════════════════════════════
 //  COMBAT
 // ═══════════════════════════════════════════════
-function startCombat(tier){
-  G.enemies = buildEnemyGroup(tier);
+function startCombat(tier, isInfinite){
+  const infiniteMult = (G.infiniteMode || isInfinite) ? getInfiniteMultiplier() : 1;
+  G.enemies = buildEnemyGroup(tier, infiniteMult);
   G.targetIdx = 0;
   G.turn = 1;
+  combatTurn = 0;
   G.firstHitUsed = false;
   const p = G.player;
   p.block = 0;
   p.mana = p.maxMana;
-  // Keep hand between combats — just draw up to fill
   drawUpTo(getMaxHand());
   applyPort();
   const ch = chById(G.charId);
   document.getElementById('passiveInfo').textContent = ch ? ch.passive : '';
   document.getElementById('charBadge').textContent = G.heroName || (ch ? ch.name : '');
+  // Show infinite mode info if applicable
+  if(G.infiniteMode) {
+    const mult = getInfiniteMultiplier();
+    document.getElementById('passiveInfo').textContent = (ch ? ch.passive + '\n' : '') +
+      `🌑 Modo Infinito · Encuentro ${G.infiniteEncounters} · ${mult.toFixed(1)}×`;
+  }
   renderEnemies();
   renderHand();
   renderPS();
@@ -516,7 +771,7 @@ function applyPort(){
 }
 
 // ═══════════════════════════════════════════════
-//  RENDER ENEMIES (multi-target)
+//  RENDER ENEMIES
 // ═══════════════════════════════════════════════
 function renderEnemies() {
   const zone = document.getElementById('eZone');
@@ -529,29 +784,64 @@ function renderEnemies() {
     wrap.dataset.idx = i;
 
     const hpPct = Math.max(0, e.hp / e.maxHp * 100);
-    const imgHtml = getImg('enemy' + (e.tier||0))
-      ? `<img src="${getImg('enemy'+(e.tier||0))}" style="width:100%;height:100%;object-fit:contain">`
-      : getESVG(e.name, e.tier||0);
+    // Healer uses special image
+    const imgKey = e.isHealer ? 'enemy_healer' : ('enemy'+(e.tier||0));
+    const imgHtml = getImg(imgKey)
+      ? `<img src="${getImg(imgKey)}" style="width:100%;height:100%;object-fit:contain">`
+      : (e.isHealer ? getHealerSVG() : getESVG(e.name, e.tier||0));
 
     let statusHtml = '';
     if(e.block)  statusHtml += `<span class="si si-bk">🛡 ${e.block}</span>`;
     if(e.bleed)  statusHtml += `<span class="si si-bl">🩸 ${e.bleed}</span>`;
     if(e.poison) statusHtml += `<span class="si si-ps">☠ ${e.poison}</span>`;
 
+    // Healer intent
+    let intentText;
+    if(e.isHealer) {
+      const action = getHealerAction(e, combatTurn);
+      if(action==='heal')   intentText = `❤ Cura aliados (${e.healAmt||8})`;
+      else if(action==='shield') intentText = `🛡 Escudo aliados (${e.shieldAmt||6})`;
+      else if(action==='debuff') intentText = `☠ Maldición · Veneno/Sangrado`;
+      else                  intentText = `⚔ Ataque: ${e.dmg}`;
+    } else {
+      intentText = `⚔ Ataque: ${e.dmg}`;
+    }
+
+    const healerBadge = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
+
     wrap.innerHTML = `
+      ${healerBadge}
       <div class="e-name">${e.name}</div>
       <div class="e-sprite" id="eSprite${i}">${imgHtml}</div>
       <div class="e-hp-wrap">
         <div class="e-hp-bar" id="eHpBar${i}" style="width:${hpPct}%"></div>
         <div class="e-hp-txt">${Math.max(0,e.hp)} / ${e.maxHp}</div>
       </div>
-      <div class="e-intent">⚔ Ataque: ${e.dmg}</div>
+      <div class="e-intent">${intentText}</div>
       <div class="si-wrap" style="justify-content:center;margin-top:3px">${statusHtml}</div>
       <div class="target-indicator">${i===G.targetIdx?'▼ OBJETIVO ▼':''}</div>
     `;
     wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
     zone.appendChild(wrap);
   });
+}
+
+function getHealerSVG() {
+  return `<svg viewBox="0 0 130 168" fill="none">
+    <ellipse cx="65" cy="137" rx="30" ry="5" fill="#00000066"/>
+    <ellipse cx="65" cy="55" rx="20" ry="22" fill="#1a2a1a" stroke="#4acc7088" stroke-width="1.5"/>
+    <circle cx="57" cy="51" r="6" fill="#0a120a" stroke="#4acc7066"/>
+    <circle cx="73" cy="51" r="6" fill="#0a120a" stroke="#4acc7066"/>
+    <circle cx="57" cy="51" r="3" fill="#4acc7088"/>
+    <circle cx="73" cy="51" r="3" fill="#4acc7088"/>
+    <path d="M57 64 Q65 70 73 64" stroke="#4acc70" stroke-width="1.5" fill="none"/>
+    <rect x="42" y="77" width="46" height="54" rx="6" fill="#1a2a1a" stroke="#4acc7066" stroke-width="1.5"/>
+    <path d="M42 88 Q24 80 22 102 Q34 94 42 100" fill="#121e12"/>
+    <path d="M88 88 Q106 80 108 102 Q96 94 88 100" fill="#121e12"/>
+    <rect x="59" y="82" width="12" height="28" rx="3" fill="#4acc7066"/>
+    <rect x="53" y="88" width="24" height="12" rx="3" fill="#4acc7066"/>
+    <circle cx="65" cy="55" r="28" fill="none" stroke="#4acc7033" stroke-width="1"/>
+  </svg>`;
 }
 
 function getESVG(name,tier){
@@ -606,7 +896,6 @@ function playCard(hi){
   const e=G.enemies[G.targetIdx];
   if(!card||card.cost>p.mana)return;
   if(!e||e.dead){
-    // Auto-select alive enemy
     const alive = G.enemies.findIndex(en=>!en.dead);
     if(alive>=0) G.targetIdx=alive;
     else return;
@@ -626,6 +915,9 @@ function playCard(hi){
     const nd=d-ab;
     target.hp=Math.max(0,target.hp-nd);
     msg+=` · ${nd} daño`;
+    // Track stats
+    runTotalDmg += nd;
+    if(nd > runHighDmg) runHighDmg = nd;
     animateAttack(G.targetIdx, nd);
   }
   if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');}
@@ -635,11 +927,11 @@ function playCard(hi){
     const h=Math.min(p.maxHp,p.hp+card.heal)-p.hp;
     p.hp+=h;
     msg+=` · +${h} vida`;
+    runDmgHealed += h;
     animateHeal(h);
   }
   addLog(msg,'sta');
 
-  // Check if targeted enemy died
   if(target.hp<=0){
     target.dead=true;
     const alive=G.enemies.filter(en=>!en.dead);
@@ -648,7 +940,6 @@ function playCard(hi){
       setTimeout(()=>combatWin(),400);
       return;
     } else {
-      // Move target to next alive
       G.targetIdx=G.enemies.findIndex(en=>!en.dead);
     }
   }
@@ -665,7 +956,6 @@ function animateAttack(enemyIdx, dmg) {
     spriteEl.classList.add('hit-flash');
     setTimeout(()=>spriteEl.classList.remove('hit-flash'), 500);
   }
-  // Slash effect overlay
   const slash = document.createElement('div');
   slash.className = 'slash-fx';
   const ref = spriteEl ? spriteEl.getBoundingClientRect() : {left:200,top:200,width:100,height:100};
@@ -677,7 +967,6 @@ function animateAttack(enemyIdx, dmg) {
   </svg>`;
   document.body.appendChild(slash);
   setTimeout(()=>slash.remove(), 500);
-
   spawnN(dmg, 'en', spriteEl);
 }
 
@@ -691,7 +980,6 @@ function animateHeal(amount) {
     wrap.appendChild(healPulse);
     setTimeout(()=>healPulse.remove(), 800);
   }
-  // Green particles
   const portrait = document.getElementById('portrait');
   if(portrait) {
     const r = portrait.getBoundingClientRect();
@@ -711,14 +999,13 @@ function animateHeal(amount) {
 }
 
 // ═══════════════════════════════════════════════
-//  END TURN — persistent hand
+//  END TURN — healer actions included
 // ═══════════════════════════════════════════════
 function endTurn(){
   const p=G.player;
   const aliveEnemies = G.enemies.filter(e=>!e.dead);
 
-  // Discard played cards (already done in playCard), keep remaining hand
-  // Apply enemy DoTs
+  // DoTs on enemies
   aliveEnemies.forEach(e=>{
     if(e.bleed>0){const d=2;e.hp=Math.max(0,e.hp-d);e.bleed--;addLog(`${e.name} sangra (-${d})`,'ene');animateHit(e);}
     if(e.poison>0){const d=e.poison+(G.charId==='hechicera'?1:0);e.hp=Math.max(0,e.hp-d);e.poison=Math.max(0,e.poison-1);addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);}
@@ -731,19 +1018,30 @@ function endTurn(){
     return;
   }
 
-  // Each alive enemy attacks
+  // Each alive enemy acts
   aliveEnemies.filter(e=>!e.dead).forEach(e=>{
-    let actualDmg=e.dmg;
-    if(G.charId==='espectro'&&!G.firstHitUsed){
-      G.firstHitUsed=true;actualDmg=0;
-      addLog('Forma Etérea: golpe evitado!','sta');
+    if(e.isHealer) {
+      doHealerAction(e);
+    } else {
+      // Normal attack
+      let actualDmg=e.dmg;
+      if(G.charId==='espectro'&&!G.firstHitUsed){
+        G.firstHitUsed=true;actualDmg=0;
+        addLog('Forma Etérea: golpe evitado!','sta');
+      }
+      const ab=Math.min(p.block,actualDmg);
+      p.block=Math.max(0,p.block-actualDmg);
+      const nd=actualDmg-ab;
+      p.hp=Math.max(0,p.hp-nd);
+      if(nd>0){
+        addLog(`${e.name} golpea por ${nd}`,'ene');
+        spawnN(nd,'pl');
+        runDmgTanked += nd;
+      }
     }
-    const ab=Math.min(p.block,actualDmg);
-    p.block=Math.max(0,p.block-actualDmg);
-    const nd=actualDmg-ab;
-    p.hp=Math.max(0,p.hp-nd);
-    if(nd>0){addLog(`${e.name} golpea por ${nd}`,'ene');spawnN(nd,'pl');}
   });
+
+  combatTurn++;
 
   // Player DoTs
   if(p.bleed>0){p.hp=Math.max(0,p.hp-2);p.bleed--;}
@@ -755,7 +1053,8 @@ function endTurn(){
     setTimeout(()=>{
       document.getElementById('s-game').classList.remove('shake');
       localStorage.removeItem(SK);
-      document.getElementById('overStats').textContent=`${G.heroName}  ·  Turno ${G.turn}  ·  Oro: ${G.gold}`;
+      finalizeRunStats(false);
+      document.getElementById('overStats').textContent=`${G.heroName}  ·  Turno ${G.turn}  ·  Oro: ${G.gold}${G.infiniteMode?' · Modo Infinito':''}`;
       show('over');
     },400);
     return;
@@ -764,12 +1063,71 @@ function endTurn(){
   G.turn++;
   p.block=0;
   p.mana=p.maxMana;
-
-  // Draw to fill hand (persistent cards stay, draw to max)
   drawUpTo(getMaxHand());
 
   document.getElementById('turnLbl').textContent=`Turno ${G.turn}`;
   saveG();renderHand();renderEnemies();renderPS();updMana();
+}
+
+// ─── HEALER ACTIONS ───────────────────────────
+function doHealerAction(healer) {
+  const action = getHealerAction(healer, combatTurn);
+  const aliveAllies = G.enemies.filter(e=>!e.dead && e !== healer);
+  const p = G.player;
+
+  if(action === 'heal') {
+    // Heal lowest HP ally, or self
+    const targets = aliveAllies.length > 0 ? aliveAllies : [healer];
+    const lowestHp = targets.reduce((a,b) => (a.hp < b.hp ? a : b));
+    const healAmt = healer.healAmt || 8;
+    const healed = Math.min(lowestHp.maxHp - lowestHp.hp, healAmt);
+    lowestHp.hp += healed;
+    addLog(`${healer.name} cura a ${lowestHp.name} (+${healed})`, 'heal');
+    // Visual: green particle on enemy
+    const idx = G.enemies.indexOf(lowestHp);
+    const el = document.getElementById('eSprite'+idx);
+    if(el) {
+      const pulse = document.createElement('div');
+      pulse.className = 'heal-pulse';
+      pulse.style.cssText = 'position:absolute;inset:-4px;border-radius:4px;background:radial-gradient(circle,#4acc7033,transparent 70%);border:2px solid #4acc7066;animation:healPulseAnim .8s forwards;pointer-events:none;z-index:5';
+      el.style.position='relative';
+      el.appendChild(pulse);
+      setTimeout(()=>pulse.remove(),800);
+    }
+  } else if(action === 'shield') {
+    // Shield all allies
+    const shieldAmt = healer.shieldAmt || 6;
+    const shieldTargets = [...aliveAllies, healer];
+    shieldTargets.forEach(ally => { ally.block += shieldAmt; });
+    addLog(`${healer.name} escuda a sus aliados (+${shieldAmt} bloqueo cada uno)`, 'sta');
+  } else if(action === 'debuff') {
+    // Apply poison or bleed to player
+    if(Math.random() < 0.5) {
+      p.poison += 2;
+      addLog(`${healer.name} lanza una maldición · +2 veneno`, 'ene');
+    } else {
+      p.bleed += 2;
+      addLog(`${healer.name} lanza una maldición · +2 sangrado`, 'ene');
+    }
+    spawnN(2, 'pl');
+  } else {
+    // Weak attack
+    let actualDmg = healer.dmg;
+    if(G.charId==='espectro'&&!G.firstHitUsed){
+      G.firstHitUsed=true; actualDmg=0;
+      addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const ab = Math.min(p.block, actualDmg);
+    p.block = Math.max(0, p.block - actualDmg);
+    const nd = actualDmg - ab;
+    p.hp = Math.max(0, p.hp - nd);
+    if(nd>0){
+      addLog(`${healer.name} ataca débilmente por ${nd}`,'ene');
+      spawnN(nd,'pl');
+      runDmgTanked += nd;
+    }
+  }
+  healer.healerTurn = (healer.healerTurn||0) + 1;
 }
 
 function animateHit(e) {
@@ -787,7 +1145,7 @@ function combatWin(){
 }
 
 // ═══════════════════════════════════════════════
-//  RENDER PLAYER STATS + SHIELD DISPLAY
+//  RENDER PLAYER STATS
 // ═══════════════════════════════════════════════
 function renderPS(){
   const p=G.player;
@@ -804,7 +1162,6 @@ function renderPS(){
   if(p.bleed)st.innerHTML+=`<span class="si si-bl">🩸 ${p.bleed}</span>`;
   if(p.poison)st.innerHTML+=`<span class="si si-ps">☠ ${p.poison}</span>`;
 
-  // Shield sidebar display
   const shieldDisp = document.getElementById('shieldDisplay');
   if(shieldDisp){
     if(p.block > 0){
@@ -860,15 +1217,23 @@ function showRew(){
     if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
     if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
     w.innerHTML=`<div class="gcard ${card.type} playable" style="width:104px;height:155px;cursor:pointer"><div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art" style="padding:9px 5px 3px">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div><div style="font-size:8px;color:var(--dim);padding:0 4px 5px;text-align:center;line-height:1.4;font-style:italic">${card.desc}</div></div>`;
-    w.addEventListener('click',()=>{G.player.deck.push(card.id);saveG();advance();});
+    w.addEventListener('click',()=>{
+      G.player.deck.push(card.id);
+      saveG();
+      if(G.infiniteMode) advanceInfinite();
+      else advance();
+    });
     c.appendChild(w);
   });
   show('reward');
 }
 
-function skipRew(){advance()}
-function doHeal(){const p=G.player;p.hp=Math.min(p.maxHp,p.hp+20);saveG();advance()}
-function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck.splice(i,1);saveG();advance()}
+function skipRew(){
+  if(G.infiniteMode) advanceInfinite();
+  else advance();
+}
+function doHeal(){const p=G.player;p.hp=Math.min(p.maxHp,p.hp+20);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
+function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck.splice(i,1);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
 
 function showShop(){
   document.getElementById('shopG').textContent=G.gold;
@@ -893,7 +1258,10 @@ function showShop(){
   show('shop');
 }
 
-function leaveShop(){advance()}
+function leaveShop(){
+  if(G.infiniteMode) advanceInfinite();
+  else advance();
+}
 
 // ═══════════════════════════════════════════════
 //  CHEST
@@ -912,13 +1280,13 @@ function showChest(){
   }
   show('chest');
 }
-function chestGold(n){G.gold+=n;saveG();advance()}
+function chestGold(n){G.gold+=n;saveG();if(G.infiniteMode)advanceInfinite();else advance();}
 function chestCard(){showRew();}
 function chestMimic(){
   const mimic={name:'Mímic Devorador',hp:38,maxHp:38,dmg:13,bleed:2,psn:0,block:0,poison:0,tier:1,rw:25,dead:false};
   G.enemies=[mimic];
   G.targetIdx=0;
-  G.turn=1;G.firstHitUsed=false;
+  G.turn=1;G.firstHitUsed=false;combatTurn=0;
   const p=G.player;
   p.block=0;p.mana=p.maxMana;
   drawUpTo(getMaxHand());
@@ -934,15 +1302,138 @@ function chestMimic(){
 }
 
 // ═══════════════════════════════════════════════
+//  STATISTICS SCREEN
+// ═══════════════════════════════════════════════
+function showStats() {
+  let ov = document.getElementById('statsOverlay');
+  if(!ov) {
+    ov = document.createElement('div');
+    ov.id = 'statsOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9998;background:#080610ee;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s;overflow-y:auto';
+    document.body.appendChild(ov);
+  }
+
+  const s = loadStats();
+  const lb = loadLeaderboard();
+
+  function fmtTime(sec) {
+    const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s2 = sec%60;
+    if(h>0) return `${h}h ${m}m ${s2}s`;
+    if(m>0) return `${m}m ${s2}s`;
+    return `${s2}s`;
+  }
+
+  const statsRows = [
+    {label:'Partidas jugadas',       val: s.totalRuns},
+    {label:'Tiempo total de juego',  val: fmtTime(s.totalPlaytime)},
+    {label:'Mejor racha (encuentros)',val: s.bestRunEncounters},
+    {label:'Tiempo de mejor racha',  val: fmtTime(s.bestRunTime)},
+    {label:'Mayor daño en un golpe', val: s.highestSingleDmg},
+    {label:'Daño total en mejor run',val: s.bestRunTotalDmg},
+    {label:'Mayor daño tanqueado',   val: s.mostDmgTanked},
+    {label:'Mayor daño curado',      val: s.mostDmgHealed},
+  ];
+
+  const statsHtml = statsRows.map(r=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1428;font-size:11px">
+      <span style="color:#b8a8c8;font-family:'Cinzel',serif;letter-spacing:1px">${r.label}</span>
+      <span style="color:#e8b460;font-family:'Cinzel Decorative',cursive;font-size:13px">${r.val}</span>
+    </div>`
+  ).join('');
+
+  const lbHtml = lb.length === 0 ?
+    `<div style="color:#5a5070;font-style:italic;text-align:center;padding:16px">Aún no hay entradas.</div>` :
+    lb.slice(0,10).map((e,i)=>
+      `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #1a1428;font-size:10px;${e.infiniteMode?'background:#2a0a1422;':''}">
+        <span style="font-family:'Cinzel Decorative',cursive;color:${i<3?['#e8b460','#c0c0c0','#cd7f32'][i]:'#5a5070'};font-size:13px;min-width:22px">${i<3?['🥇','🥈','🥉'][i]:`#${i+1}`}</span>
+        <div style="flex:1">
+          <div style="color:#f0e8de;font-family:'Cinzel',serif;letter-spacing:1px">${e.heroName} <span style="color:#7a5a8a;font-size:9px">— ${e.charName}</span> ${e.infiniteMode?'<span style="color:#9a2f45;font-size:9px">🌑 ∞</span>':''}</div>
+          <div style="color:#6a5a7a;font-size:9px">${e.date}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="color:#e8b460;font-family:'Cinzel',serif">${e.encounters} enc.</div>
+          <div style="color:#5a5070;font-size:9px">${fmtTime(e.runTime||0)}</div>
+        </div>
+      </div>`
+    ).join('');
+
+  ov.innerHTML = `
+    <div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #4a3a5a;border-radius:12px;padding:32px 36px;max-width:540px;width:92%;box-shadow:0 0 60px #c9984a22;max-height:90vh;overflow-y:auto">
+      <div style="font-family:'Cinzel Decorative',cursive;font-size:20px;color:#e8b460;text-shadow:0 0 30px #c9984a66;letter-spacing:3px;text-align:center;margin-bottom:6px">✦ Estadísticas ✦</div>
+      <div style="font-size:11px;color:#7a6a8a;font-style:italic;text-align:center;margin-bottom:20px">Registro eterno del Cazador</div>
+
+      <div style="margin-bottom:22px">${statsHtml}</div>
+
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#a090b8;text-transform:uppercase;border-bottom:1px solid #2a1f3a;padding-bottom:5px;margin-bottom:10px">🏆 Tabla de Clasificación</div>
+      <div>${lbHtml}</div>
+
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:24px">
+        <button class="btn" onclick="closeStats()" style="font-size:10px;padding:9px 22px">↩ Volver</button>
+        <button class="btn btn-wine" onclick="clearAllStats()" style="font-size:10px;padding:9px 22px">🗑 Borrar todo</button>
+      </div>
+    </div>
+  `;
+
+  ov.style.display = 'flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ov.style.opacity='1'));
+}
+
+function closeStats() {
+  const ov = document.getElementById('statsOverlay');
+  if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
+}
+
+function clearAllStats() {
+  if(confirm('¿Borrar todas las estadísticas y la tabla de clasificación?')) {
+    localStorage.removeItem(STATS_KEY);
+    localStorage.removeItem(LB_KEY);
+    showStats();
+  }
+}
+
+// ═══════════════════════════════════════════════
 //  CUSTOMIZE
 // ═══════════════════════════════════════════════
 function buildCustom(){
   buildCharDz();buildCardGrid();
-  ['e0','e1','e2'].forEach((_,i)=>{
-    const k='enemy'+i,dz=document.getElementById('dz-e'+i);
-    if(dz&&CUSTOM[k]&&!dz.querySelector('img')){const img=document.createElement('img');img.src=CUSTOM[k];dz.prepend(img);dz.classList.add('has-img')}
+  // Enemy customization now includes healer slot
+  const enemySlots = [
+    {key:'enemy0',  id:'dz-e0', ico:'🐀', lbl:'Normal',  cap:'Tier 1'},
+    {key:'enemy1',  id:'dz-e1', ico:'⚔',  lbl:'Élite',   cap:'Tier 2'},
+    {key:'enemy2',  id:'dz-e2', ico:'👁',  lbl:'Jefe',    cap:'Tier 3'},
+    {key:'enemy_healer', id:'dz-eh', ico:'✚', lbl:'Sanadora', cap:'Healer'},
+  ];
+  enemySlots.forEach(slot => {
+    const dz = document.getElementById(slot.id);
+    if(dz && CUSTOM[slot.key] && !dz.querySelector('img')){
+      const img=document.createElement('img');img.src=CUSTOM[slot.key];
+      dz.prepend(img);dz.classList.add('has-img');
+    }
   });
+  // Make sure healer dz is in DOM (injected dynamically if not)
+  ensureHealerDz();
 }
+
+function ensureHealerDz() {
+  if(document.getElementById('dz-eh')) return;
+  // Find the enemies section and inject healer dz
+  const e2Container = document.getElementById('dz-e2');
+  if(!e2Container) return;
+  const parentFlex = e2Container.parentElement?.parentElement;
+  if(!parentFlex) return;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px';
+  wrap.innerHTML = `
+    <div class="dz" id="dz-eh" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy_healer',this)">
+      <div class="dz-ico">✚</div><div class="dz-lbl">Sanadora</div>
+      <input type="file" accept="image/*" onchange="dzFile(event,'enemy_healer',this.parentNode)">
+      <button class="dz-clr" onclick="dzClr('enemy_healer',document.getElementById('dz-eh'),event)">✕</button>
+    </div>
+    <div class="dz-cap">Healer</div>
+  `;
+  parentFlex.appendChild(wrap);
+}
+
 function buildCharDz(){
   const row=document.getElementById('charDzRow');if(row.children.length>0)return;
   CHARS.forEach(ch=>{
@@ -1013,8 +1504,8 @@ const DEV = {
   invincible(){this._invincible=!this._invincible;console.log(`%c[DEV] Invencibilidad: ${this._invincible?'✅ ON':'❌ OFF'}`, 'color:#c9984a;font-size:14px;font-weight:bold');},
   winCombat(){if(!G.enemies){console.warn('[DEV] No hay combate activo.');return;}G.enemies.forEach(e=>e.hp=0);combatWin();},
   addGold(n=999){G.gold+=(n|0);if(document.getElementById('goldN'))document.getElementById('goldN').textContent=G.gold;saveG();console.log(`%c[DEV] +${n} oro → Total: ${G.gold}`,'color:#e8b460;font-weight:bold');},
-  skipNode(){if(!G.path){console.warn('[DEV] No hay run activo.');return;}advance();},
-  status(){console.log('%c[DEV] Estado actual:','color:#c9984a;font-weight:bold');console.table({Personaje:G.charId,Héroe:G.heroName,HP:`${G.player?.hp}/${G.player?.maxHp}`,Maná:`${G.player?.mana}/${G.player?.maxMana}`,Oro:G.gold,Acto:G.path?.act+1,Fila:G.path?.row,Invencible:DEV._invincible});}
+  skipNode(){if(!G.path){console.warn('[DEV] No hay run activo.');return;}if(G.infiniteMode)advanceInfinite();else advance();},
+  status(){console.log('%c[DEV] Estado actual:','color:#c9984a;font-weight:bold');console.table({Personaje:G.charId,Héroe:G.heroName,HP:`${G.player?.hp}/${G.player?.maxHp}`,Maná:`${G.player?.mana}/${G.player?.maxMana}`,Oro:G.gold,ModoInfinito:G.infiniteMode,Encuentros:G.infiniteEncounters,Multiplicador:getInfiniteMultiplier()});}
 };
 const _origEndTurn=endTurn;
 window.endTurn=function(){
@@ -1024,7 +1515,23 @@ window.endTurn=function(){
 console.log('%c[NOCTIS DECK] Herramientas de desarrollador → escribe DEV en la consola.','color:#c9984a;font-style:italic');
 
 // ═══════════════════════════════════════════════
+//  INJECT STATS BUTTON INTO TITLE + PATCH HTML
+// ═══════════════════════════════════════════════
+function injectStatsButton() {
+  const tBtns = document.querySelector('.t-btns');
+  if(!tBtns || document.getElementById('btnStats')) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-top:4px';
+  row.innerHTML = `<button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>`;
+  // Insert before the customize row
+  const smRow = tBtns.querySelector('div');
+  if(smRow) tBtns.insertBefore(row, smRow);
+  else tBtns.appendChild(row);
+}
+
+// ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
 loadCustom();
 updateTitle();
+injectStatsButton();

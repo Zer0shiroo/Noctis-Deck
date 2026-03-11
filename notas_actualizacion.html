@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noctis Deck — Notas de Actualización</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
-
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -20,31 +19,25 @@
     --text-bright:#e8d8ba;
     --fog:        #2a1e3a;
     --accent:     #4a2a6a;
+    --green:      #4acc70;
+    --green2:     #80ee90;
   }
-
   *{margin:0;padding:0;box-sizing:border-box}
-
   body {
     background: var(--ink);
     color: var(--text);
     font-family: 'IM Fell English', Georgia, serif;
     min-height: 100vh;
     overflow-x: hidden;
-    cursor: default;
   }
-
-  /* ── Fondo animado ── */
   body::before {
-    content:'';
-    position:fixed;inset:0;
+    content:'';position:fixed;inset:0;
     background:
       radial-gradient(ellipse 80% 60% at 20% 10%, #3a1a5a22 0%, transparent 60%),
       radial-gradient(ellipse 60% 80% at 80% 80%, #6a102022 0%, transparent 60%),
       radial-gradient(ellipse 40% 40% at 50% 50%, #1a0a2a44 0%, transparent 70%);
     pointer-events:none;z-index:0;
   }
-
-  /* Niebla flotante */
   #fog-layer {position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
   .fog-p {
     position:absolute;border-radius:50%;
@@ -56,25 +49,29 @@
     from {transform:translateX(-120%) scaleY(0.6)}
     to   {transform:translateX(110vw) scaleY(1.2)}
   }
-
-  /* ── Wrapper ── */
   .page {
     position:relative;z-index:2;
     max-width: 900px;
     margin: 0 auto;
-    padding: 60px 40px 100px;
+    padding: 60px 40px 120px;
   }
 
-  /* ── Header ── */
-  .header {
-    text-align:center;
-    margin-bottom: 70px;
-    position:relative;
+  /* ── VERSION BADGE ── */
+  .version-tag {
+    display:inline-block;
+    font-family:'Cinzel',serif;
+    font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+    padding:4px 12px;border-radius:3px;
+    margin-left:10px;vertical-align:middle;
   }
+  .vtag-new  { background:#4acc700f;color:var(--green2);border:1px solid #4acc7033; }
+  .vtag-fix  { background:#c030400f;color:#e87070;border:1px solid #c0304033; }
+  .vtag-old  { background:#2a1a3a;color:var(--dim);border:1px solid #3a2a4a33; }
+
+  /* ── HEADER ── */
+  .header { text-align:center; margin-bottom:70px; }
   .header-eye {
-    font-size: 56px;
-    display:block;
-    margin-bottom:12px;
+    font-size:56px;display:block;margin-bottom:12px;
     animation: eyePulse 4s ease-in-out infinite;
     filter: drop-shadow(0 0 20px #8a1a2a88);
   }
@@ -84,571 +81,610 @@
   }
   .game-title {
     font-family:'Cinzel Decorative',serif;
-    font-size: clamp(18px,4vw,38px);
-    font-weight:900;
-    letter-spacing:.15em;
-    text-transform:uppercase;
+    font-size: clamp(18px,4vw,38px);font-weight:900;
+    letter-spacing:.15em;text-transform:uppercase;
     color: var(--gold2);
     text-shadow: 0 0 30px #d4a84366, 0 2px 0 #6a1020;
     margin-bottom:8px;
   }
   .patch-title {
     font-family:'Cinzel',serif;
-    font-size: clamp(11px,2vw,16px);
-    font-weight:600;
-    letter-spacing:.4em;
-    text-transform:uppercase;
-    color: var(--crimson);
-    text-shadow: 0 0 15px #c0304055;
+    font-size: clamp(11px,2vw,16px);font-weight:600;
+    letter-spacing:.4em;text-transform:uppercase;
+    color: var(--crimson);text-shadow:0 0 15px #c0304055;
     margin-bottom:20px;
   }
-  .patch-version {
-    font-family:'IM Fell English',serif;
-    font-style:italic;
-    font-size:13px;
-    color: var(--dim);
-    letter-spacing:.1em;
-  }
+  .patch-version { font-style:italic;font-size:13px;color:var(--dim);letter-spacing:.1em; }
 
-  /* Divisor ornamental */
-  .divider {
-    display:flex;align-items:center;gap:14px;
-    margin: 30px 0;
-  }
-  .divider-line {
-    flex:1;height:1px;
-    background: linear-gradient(90deg, transparent, #d4a84344, transparent);
-  }
-  .divider-glyph {
-    color: var(--gold);font-size:16px;
-    text-shadow: 0 0 10px #d4a84388;
-    flex-shrink:0;
-  }
+  /* Divisor */
+  .divider { display:flex;align-items:center;gap:14px;margin:30px 0; }
+  .divider-line { flex:1;height:1px;background:linear-gradient(90deg,transparent,#d4a84344,transparent); }
+  .divider-glyph { color:var(--gold);font-size:16px;text-shadow:0 0 10px #d4a84388;flex-shrink:0; }
 
-  /* ── Secciones ── */
-  .section {
-    margin-bottom: 52px;
-    opacity:0;
-    transform: translateY(22px);
-    animation: fadeUp .7s ease forwards;
+  /* ── VERSIÓN BLOCK ── */
+  .version-block {
+    margin-bottom: 60px;
+    border: 1px solid #d4a84322;
+    border-radius: 10px;
+    overflow:hidden;
   }
-  .section:nth-child(1){animation-delay:.1s}
-  .section:nth-child(2){animation-delay:.25s}
-  .section:nth-child(3){animation-delay:.4s}
-  .section:nth-child(4){animation-delay:.55s}
-  .section:nth-child(5){animation-delay:.7s}
-  .section:nth-child(6){animation-delay:.85s}
-  .section:nth-child(7){animation-delay:1s}
-  .section:nth-child(8){animation-delay:1.15s}
-  .section:nth-child(9){animation-delay:1.3s}
-  @keyframes fadeUp {
-    to{opacity:1;transform:translateY(0)}
+  .version-header {
+    background: linear-gradient(135deg,#1e1430,#180e28);
+    padding: 20px 28px;
+    display:flex;align-items:center;gap:16px;
+    border-bottom:1px solid #d4a84322;
   }
+  .version-num {
+    font-family:'Cinzel Decorative',serif;
+    font-size: clamp(16px,2.5vw,24px);
+    letter-spacing:.12em;
+  }
+  .version-num.latest { color:var(--gold2);text-shadow:0 0 20px #d4a84366; }
+  .version-num.old    { color:var(--dim); }
+  .version-date { font-size:12px;color:var(--dim);font-style:italic;margin-left:auto;font-family:'Cinzel',serif;letter-spacing:.15em; }
+  .version-body { padding:24px 28px;display:flex;flex-direction:column;gap:0; }
 
-  .section-header {
-    display:flex;align-items:center;gap:14px;
-    margin-bottom:18px;
-  }
+  /* Sección */
+  .section { margin-bottom:32px; }
+  .section:last-child{ margin-bottom:0; }
+  .section-header { display:flex;align-items:center;gap:14px;margin-bottom:14px; }
   .section-icon {
-    font-size:22px;
-    width:42px;height:42px;
-    border-radius:50%;
+    font-size:20px;width:38px;height:38px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
-    background: linear-gradient(135deg, #2a1a3a, #1a0a28);
-    border:1px solid #d4a84344;
-    box-shadow: 0 0 12px #d4a84322, inset 0 0 8px #00000044;
+    background:linear-gradient(135deg,#2a1a3a,#1a0a28);
+    border:1px solid #d4a84344;box-shadow:0 0 12px #d4a84322,inset 0 0 8px #00000044;
     flex-shrink:0;
   }
   .section-title {
-    font-family:'Cinzel',serif;
-    font-size: clamp(13px,2.2vw,19px);
-    font-weight:900;
-    letter-spacing:.12em;
-    text-transform:uppercase;
+    font-family:'Cinzel',serif;font-size:clamp(12px,2vw,17px);font-weight:900;
+    letter-spacing:.12em;text-transform:uppercase;
   }
-  .s-fix   .section-title { color: #e87070; text-shadow:0 0 12px #c0304044 }
-  .s-feat  .section-title { color: var(--gold2); text-shadow:0 0 12px #d4a84344 }
-  .s-map   .section-title { color: #70b8e8; text-shadow:0 0 12px #3a8acc44 }
-  .s-cards .section-title { color: #a870e8; text-shadow:0 0 12px #7a3acc44 }
-  .s-combat.section-title,.s-combat .section-title { color: #e87070; text-shadow:0 0 12px #c0304044 }
-  .s-ux    .section-title { color: #70e8a0; text-shadow:0 0 12px #3acc7044 }
-  .s-dev   .section-title { color: #e8b870; text-shadow:0 0 12px #c9984a44 }
-  .s-cred  .section-title { color: var(--gold2); text-shadow:0 0 20px #d4a84366 }
+  .s-fix   .section-title { color:#e87070;text-shadow:0 0 12px #c0304044 }
+  .s-feat  .section-title { color:var(--gold2);text-shadow:0 0 12px #d4a84344 }
+  .s-map   .section-title { color:#70b8e8;text-shadow:0 0 12px #3a8acc44 }
+  .s-cards .section-title { color:#a870e8;text-shadow:0 0 12px #7a3acc44 }
+  .s-combat .section-title{ color:#e87070;text-shadow:0 0 12px #c0304044 }
+  .s-ux    .section-title { color:#70e8a0;text-shadow:0 0 12px #3acc7044 }
+  .s-dev   .section-title { color:#e8b870;text-shadow:0 0 12px #c9984a44 }
+  .s-inf   .section-title { color:#cc4060;text-shadow:0 0 12px #9a2f4566 }
+  .s-stats .section-title { color:#70b8e8;text-shadow:0 0 12px #3a8acc44 }
+  .s-cred  .section-title { color:var(--gold2);text-shadow:0 0 20px #d4a84366 }
+  .s-heal  .section-title { color:var(--green2);text-shadow:0 0 12px #4acc7044 }
+  .s-ui    .section-title { color:#f0c060;text-shadow:0 0 12px #d4a84344 }
 
-  /* ── Cards de contenido ── */
+  /* Card */
   .card {
-    background: linear-gradient(135deg, #1e1430 0%, #150d22 100%);
-    border: 1px solid #d4a84322;
-    border-radius: 6px;
-    padding: 20px 24px;
-    position:relative;
-    overflow:hidden;
+    background:linear-gradient(135deg,#1e1430 0%,#150d22 100%);
+    border:1px solid #d4a84322;border-radius:6px;
+    padding:20px 24px;position:relative;overflow:hidden;
   }
   .card::before {
-    content:'';position:absolute;
-    top:0;left:0;right:0;height:1px;
-    background: linear-gradient(90deg, transparent, #d4a84344, transparent);
-  }
-  .card::after {
-    content:'';position:absolute;
-    bottom:0;left:0;right:0;height:1px;
-    background: linear-gradient(90deg, transparent, #6a102033, transparent);
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,#d4a84344,transparent);
   }
 
-  /* Items de lista */
   .items { display:flex;flex-direction:column;gap:10px; }
   .item {
     display:flex;gap:14px;align-items:flex-start;
-    padding: 10px 14px;
-    background: #1a1030;
-    border-radius:4px;
-    border-left: 2px solid transparent;
-    transition: border-color .2s, background .2s;
+    padding:10px 14px;background:#1a1030;border-radius:4px;
+    border-left:2px solid transparent;transition:border-color .2s,background .2s;
   }
-  .item:hover { background:#21183a; border-left-color: var(--gold); }
+  .item:hover{ background:#21183a;border-left-color:var(--gold); }
   .item-tag {
-    font-size:9px;font-family:'Cinzel',serif;letter-spacing:.12em;
-    font-weight:700;text-transform:uppercase;padding:3px 7px;border-radius:3px;
-    flex-shrink:0;margin-top:2px;white-space:nowrap;
+    font-size:9px;font-family:'Cinzel',serif;letter-spacing:.12em;font-weight:700;
+    text-transform:uppercase;padding:3px 7px;border-radius:3px;flex-shrink:0;
+    margin-top:2px;white-space:nowrap;
   }
   .tag-fix    { background:#c030400f;color:#e87070;border:1px solid #c0304033 }
   .tag-new    { background:#d4a8430f;color:var(--gold2);border:1px solid #d4a84333 }
   .tag-change { background:#3a8acc0f;color:#70b8e8;border:1px solid #3a8acc33 }
   .tag-dev    { background:#c9984a0f;color:#e8b870;border:1px solid #c9984a33 }
+  .tag-heal   { background:#4acc700f;color:var(--green2);border:1px solid #4acc7033 }
+  .tag-inf    { background:#9a2f450f;color:#cc4060;border:1px solid #9a2f4533 }
+  .tag-stats  { background:#3a8acc0f;color:#70b8e8;border:1px solid #3a8acc33 }
+  .tag-ui     { background:#d4a8430f;color:#f0c060;border:1px solid #d4a84333 }
 
-  .item-text {
-    font-size: 14px;
-    line-height: 1.65;
-    color: var(--text-bright);
-  }
+  .item-text { font-size:14px;line-height:1.65;color:var(--text-bright); }
   .item-text strong { color:var(--gold2);font-weight:normal;font-style:italic }
   .item-text code {
-    font-family: 'Courier New', monospace;
-    font-size:12px;
-    background:#2a1a3a;
-    padding:1px 6px;border-radius:3px;
-    color:#e8b870;
-    border:1px solid #c9984a33;
+    font-family:'Courier New',monospace;font-size:12px;
+    background:#2a1a3a;padding:1px 6px;border-radius:3px;
+    color:#e8b870;border:1px solid #c9984a33;
   }
-
-  /* Sub-items */
-  .sub-items {
-    margin-top:8px;
-    padding-left:14px;
-    display:flex;flex-direction:column;gap:5px;
-    border-left:1px solid #d4a84322;
-  }
-  .sub-item {
-    font-size:13px;color: var(--text-bright);line-height:1.55;
-    display:flex;gap:8px;align-items:flex-start;
-  }
+  .sub-items { margin-top:8px;padding-left:14px;display:flex;flex-direction:column;gap:5px;border-left:1px solid #d4a84322; }
+  .sub-item { font-size:13px;color:var(--text-bright);line-height:1.55;display:flex;gap:8px;align-items:flex-start; }
   .sub-item::before { content:'◆';color:var(--gold);font-size:8px;margin-top:4px;flex-shrink:0 }
 
-  /* ── Dev block ── */
+  /* Dev block */
   .dev-block {
-    background: #0f0c18;
-    border:1px solid #c9984a44;
-    border-radius:6px;
-    padding:20px 24px;
+    background:#0f0c18;border:1px solid #c9984a44;border-radius:6px;padding:20px 24px;
     font-family:'Courier New',monospace;
   }
   .dev-block .prompt { color:#c9984a;margin-bottom:14px;font-size:12px;letter-spacing:.05em }
   .cmd-row { display:flex;align-items:center;gap:12px;margin:8px 0 }
   .cmd { color:#e8b870;font-size:13px }
-  .cmd-desc { color: var(--text-bright);font-size:12px;font-family:'IM Fell English',serif;font-style:italic }
-  .cursor {
-    display:inline-block;width:8px;height:14px;
-    background:#c9984a;margin-left:2px;
-    animation:blink 1s step-end infinite;
-  }
+  .cmd-desc { color:var(--text-bright);font-size:12px;font-family:'IM Fell English',serif;font-style:italic }
+  .cursor { display:inline-block;width:8px;height:14px;background:#c9984a;margin-left:2px;animation:blink 1s step-end infinite; }
   @keyframes blink{50%{opacity:0}}
 
-  /* ── Créditos ── */
+  /* Credits card */
   .credits-card {
-    background: linear-gradient(135deg, #1e0a18 0%, #2a0a20 50%, #1e0a18 100%);
-    border:1px solid #d4a84344;
-    border-radius:8px;
-    padding:36px 32px;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
+    background:linear-gradient(135deg,#1e0a18 0%,#2a0a20 50%,#1e0a18 100%);
+    border:1px solid #d4a84344;border-radius:8px;padding:36px 32px;
+    text-align:center;position:relative;overflow:hidden;
   }
   .credits-card::before {
     content:'';position:absolute;inset:0;
-    background: radial-gradient(ellipse 70% 50% at 50% 50%, #6a102015 0%, transparent 70%);
+    background:radial-gradient(ellipse 70% 50% at 50% 50%,#6a102015 0%,transparent 70%);
     pointer-events:none;
   }
-  .credits-subtitle {
-    font-family:'Cinzel',serif;font-size:10px;letter-spacing:.4em;
-    text-transform:uppercase;color:var(--crimson);margin-bottom:28px;
-    text-shadow:0 0 10px #c0304044;
-  }
+  .credits-subtitle { font-family:'Cinzel',serif;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:28px; }
   .dev-name {
-    font-family:'Cinzel Decorative',serif;
-    font-size:clamp(14px,2.5vw,22px);
-    color:var(--gold2);
-    text-shadow:0 0 20px #d4a84366;
-    margin:10px 0;
-    animation: nameGlow 3s ease-in-out infinite alternate;
+    font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.5vw,22px);
+    color:var(--gold2);text-shadow:0 0 20px #d4a84366;margin:10px 0;
+    animation:nameGlow 3s ease-in-out infinite alternate;
   }
   .dev-name:nth-child(3){animation-delay:1.5s}
-  @keyframes nameGlow {
-    from{text-shadow:0 0 10px #d4a84344}
-    to  {text-shadow:0 0 30px #d4a84399,0 0 60px #c0304044}
-  }
-  .dev-role {
-    font-size:11px;letter-spacing:.25em;text-transform:uppercase;
-    color:var(--dim);font-family:'Cinzel',serif;margin-bottom:24px;
-  }
-  .credits-seal {
-    display:inline-block;margin-top:20px;
-    font-size:32px;
-    animation:sealSpin 20s linear infinite;
-    filter:drop-shadow(0 0 12px #d4a84366);
-  }
+  @keyframes nameGlow { from{text-shadow:0 0 10px #d4a84344} to{text-shadow:0 0 30px #d4a84399,0 0 60px #c0304044} }
+  .dev-role { font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);font-family:'Cinzel',serif;margin-bottom:24px; }
+  .credits-seal { display:inline-block;margin-top:20px;font-size:32px;animation:sealSpin 20s linear infinite;filter:drop-shadow(0 0 12px #d4a84366); }
   @keyframes sealSpin{to{transform:rotate(360deg)}}
 
-  /* ── Bug highlight ── */
-  .bug-note {
-    background:#c030400a;border:1px solid #c0304033;
-    border-radius:4px;padding:12px 16px;
-    font-size:13px;color:#e87070;
-    font-style:italic;line-height:1.6;
-    margin-top:10px;
-  }
-  .bug-note::before{content:'⚠ ';font-style:normal}
-
-  /* ── Back link ── */
-  .back-bar {
-    position:fixed;bottom:0;left:0;right:0;
-    background: linear-gradient(0deg, #0a0810 60%, transparent);
-    padding:20px 40px;
-    display:flex;justify-content:center;
-    z-index:10;
-  }
-  .back-btn {
-    font-family:'Cinzel',serif;font-size:12px;font-weight:600;
-    letter-spacing:.25em;text-transform:uppercase;
-    color:var(--gold2);text-decoration:none;
-    padding:10px 28px;
-    border:1px solid #d4a84344;border-radius:4px;
-    background: linear-gradient(135deg, #2a1a3a88, #1a0a2888);
-    backdrop-filter:blur(8px);
-    transition: all .25s;
-    text-shadow:0 0 10px #d4a84366;
-    box-shadow:0 0 20px #d4a84311;
-  }
-  .back-btn:hover {
-    background: linear-gradient(135deg, #3a2a4a, #2a1a3a);
-    border-color:#d4a84388;
-    box-shadow:0 0 30px #d4a84333;
-    text-shadow:0 0 20px #d4a843aa;
-  }
-
-  /* ── Map visual ── */
-  .map-demo {
-    display:flex;justify-content:center;gap:8px;
-    padding:20px 0 10px;
-    flex-wrap:wrap;
-  }
+  /* Map demo */
+  .map-demo { display:flex;justify-content:center;gap:8px;padding:20px 0 10px;flex-wrap:wrap; }
   .map-col { display:flex;flex-direction:column;gap:6px;align-items:center }
   .map-node {
     width:52px;height:44px;border-radius:5px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-    border:1px solid #d4a84333;
-    background:#1a1030;font-size:16px;
-    transition: transform .2s, box-shadow .2s;
-    cursor:default;
+    border:1px solid #d4a84333;background:#1a1030;font-size:16px;
+    transition:transform .2s,box-shadow .2s;
   }
   .map-node:hover{transform:translateY(-2px);box-shadow:0 4px 16px #d4a84322}
   .map-node span{font-size:8px;font-family:'Cinzel',serif;letter-spacing:.05em;color:var(--dim)}
-  .mn-combat{border-color:#c0304033}
-  .mn-elite {border-color:#8a1a2a55;background:#1a0a20}
-  .mn-rest  {border-color:#3a6a3a44;background:#0e1a10}
-  .mn-shop  {border-color:#c9984a44;background:#1a140a}
-  .mn-chest {border-color:#d4a84355;background:#1a1505}
-  .mn-boss  {border-color:#8a1a2a88;background:#1a0808;width:58px}
+  .mn-combat{border-color:#c0304033}.mn-elite{border-color:#8a1a2a55;background:#1a0a20}
+  .mn-rest{border-color:#3a6a3a44;background:#0e1a10}.mn-shop{border-color:#c9984a44;background:#1a140a}
+  .mn-chest{border-color:#d4a84355;background:#1a1505}.mn-boss{border-color:#8a1a2a88;background:#1a0808;width:58px}
   .map-arrow{color:var(--dim);font-size:10px;margin:2px 0}
 
-  /* Responsive */
+  /* Back bar */
+  .back-bar {
+    position:fixed;bottom:0;left:0;right:0;
+    background:linear-gradient(0deg,#0a0810 60%,transparent);
+    padding:20px 40px;display:flex;justify-content:center;z-index:10;
+  }
+  .back-btn {
+    font-family:'Cinzel',serif;font-size:12px;font-weight:600;
+    letter-spacing:.25em;text-transform:uppercase;color:var(--gold2);text-decoration:none;
+    padding:10px 28px;border:1px solid #d4a84344;border-radius:4px;
+    background:linear-gradient(135deg,#2a1a3a88,#1a0a2888);backdrop-filter:blur(8px);
+    transition:all .25s;text-shadow:0 0 10px #d4a84366;box-shadow:0 0 20px #d4a84311;
+  }
+  .back-btn:hover{background:linear-gradient(135deg,#3a2a4a,#2a1a3a);border-color:#d4a84388;box-shadow:0 0 30px #d4a84333;}
+
   @media(max-width:600px){
     .page{padding:40px 20px 100px}
     .card,.dev-block{padding:16px}
     .item{flex-direction:column;gap:6px}
+    .version-body{padding:16px}
+    .version-header{padding:16px}
   }
 </style>
 </head>
 <body>
-
 <div id="fog-layer"></div>
-
 <div class="page">
 
   <!-- HEADER -->
   <div class="header">
     <span class="header-eye">👁</span>
     <div class="game-title">Noctis Deck</div>
-    <div class="patch-title">Pergamino de Cambios · Parche v2.0</div>
+    <div class="patch-title">Pergamino de Cambios</div>
     <div class="patch-version">Registrado en los archivos de la Torre Obscura · Anno Domini MMXXVI</div>
   </div>
 
-  <!-- CORRECCIONES DE BUGS -->
-  <div class="section s-fix">
-    <div class="section-header">
-      <div class="section-icon">🔧</div>
-      <div class="section-title">Exorcismos — Corrección de Males</div>
+  <!-- ══════════════════════════════════
+       VERSIÓN 0.0.3 — LA MÁS RECIENTE
+       ══════════════════════════════════ -->
+  <div class="version-block">
+    <div class="version-header">
+      <div class="version-num latest">v 0.0.3 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-date">2026</div>
     </div>
-    <div class="card">
-      <div class="items">
+    <div class="version-body">
 
-        <div class="item">
-          <span class="item-tag tag-fix">BUG</span>
-          <div class="item-text">
-            <strong>Partida guardada bloqueada.</strong> Al continuar una partida guardada el mapa aparecía completamente bloqueado sin poder interactuar con ningún nodo. Corregido el sistema de restauración de progreso para retomar exactamente desde el nodo en que se encontraba el jugador.
-          </div>
+      <!-- ENEMIGO SANADORA -->
+      <div class="section s-heal">
+        <div class="section-header">
+          <div class="section-icon">✚</div>
+          <div class="section-title">Nuevo Enemigo — La Sanadora</div>
         </div>
-
-        <div class="item">
-          <span class="item-tag tag-fix">BUG</span>
-          <div class="item-text">
-            <strong>Cartas desaparecen al tener duplicadas.</strong> Cuando el jugador acumulaba 2 o más copias de la misma carta, el algoritmo de robo eliminaba toda la mano y dejaba únicamente las dos últimas. Reescrito completamente el sistema de robo con límite correcto de 2 copias por carta.
-          </div>
-        </div>
-
-        <div class="item">
-          <span class="item-tag tag-fix">BUG</span>
-          <div class="item-text">
-            <strong>Maná máximo incorrecto en UI.</strong> El texto de maná mostraba siempre <code>/ 3</code> independientemente del personaje seleccionado, causando que La Hechicera (4 de maná) mostrase <code>4 / 3</code>. Ahora el valor máximo se toma directamente del estado del personaje en partida.
-          </div>
-        </div>
-
-        <div class="item">
-          <span class="item-tag tag-fix">BUG</span>
-          <div class="item-text">
-            <strong>Cartas transparentes e injugables a partir del segundo turno.</strong> El flag interno <code>_locked</code> quedaba atascado en <code>true</code> entre turnos impidiendo jugar cualquier carta. Reescrito el flujo de fin de turno usando <code>async/await</code> para garantizar que el bloqueo se libera siempre.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- MAPA -->
-  <div class="section s-map">
-    <div class="section-header">
-      <div class="section-icon">🗺</div>
-      <div class="section-title">El Gran Mapa — Nuevas Rutas</div>
-    </div>
-    <div class="card">
-      <div class="items">
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Mapa ramificado al estilo Slay the Spire.</strong> Cada acto ahora presenta <strong>6 filas de nodos</strong> con dos opciones por fila. El jugador elige su ruta en cada encuentro, nunca existe un único camino forzado.
-          </div>
-        </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Nodos de Cofre</strong> 📦 añadidos al mapa. Al abrir un cofre puedes encontrar tres destinos posibles:
-            <div class="sub-items">
-              <div class="sub-item">🪙 <strong>Monedas</strong> — entre 15 y 40 de oro según tu fortuna</div>
-              <div class="sub-item">🃏 <strong>Carta</strong> — un grimorio con tres cartas para añadir al mazo</div>
-              <div class="sub-item">💀 <strong>Mímic / Emboscada</strong> — la caja cobra vida, prepárate para combatir</div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-heal">NUEVO</span>
+              <div class="item-text">
+                <strong>Enemigo tipo Sanadora</strong> añadido al bestiario. Tiene 3 variantes:
+                <div class="sub-items">
+                  <div class="sub-item"><strong>Sanadora Espectral</strong> — 22 HP · Cura 8 · Escudo 6</div>
+                  <div class="sub-item"><strong>Médium Corrupta</strong> — 25 HP · Cura 10 · Escudo 8</div>
+                  <div class="sub-item"><strong>Hechicera Pálida</strong> — 20 HP · Cura 7 · Escudo 5</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-heal">MECÁNICA</span>
+              <div class="item-text">
+                La Sanadora sigue un <strong>ciclo de 4 acciones</strong> por turno:
+                <div class="sub-items">
+                  <div class="sub-item">❤ <strong>Curar</strong> — cura al aliado con menos HP</div>
+                  <div class="sub-item">🛡 <strong>Escudar</strong> — aplica escudo a todos sus aliados</div>
+                  <div class="sub-item">☠ <strong>Maldición</strong> — aplica Veneno o Sangrado al jugador</div>
+                  <div class="sub-item">⚔ <strong>Ataque</strong> — ataque débil directo</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-heal">SPAWN</span>
+              <div class="item-text">
+                <strong>20% de probabilidad</strong> de aparecer en grupos normales y de élite, sustituyendo a una criatura del grupo. <em>Nunca aparece en encuentros de jefe.</em> La intención de la siguiente acción se muestra claramente bajo su nombre.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-heal">ARTE</span>
+              <div class="item-text">
+                Coloca tu imagen personalizada en <code>resources/enemigos/healer.png</code>. También disponible en la pantalla de Personalización con una nueva ranura dedicada <strong>✚ Sanadora</strong>.
+              </div>
             </div>
           </div>
         </div>
-        <div class="item">
-          <span class="item-tag tag-change">CAMBIO</span>
-          <div class="item-text">
-            <strong>Nodos visitados claramente marcados.</strong> El camino recorrido se muestra visualmente de forma inequívoca para que el jugador siempre sepa dónde ha estado y cuáles son sus próximas opciones.
-          </div>
-        </div>
       </div>
 
-      <!-- Diagrama visual del mapa -->
-      <div style="margin-top:20px">
-        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;text-align:center">Vista del mapa — Ejemplo de ruta</div>
-        <div class="map-demo">
-          <div class="map-col">
-            <div class="map-node mn-boss">👁<span>JEFE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-elite">💀<span>ÉLITE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-rest">🕯<span>DESCANSO</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-shop">🛒<span>TIENDA</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-chest">📦<span>COFRE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
-          </div>
-          <div style="color:var(--dim);font-size:18px;align-self:center;margin:0 4px">⟷</div>
-          <div class="map-col">
-            <div class="map-node mn-boss" style="opacity:.3">👁<span>JEFE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-rest">🕯<span>DESCANSO</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-chest">📦<span>COFRE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-elite">💀<span>ÉLITE</span></div>
-            <div class="map-arrow">▲</div>
-            <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
-          </div>
+      <!-- MODO INFINITO -->
+      <div class="section s-inf">
+        <div class="section-header">
+          <div class="section-icon">🌑</div>
+          <div class="section-title">Modo Infinito — La Oscuridad Sin Fin</div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COMBATE -->
-  <div class="section s-combat">
-    <div class="section-header">
-      <div class="section-icon">⚔</div>
-      <div class="section-title">Combate — Nuevas Reglas del Duelo</div>
-    </div>
-    <div class="card">
-      <div class="items">
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Múltiples enemigos por encuentro.</strong> Los encuentros ya no son uno contra uno. Los grupos varían según el tipo de nodo:
-            <div class="sub-items">
-              <div class="sub-item"><strong>Combate común</strong> — grupos de 2 o 3 enemigos de baja vida</div>
-              <div class="sub-item"><strong>Élite</strong> — 2 élites, o 1 élite + 1 común</div>
-              <div class="sub-item"><strong>Jefe</strong> — siempre solo, sin modificación de estadísticas</div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-inf">NUEVO</span>
+              <div class="item-text">
+                Al completar el Acto III aparece un <strong>overlay de elección</strong>: volver al menú principal (y ver los créditos) o entrar al <strong>Modo Infinito</strong>, un flujo de encuentros sin fin hasta morir.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-inf">DIFICULTAD</span>
+              <div class="item-text">
+                Los enemigos en modo infinito tienen un <strong>multiplicador base 1.5×</strong> en HP, daño y bufos. Cada 10 encuentros completados el multiplicador crece <strong>+0.5×</strong> adicional.
+                <div class="sub-items">
+                  <div class="sub-item">Encuentros 0–9 · Multiplicador 1.5×</div>
+                  <div class="sub-item">Encuentros 10–19 · Multiplicador 2.0×</div>
+                  <div class="sub-item">Encuentros 20–29 · Multiplicador 2.5×</div>
+                  <div class="sub-item">... y así indefinidamente</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-inf">MAPA</span>
+              <div class="item-text">
+                El Modo Infinito presenta un <strong>mapa simplificado</strong> con cuatro opciones siempre disponibles: Combate · Élite · Descanso · Tienda. El multiplicador y el número de encuentros se muestran en pantalla en todo momento.
+              </div>
             </div>
           </div>
         </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Selección de objetivo.</strong> Haz clic sobre el enemigo que deseas atacar. El objetivo activo se resalta con un anillo luminoso.
-          </div>
-        </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Overlay de cambio de turno.</strong> Al finalizar el turno aparece en pantalla el texto <em>"Turno del Enemigo"</em>, los enemigos atacan, y después se muestra <em>"Turno de [nombre del héroe]"</em> antes de devolver el control al jugador.
-          </div>
-        </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Mano persistente entre turnos.</strong> Las cartas no utilizadas permanecen en mano. Máximo 6 cartas y máximo 2 copias de la misma carta. Al inicio de cada turno solo se reponen las cartas gastadas.
-          </div>
-        </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Display de escudo lateral.</strong> Cuando el jugador tiene bloqueo activo, aparece un indicador lateral con el valor exacto de escudo, con animación al activarse.
-          </div>
-        </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Animaciones de combate.</strong> Golpe al enemigo con destello de impacto · Números de daño flotantes · Animación de curación en el retrato del héroe · Animación del escudo al bloquearse.
-          </div>
-        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- CARTAS -->
-  <div class="section s-cards">
-    <div class="section-header">
-      <div class="section-icon">🃏</div>
-      <div class="section-title">El Grimorio — Nuevas Cartas</div>
-    </div>
-    <div class="card">
-      <div class="items">
-        <div class="item">
-          <span class="item-tag tag-new">CARTA</span>
-          <div class="item-text">
-            <strong>Susurro Vital</strong> — Coste: 1 maná · Tipo: Habilidad<br>
-            <em>Recupera 8 de Vitalidad.</em> Una carta de curación para mitigar el daño recibido en encuentros largos. Imagen personalizable desde la pantalla de personalización.
-          </div>
+      <!-- ESTADÍSTICAS Y CLASIFICACIÓN -->
+      <div class="section s-stats">
+        <div class="section-header">
+          <div class="section-icon">📊</div>
+          <div class="section-title">Estadísticas & Tabla de Clasificación</div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- UX / PERSONAJE -->
-  <div class="section s-ux">
-    <div class="section-header">
-      <div class="section-icon">✦</div>
-      <div class="section-title">Experiencia del Héroe</div>
-    </div>
-    <div class="card">
-      <div class="items">
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Pantalla de nombre del héroe.</strong> Antes de cada partida puedes bautizar a tu personaje. Incluye un botón de dado 🎲 que sugiere un nombre al azar entre 10 nombres de temática gótico-victoriana:
-            <div class="sub-items">
-              <div class="sub-item">Lord Ashcroft · Lady Morvaine · Sir Dorian Vex · Elara Nighthollow</div>
-              <div class="sub-item">Edmund Blackthorn · Seraphine Dusk · Victor Greymoore · Isolde Ravenscroft</div>
-              <div class="sub-item">Aldric Voss · Mireille Ashfen</div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-stats">NUEVO</span>
+              <div class="item-text">
+                Botón <strong>📊 Estadísticas</strong> en el menú principal. Muestra un panel de estadísticas globales acumuladas entre todas las partidas:
+                <div class="sub-items">
+                  <div class="sub-item">Partidas jugadas · Tiempo total de juego</div>
+                  <div class="sub-item">Mejor racha de encuentros · Tiempo de esa racha</div>
+                  <div class="sub-item">Mayor daño en un solo golpe · Daño total en la mejor run</div>
+                  <div class="sub-item">Mayor daño tanqueado · Mayor daño curado</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-stats">NUEVO</span>
+              <div class="item-text">
+                <strong>Tabla de clasificación local</strong> con el top 10 de partidas. Muestra nombre del héroe, personaje, número de encuentros, tiempo de la run, y si fue en Modo Infinito (🌑 ∞). Ordenado por encuentros completados.
+              </div>
             </div>
           </div>
         </div>
-        <div class="item">
-          <span class="item-tag tag-change">CAMBIO</span>
-          <div class="item-text">
-            <strong>Brillo de textos aumentado.</strong> Los textos del mapa, cartas y UI general han sido ligeramente aclarados para mejorar la legibilidad sin alterar el diseño gótico existente.
+      </div>
+
+      <!-- UI ESCALADA -->
+      <div class="section s-ui">
+        <div class="section-header">
+          <div class="section-icon">🔍</div>
+          <div class="section-title">Interfaz — Todo más Grande</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-ui">CAMBIO</span>
+              <div class="item-text">
+                Escala general de la interfaz aumentada. Las <strong>cartas, enemigos, mapa, menús y textos</strong> son notablemente más grandes para mejorar la legibilidad y la comodidad visual en todo tipo de pantallas.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-ui">CAMBIO</span>
+              <div class="item-text">
+                El enlace de notas del parche en la pantalla principal ahora muestra el <strong>número de versión actual</strong>: <em>✦ Notas del Parche (v0.0.3)</em>.
+              </div>
+            </div>
           </div>
         </div>
-        <div class="item">
-          <span class="item-tag tag-new">NUEVO</span>
-          <div class="item-text">
-            <strong>Pantalla de Créditos al completar el Acto III.</strong> Al derrotar al jefe final se despliega una pantalla de créditos cinematográfica con animación de aparición progresiva y los nombres de los autores.
+      </div>
+
+      <!-- BUGS CORREGIDOS v0.0.3 -->
+      <div class="section s-fix">
+        <div class="section-header">
+          <div class="section-icon">🔧</div>
+          <div class="section-title">Exorcismos v0.0.3</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Doble entrada en la tabla de clasificación en Modo Infinito.</strong> Al morir en modo infinito, el personaje aparecía dos o más veces en el ranking. Añadido un guard <code>runFinalized</code> que garantiza que la entrada se registra una única vez por run.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Texto "Dificultad: N" en menú principal.</strong> Aparecía un texto de dificultad innecesario en la pantalla de título que no tenía efecto gameplay visible. Eliminado por completo de la interfaz.
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- DEV MODE -->
-  <div class="section s-dev">
-    <div class="section-header">
-      <div class="section-icon">⚙</div>
-      <div class="section-title">Modo Desarrollador — Herramientas Ocultas</div>
-    </div>
-    <div class="dev-block">
-      <div class="prompt">// Consola del navegador (F12) → pestaña Console</div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.invincible()</span>
-        <span class="cmd-desc">— activa/desactiva invencibilidad del jugador</span>
-      </div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.winCombat()</span>
-        <span class="cmd-desc">— termina el combate actual con victoria inmediata</span>
-      </div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.addGold(500)</span>
-        <span class="cmd-desc">— añade la cantidad indicada de oro a la bolsa</span>
-      </div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.skipNode()</span>
-        <span class="cmd-desc">— avanza al siguiente nodo sin completar el actual</span>
-      </div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.unlock()</span>
-        <span class="cmd-desc">— desbloquea las cartas si quedan atascadas (emergencia)</span>
-      </div>
-      <div class="cmd-row">
-        <span class="cmd">DEV.status()</span>
-        <span class="cmd-desc">— muestra tabla completa del estado de la partida<span class="cursor"></span></span>
-      </div>
-      <div style="margin-top:14px;font-size:11px;color:var(--dim);font-family:'IM Fell English',serif;font-style:italic">
-        Estas herramientas pueden ser eliminadas en versiones de producción.
-      </div>
-    </div>
-  </div>
+    </div><!-- /version-body -->
+  </div><!-- /version-block v0.0.3 -->
 
-  <!-- CRÉDITOS -->
-  <div class="section s-cred">
+
+  <!-- ══════════════════════════════════
+       VERSIÓN 2.0 — ANTERIOR
+       ══════════════════════════════════ -->
+  <div class="version-block" style="opacity:.85">
+    <div class="version-header">
+      <div class="version-num old">v 2.0 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+
+      <!-- CORRECCIONES DE BUGS -->
+      <div class="section s-fix">
+        <div class="section-header">
+          <div class="section-icon">🔧</div>
+          <div class="section-title">Exorcismos — Corrección de Males</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Partida guardada bloqueada.</strong> Al continuar una partida guardada el mapa aparecía completamente bloqueado sin poder interactuar con ningún nodo. Corregido el sistema de restauración de progreso para retomar exactamente desde el nodo en que se encontraba el jugador.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Cartas desaparecen al tener duplicadas.</strong> Cuando el jugador acumulaba 2 o más copias de la misma carta, el algoritmo de robo eliminaba toda la mano y dejaba únicamente las dos últimas. Reescrito completamente el sistema de robo con límite correcto de 2 copias por carta.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Maná máximo incorrecto en UI.</strong> El texto de maná mostraba siempre <code>/ 3</code> independientemente del personaje seleccionado, causando que La Hechicera (4 de maná) mostrase <code>4 / 3</code>. Ahora el valor máximo se toma directamente del estado del personaje en partida.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">BUG</span>
+              <div class="item-text">
+                <strong>Cartas transparentes e injugables a partir del segundo turno.</strong> El flag interno <code>_locked</code> quedaba atascado en <code>true</code> entre turnos impidiendo jugar cualquier carta. Reescrito el flujo de fin de turno usando <code>async/await</code> para garantizar que el bloqueo se libera siempre.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAPA -->
+      <div class="section s-map">
+        <div class="section-header">
+          <div class="section-icon">🗺</div>
+          <div class="section-title">El Gran Mapa — Nuevas Rutas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Mapa ramificado al estilo Slay the Spire.</strong> Cada acto ahora presenta <strong>6 filas de nodos</strong> con dos opciones por fila. El jugador elige su ruta en cada encuentro, nunca existe un único camino forzado.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Nodos de Cofre</strong> 📦 añadidos al mapa. Al abrir un cofre puedes encontrar tres destinos posibles:
+                <div class="sub-items">
+                  <div class="sub-item">🪙 <strong>Monedas</strong> — entre 15 y 40 de oro según tu fortuna</div>
+                  <div class="sub-item">🃏 <strong>Carta</strong> — un grimorio con tres cartas para añadir al mazo</div>
+                  <div class="sub-item">💀 <strong>Mímic / Emboscada</strong> — la caja cobra vida, prepárate para combatir</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">
+                <strong>Nodos visitados claramente marcados.</strong> El camino recorrido se muestra visualmente de forma inequívoca para que el jugador siempre sepa dónde ha estado y cuáles son sus próximas opciones.
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;text-align:center">Vista del mapa — Ejemplo de ruta</div>
+            <div class="map-demo">
+              <div class="map-col">
+                <div class="map-node mn-boss">👁<span>JEFE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-elite">💀<span>ÉLITE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-rest">🕯<span>DESCANSO</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-shop">🛒<span>TIENDA</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-chest">📦<span>COFRE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
+              </div>
+              <div style="color:var(--dim);font-size:18px;align-self:center;margin:0 4px">⟷</div>
+              <div class="map-col">
+                <div class="map-node mn-boss" style="opacity:.3">👁<span>JEFE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-rest">🕯<span>DESCANSO</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-chest">📦<span>COFRE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-elite">💀<span>ÉLITE</span></div>
+                <div class="map-arrow">▲</div>
+                <div class="map-node mn-combat">⚔<span>COMBATE</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMBATE -->
+      <div class="section s-combat">
+        <div class="section-header">
+          <div class="section-icon">⚔</div>
+          <div class="section-title">Combate — Nuevas Reglas del Duelo</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Múltiples enemigos por encuentro.</strong> Los encuentros ya no son uno contra uno. Los grupos varían según el tipo de nodo:
+                <div class="sub-items">
+                  <div class="sub-item"><strong>Combate común</strong> — grupos de 2 o 3 enemigos de baja vida</div>
+                  <div class="sub-item"><strong>Élite</strong> — 2 élites, o 1 élite + 1 común</div>
+                  <div class="sub-item"><strong>Jefe</strong> — siempre solo, sin modificación de estadísticas</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Selección de objetivo.</strong> Haz clic sobre el enemigo que deseas atacar. El objetivo activo se resalta con un anillo luminoso.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Mano persistente entre turnos.</strong> Las cartas no utilizadas permanecen en mano. Máximo 6 cartas y máximo 2 copias de la misma carta. Al inicio de cada turno solo se reponen las cartas gastadas.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Display de escudo lateral.</strong> Cuando el jugador tiene bloqueo activo, aparece un indicador lateral con el valor exacto de escudo, con animación al activarse.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Animaciones de combate.</strong> Golpe al enemigo con destello de impacto · Números de daño flotantes · Animación de curación en el retrato del héroe · Animación del escudo al bloquearse.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARTAS -->
+      <div class="section s-cards">
+        <div class="section-header">
+          <div class="section-icon">🃏</div>
+          <div class="section-title">El Grimorio — Nuevas Cartas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">CARTA</span>
+              <div class="item-text">
+                <strong>Susurro Vital</strong> — Coste: 1 maná · Tipo: Habilidad<br>
+                <em>Recupera 8 de Vitalidad.</em> Una carta de curación para mitigar el daño recibido en encuentros largos.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UX -->
+      <div class="section s-ux">
+        <div class="section-header">
+          <div class="section-icon">✦</div>
+          <div class="section-title">Experiencia del Héroe</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Pantalla de nombre del héroe.</strong> Antes de cada partida puedes bautizar a tu personaje. Incluye un botón de dado 🎲 que sugiere un nombre al azar entre 20 nombres de temática gótico-victoriana.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Pantalla de Créditos al completar el Acto III.</strong> Al derrotar al jefe final se despliega una pantalla de créditos cinematográfica con animación de aparición progresiva y los nombres de los autores.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEV MODE -->
+      <div class="section s-dev">
+        <div class="section-header">
+          <div class="section-icon">⚙</div>
+          <div class="section-title">Modo Desarrollador — Herramientas Ocultas</div>
+        </div>
+        <div class="dev-block">
+          <div class="prompt">// Consola del navegador (F12) → pestaña Console</div>
+          <div class="cmd-row"><span class="cmd">DEV.invincible()</span><span class="cmd-desc">— activa/desactiva invencibilidad del jugador</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.winCombat()</span><span class="cmd-desc">— termina el combate actual con victoria inmediata</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.addGold(500)</span><span class="cmd-desc">— añade la cantidad indicada de oro a la bolsa</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.skipNode()</span><span class="cmd-desc">— avanza al siguiente nodo sin completar el actual</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.status()</span><span class="cmd-desc">— muestra tabla completa del estado de la partida<span class="cursor"></span></span></div>
+          <div style="margin-top:14px;font-size:11px;color:var(--dim);font-family:'IM Fell English',serif;font-style:italic">
+            Estas herramientas pueden ser eliminadas en versiones de producción.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v2.0 -->
+  </div><!-- /version-block v2.0 -->
+
+
+  <!-- CRÉDITOS (siempre al final) -->
+  <div class="section s-cred" style="margin-top:60px">
     <div class="section-header">
       <div class="section-icon">👑</div>
       <div class="section-title">Los Arquitectos de la Oscuridad</div>
@@ -673,24 +709,20 @@
 
 </div><!-- /page -->
 
-<!-- Botón volver -->
 <div class="back-bar">
   <a href="index.html" class="back-btn">← Volver al Juego</a>
 </div>
 
 <script>
-// Niebla animada
 (()=>{
   const l=document.getElementById('fog-layer');
   for(let i=0;i<6;i++){
-    const p=document.createElement('div');
-    p.className='fog-p';
+    const p=document.createElement('div');p.className='fog-p';
     const s=200+Math.random()*400;
     p.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:-${s}px;animation-duration:${28+Math.random()*30}s;animation-delay:${Math.random()*20}s`;
     l.appendChild(p);
   }
 })();
 </script>
-
 </body>
 </html>

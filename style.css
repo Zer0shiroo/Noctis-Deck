@@ -278,3 +278,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .cr-name{font-family:'Cinzel Decorative',cursive;font-size:20px;color:var(--mist);text-shadow:0 0 30px #ffffff33;letter-spacing:2px}
 .cr-small{font-family:'Cinzel',serif;font-size:10px;color:var(--fog);letter-spacing:2px;font-style:italic}
 .cr-quote{font-family:'IM Fell English',serif;font-size:14px;color:var(--dim);font-style:italic;line-height:2;max-width:420px}
+
+
+
