@@ -151,6 +151,10 @@
   .s-cred  .section-title { color:var(--gold2);text-shadow:0 0 20px #d4a84366 }
   .s-heal  .section-title { color:var(--green2);text-shadow:0 0 12px #4acc7044 }
   .s-ui    .section-title { color:#f0c060;text-shadow:0 0 12px #d4a84344 }
+  .s-char  .section-title { color:#d4804a;text-shadow:0 0 12px #d4804a44 }
+  .s-rarity .section-title{ color:#cc80ff;text-shadow:0 0 12px #9a40cc44 }
+  .s-deck  .section-title { color:#70e8a0;text-shadow:0 0 12px #3acc7044 }
+  .s-mob   .section-title { color:#70b8e8;text-shadow:0 0 12px #3a8acc44 }
 
   /* Card */
   .card {
@@ -183,6 +187,11 @@
   .tag-inf    { background:#9a2f450f;color:#cc4060;border:1px solid #9a2f4533 }
   .tag-stats  { background:#3a8acc0f;color:#70b8e8;border:1px solid #3a8acc33 }
   .tag-ui     { background:#d4a8430f;color:#f0c060;border:1px solid #d4a84333 }
+  .tag-char   { background:#d4804a0f;color:#d4804a;border:1px solid #d4804a33 }
+  .tag-rarity { background:#cc80ff0f;color:#cc80ff;border:1px solid #cc80ff33 }
+  .tag-deck   { background:#4acc700f;color:var(--green2);border:1px solid #4acc7033 }
+  .tag-mob    { background:#3a8acc0f;color:#70b8e8;border:1px solid #3a8acc33 }
+  .tag-boss   { background:#c030400f;color:#e87070;border:1px solid #c0304033 }
 
   .item-text { font-size:14px;line-height:1.65;color:var(--text-bright); }
   .item-text strong { color:var(--gold2);font-weight:normal;font-style:italic }
@@ -194,6 +203,17 @@
   .sub-items { margin-top:8px;padding-left:14px;display:flex;flex-direction:column;gap:5px;border-left:1px solid #d4a84322; }
   .sub-item { font-size:13px;color:var(--text-bright);line-height:1.55;display:flex;gap:8px;align-items:flex-start; }
   .sub-item::before { content:'◆';color:var(--gold);font-size:8px;margin-top:4px;flex-shrink:0 }
+
+  /* Rarity pill demo */
+  .rarity-row { display:flex;gap:10px;flex-wrap:wrap;margin-top:10px; }
+  .rarity-pill {
+    padding:4px 12px;border-radius:4px;font-family:'Cinzel',serif;
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  }
+  .rp-common    { background:#a0a0b011;color:#a0a0b0;border:1px solid #a0a0b044 }
+  .rp-uncommon  { background:#60aaee11;color:#60aaee;border:1px solid #60aaee44 }
+  .rp-rare      { background:#cc80ff11;color:#cc80ff;border:1px solid #cc80ff44 }
+  .rp-legendary { background:#ffcc4411;color:#ffcc44;border:1px solid #ffcc4444 }
 
   /* Dev block */
   .dev-block {
@@ -282,17 +302,229 @@
     <div class="patch-version">Registrado en los archivos de la Torre Obscura · Anno Domini MMXXVI</div>
   </div>
 
+
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.3 — LA MÁS RECIENTE
+       VERSIÓN 0.0.4 — LA MÁS RECIENTE
        ══════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.3 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num latest">v 0.0.4 <span class="version-tag vtag-new">ÚLTIMA</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
 
-      <!-- ENEMIGO SANADORA -->
+      <!-- PERSONAJES -->
+      <div class="section s-char">
+        <div class="section-header">
+          <div class="section-icon">🗡</div>
+          <div class="section-title">Personajes — Reworks y Nuevo Héroe</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-char">REWORK</span>
+              <div class="item-text">
+                <strong>El Cazador — nueva pasiva: Vampirismo.</strong> La antigua pasiva <em>Sangre por Sangre</em> (+1 daño al aplicar sangrado) ha sido reemplazada. Ahora cada carta de ataque que impacte directamente al enemigo <strong>te cura 2 HP</strong>. La vida base baja de 75 a 70 para compensar la sostenibilidad extra.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-char">NUEVO</span>
+              <div class="item-text">
+                <strong>El Pistolero</strong> — nuevo personaje jugable. 65 HP · 3 maná · Estilo: ráfagas y precisión.
+                <div class="sub-items">
+                  <div class="sub-item"><strong>Pasiva: Cargador</strong> — cada 3 cartas de ataque jugadas en un mismo turno, la siguiente carta de ataque hace el doble de daño. Un HUD en el panel izquierdo muestra el contador <code>🔫 2/3</code> y cambia a <code>🔥 ¡CARGADO!</code> cuando está listo.</div>
+                  <div class="sub-item">Mazo inicial: 2× Bala de Plomo · 2× Escudo Arcano</div>
+                  <div class="sub-item">Imagen personalizable en <code>resources/personajes/pistolero.png</code> o a través de la pantalla de Personalización.</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">
+                <strong>Mazos de inicio reducidos a 4 cartas</strong> para todos los personajes (2 de ataque base + 2× Escudo Arcano). El resto de cartas se obtienen durante la run, haciendo que cada partida evolucione de forma diferente.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAREZA DE CARTAS -->
+      <div class="section s-rarity">
+        <div class="section-header">
+          <div class="section-icon">🃏</div>
+          <div class="section-title">Sistema de Rareza de Cartas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-rarity">NUEVO</span>
+              <div class="item-text">
+                Todas las cartas tienen ahora una <strong>rareza</strong> que determina con qué frecuencia aparecen como recompensa y cómo de poderosas son:
+                <div class="rarity-row">
+                  <span class="rarity-pill rp-common">Común</span>
+                  <span class="rarity-pill rp-uncommon">Infrecuente</span>
+                  <span class="rarity-pill rp-rare">Rara</span>
+                  <span class="rarity-pill rp-legendary">Legendaria</span>
+                </div>
+                <div class="sub-items" style="margin-top:10px">
+                  <div class="sub-item">Combate normal: Común 55% · Infrecuente 30% · Rara 12% · Legendaria 3%</div>
+                  <div class="sub-item">Combate élite: Común 30% · Infrecuente 35% · Rara 25% · Legendaria 10%</div>
+                  <div class="sub-item">Recompensa boss: Común 20% · Infrecuente 35% · Rara 30% · Legendaria 15%</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-rarity">NUEVO</span>
+              <div class="item-text">
+                <strong>5 cartas nuevas</strong> añadidas al grimorio, incluyendo las exclusivas del Pistolero:
+                <div class="sub-items">
+                  <div class="sub-item"><strong>Bala de Plomo</strong> (Común) — 1 maná · 7 daño directo</div>
+                  <div class="sub-item"><strong>Tiro Rápido</strong> (Infrecuente) — 1 maná · golpea dos veces por 5</div>
+                  <div class="sub-item"><strong>Fuego Cerrado</strong> (Rara) — 2 maná · tres disparos consecutivos de 6</div>
+                  <div class="sub-item"><strong>Disparo Certero</strong> (Legendaria) — 3 maná · 28 daño. Un disparo. El fin.</div>
+                  <div class="sub-item"><strong>Bomba de Humo</strong> (Infrecuente) — 2 maná · 10 escudo + 2 veneno al enemigo</div>
+                  <div class="sub-item"><strong>Pacto de Sangre</strong> (Legendaria) — 2 maná · 6 sangrado + cura 14 HP</div>
+                  <div class="sub-item"><strong>Pesadilla Eterna</strong> (Legendaria) — 3 maná · 14 daño + 3 sangrado + 3 veneno</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-rarity">VISUAL</span>
+              <div class="item-text">
+                Cada carta muestra su rareza con un <strong>borde de color</strong> en la parte superior y una etiqueta de texto. Gris para Común, Azul para Infrecuente, <span style="color:#cc80ff">Morado para Rara</span>, <span style="color:#ffcc44">Dorado para Legendaria</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOSS Y EDITOR DE MAZO -->
+      <div class="section s-deck">
+        <div class="section-header">
+          <div class="section-icon">📖</div>
+          <div class="section-title">Boss, Editor de Mazo & Recompensas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-boss">BOSS</span>
+              <div class="item-text">
+                <strong>Al derrotar al jefe puedes elegir 2 cartas</strong> en lugar de 1. Se muestran 4 opciones con rareza elevada y vas eligiendo una a una. Un contador en pantalla indica cuántas te quedan.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-deck">NUEVO</span>
+              <div class="item-text">
+                <strong>Editor de mazo al final de cada acto.</strong> Después de recoger las recompensas del boss, antes de continuar al siguiente acto, se abre un overlay que muestra <em>todas las cartas de tu mazo</em> (incluyendo mano y descarte). Puedes descartar hasta 5 cartas para aligerar tu estrategia. Mínimo de 4 cartas siempre garantizado.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-deck">INFINITO</span>
+              <div class="item-text">
+                En <strong>Modo Infinito</strong>, el editor de mazo aparece automáticamente cada 10 encuentros para que puedas refinar tu mazo con el botín acumulado.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">
+                <strong>Sin límite de duplicados en el mazo.</strong> Eliminada la restricción de máximo 2 copias de la misma carta en mano. Ahora el mazo puede contener tantas copias de una carta como hayas obtenido, reflejando fielmente lo que tienes.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMBATE — NUEVOS EFECTOS -->
+      <div class="section s-combat">
+        <div class="section-header">
+          <div class="section-icon">⚔</div>
+          <div class="section-title">Combate — Nuevos Efectos y Mejoras</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Efecto de golpe al jugador.</strong> Cuando un enemigo te inflige daño, la pantalla reacciona con un <strong>vignette rojo</strong> que se desvanece desde los bordes, sacudida de pantalla y destello rojo en el retrato del personaje.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">MEJORA</span>
+              <div class="item-text">
+                <strong>Enemigos posicionados arriba</strong> del área de combate para aprovechar mejor el espacio vertical de la pantalla.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">MEJORA</span>
+              <div class="item-text">
+                <strong>Registro de combate más grande</strong> en escritorio: altura máxima aumentada a 260px, fuente a 13px con separador sutil entre entradas para mejorar la legibilidad.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓVIL -->
+      <div class="section s-mob">
+        <div class="section-header">
+          <div class="section-icon">📱</div>
+          <div class="section-title">Móvil — Ver Personaje en Combate</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-mob">MÓVIL</span>
+              <div class="item-text">
+                <strong>Botón 👤 flotante</strong> en combate (panel izquierdo, oculto en móvil). Al pulsarlo se abre un overlay a pantalla completa con:
+                <div class="sub-items">
+                  <div class="sub-item">Imagen del personaje a tamaño grande con borde dorado</div>
+                  <div class="sub-item">Nombre del héroe y descripción de la pasiva</div>
+                  <div class="sub-item">Stats en tiempo real: HP · Maná · Oro · Estados activos</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-mob">MÓVIL</span>
+              <div class="item-text">
+                El <strong>botón de retrato actualiza su icono</strong> con la imagen del personaje en miniatura circular una vez que se abre el overlay por primera vez.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI -->
+      <div class="section s-ui">
+        <div class="section-header">
+          <div class="section-icon">🔍</div>
+          <div class="section-title">Interfaz — Pantalla de Recompensa</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-ui">MEJORA</span>
+              <div class="item-text">
+                La <strong>pantalla de recompensa</strong> ahora muestra las cartas notablemente más grandes (126×190px), con fuentes más grandes en nombre, efectos y descripción, y el título actualizado dinámicamente según el tipo de combate: <em>normal · élite · victoria sobre el jefe</em>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v0.0.4 -->
+  </div><!-- /version-block v0.0.4 -->
+
+
+  <!-- ══════════════════════════════════
+       VERSIÓN 0.0.3 — ANTERIOR
+       ══════════════════════════════════ -->
+  <div class="version-block" style="opacity:.85">
+    <div class="version-header">
+      <div class="version-num old">v 0.0.3 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+
       <div class="section s-heal">
         <div class="section-header">
           <div class="section-icon">✚</div>
@@ -314,68 +546,30 @@
             <div class="item">
               <span class="item-tag tag-heal">MECÁNICA</span>
               <div class="item-text">
-                La Sanadora sigue un <strong>ciclo de 4 acciones</strong> por turno:
-                <div class="sub-items">
-                  <div class="sub-item">❤ <strong>Curar</strong> — cura al aliado con menos HP</div>
-                  <div class="sub-item">🛡 <strong>Escudar</strong> — aplica escudo a todos sus aliados</div>
-                  <div class="sub-item">☠ <strong>Maldición</strong> — aplica Veneno o Sangrado al jugador</div>
-                  <div class="sub-item">⚔ <strong>Ataque</strong> — ataque débil directo</div>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-heal">SPAWN</span>
-              <div class="item-text">
-                <strong>20% de probabilidad</strong> de aparecer en grupos normales y de élite, sustituyendo a una criatura del grupo. <em>Nunca aparece en encuentros de jefe.</em> La intención de la siguiente acción se muestra claramente bajo su nombre.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-heal">ARTE</span>
-              <div class="item-text">
-                Coloca tu imagen personalizada en <code>resources/enemigos/healer.png</code>. También disponible en la pantalla de Personalización con una nueva ranura dedicada <strong>✚ Sanadora</strong>.
+                La Sanadora sigue un <strong>ciclo de 4 acciones</strong>: ❤ Curar aliado · 🛡 Escudar todos · ☠ Maldición (veneno/sangrado) · ⚔ Ataque débil. La intención de la siguiente acción se muestra bajo su nombre. Aparece con <strong>20% de probabilidad</strong> en grupos normales y élite, nunca en boss.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MODO INFINITO -->
       <div class="section s-inf">
         <div class="section-header">
           <div class="section-icon">🌑</div>
-          <div class="section-title">Modo Infinito — La Oscuridad Sin Fin</div>
+          <div class="section-title">Modo Infinito</div>
         </div>
         <div class="card">
           <div class="items">
             <div class="item">
               <span class="item-tag tag-inf">NUEVO</span>
               <div class="item-text">
-                Al completar el Acto III aparece un <strong>overlay de elección</strong>: volver al menú principal (y ver los créditos) o entrar al <strong>Modo Infinito</strong>, un flujo de encuentros sin fin hasta morir.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-inf">DIFICULTAD</span>
-              <div class="item-text">
-                Los enemigos en modo infinito tienen un <strong>multiplicador base 1.5×</strong> en HP, daño y bufos. Cada 10 encuentros completados el multiplicador crece <strong>+0.5×</strong> adicional.
-                <div class="sub-items">
-                  <div class="sub-item">Encuentros 0–9 · Multiplicador 1.5×</div>
-                  <div class="sub-item">Encuentros 10–19 · Multiplicador 2.0×</div>
-                  <div class="sub-item">Encuentros 20–29 · Multiplicador 2.5×</div>
-                  <div class="sub-item">... y así indefinidamente</div>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-inf">MAPA</span>
-              <div class="item-text">
-                El Modo Infinito presenta un <strong>mapa simplificado</strong> con cuatro opciones siempre disponibles: Combate · Élite · Descanso · Tienda. El multiplicador y el número de encuentros se muestran en pantalla en todo momento.
+                Al completar el Acto III: overlay de elección para volver al menú o entrar al <strong>Modo Infinito</strong>. Multiplicador base 1.5× en HP/daño, +0.5× adicional cada 10 encuentros.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ESTADÍSTICAS Y CLASIFICACIÓN -->
       <div class="section s-stats">
         <div class="section-header">
           <div class="section-icon">📊</div>
@@ -386,50 +580,13 @@
             <div class="item">
               <span class="item-tag tag-stats">NUEVO</span>
               <div class="item-text">
-                Botón <strong>📊 Estadísticas</strong> en el menú principal. Muestra un panel de estadísticas globales acumuladas entre todas las partidas:
-                <div class="sub-items">
-                  <div class="sub-item">Partidas jugadas · Tiempo total de juego</div>
-                  <div class="sub-item">Mejor racha de encuentros · Tiempo de esa racha</div>
-                  <div class="sub-item">Mayor daño en un solo golpe · Daño total en la mejor run</div>
-                  <div class="sub-item">Mayor daño tanqueado · Mayor daño curado</div>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-stats">NUEVO</span>
-              <div class="item-text">
-                <strong>Tabla de clasificación local</strong> con el top 10 de partidas. Muestra nombre del héroe, personaje, número de encuentros, tiempo de la run, y si fue en Modo Infinito (🌑 ∞). Ordenado por encuentros completados.
+                Botón <strong>📊 Estadísticas</strong> en el menú. Panel de estadísticas globales acumuladas + tabla de clasificación local con el top 10 de partidas ordenadas por encuentros completados.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- UI ESCALADA -->
-      <div class="section s-ui">
-        <div class="section-header">
-          <div class="section-icon">🔍</div>
-          <div class="section-title">Interfaz — Todo más Grande</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-ui">CAMBIO</span>
-              <div class="item-text">
-                Escala general de la interfaz aumentada. Las <strong>cartas, enemigos, mapa, menús y textos</strong> son notablemente más grandes para mejorar la legibilidad y la comodidad visual en todo tipo de pantallas.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-ui">CAMBIO</span>
-              <div class="item-text">
-                El enlace de notas del parche en la pantalla principal ahora muestra el <strong>número de versión actual</strong>: <em>✦ Notas del Parche (v0.0.3)</em>.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BUGS CORREGIDOS v0.0.3 -->
       <div class="section s-fix">
         <div class="section-header">
           <div class="section-icon">🔧</div>
@@ -439,35 +596,30 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Doble entrada en la tabla de clasificación en Modo Infinito.</strong> Al morir en modo infinito, el personaje aparecía dos o más veces en el ranking. Añadido un guard <code>runFinalized</code> que garantiza que la entrada se registra una única vez por run.
-              </div>
+              <div class="item-text"><strong>Doble entrada en clasificación en Modo Infinito.</strong> Guard <code>runFinalized</code> que garantiza registro único por run.</div>
             </div>
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Texto "Dificultad: N" en menú principal.</strong> Aparecía un texto de dificultad innecesario en la pantalla de título que no tenía efecto gameplay visible. Eliminado por completo de la interfaz.
-              </div>
+              <div class="item-text"><strong>Texto "Dificultad: N" en menú principal.</strong> Eliminado por completo.</div>
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /version-body -->
-  </div><!-- /version-block v0.0.3 -->
+    </div>
+  </div>
 
 
   <!-- ══════════════════════════════════
-       VERSIÓN 2.0 — ANTERIOR
+       VERSIÓN 2.0 — HISTÓRICO
        ══════════════════════════════════ -->
-  <div class="version-block" style="opacity:.85">
+  <div class="version-block" style="opacity:.7">
     <div class="version-header">
-      <div class="version-num old">v 2.0 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-num old">v 2.0 <span class="version-tag vtag-old">HISTÓRICO</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
 
-      <!-- CORRECCIONES DE BUGS -->
       <div class="section s-fix">
         <div class="section-header">
           <div class="section-icon">🔧</div>
@@ -477,33 +629,24 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Partida guardada bloqueada.</strong> Al continuar una partida guardada el mapa aparecía completamente bloqueado sin poder interactuar con ningún nodo. Corregido el sistema de restauración de progreso para retomar exactamente desde el nodo en que se encontraba el jugador.
-              </div>
+              <div class="item-text"><strong>Partida guardada bloqueada.</strong> Corregido el sistema de restauración de progreso.</div>
             </div>
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Cartas desaparecen al tener duplicadas.</strong> Cuando el jugador acumulaba 2 o más copias de la misma carta, el algoritmo de robo eliminaba toda la mano y dejaba únicamente las dos últimas. Reescrito completamente el sistema de robo con límite correcto de 2 copias por carta.
-              </div>
+              <div class="item-text"><strong>Cartas desaparecen al tener duplicadas.</strong> Reescrito el sistema de robo.</div>
             </div>
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Maná máximo incorrecto en UI.</strong> El texto de maná mostraba siempre <code>/ 3</code> independientemente del personaje seleccionado, causando que La Hechicera (4 de maná) mostrase <code>4 / 3</code>. Ahora el valor máximo se toma directamente del estado del personaje en partida.
-              </div>
+              <div class="item-text"><strong>Maná máximo incorrecto en UI.</strong> La Hechicera mostraba <code>4 / 3</code>. Ahora el valor máximo se toma del estado del personaje.</div>
             </div>
             <div class="item">
               <span class="item-tag tag-fix">BUG</span>
-              <div class="item-text">
-                <strong>Cartas transparentes e injugables a partir del segundo turno.</strong> El flag interno <code>_locked</code> quedaba atascado en <code>true</code> entre turnos impidiendo jugar cualquier carta. Reescrito el flujo de fin de turno usando <code>async/await</code> para garantizar que el bloqueo se libera siempre.
-              </div>
+              <div class="item-text"><strong>Cartas injugables a partir del segundo turno.</strong> Flag <code>_locked</code> quedaba atascado. Reescrito con <code>async/await</code>.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MAPA -->
       <div class="section s-map">
         <div class="section-header">
           <div class="section-icon">🗺</div>
@@ -513,30 +656,10 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Mapa ramificado al estilo Slay the Spire.</strong> Cada acto ahora presenta <strong>6 filas de nodos</strong> con dos opciones por fila. El jugador elige su ruta en cada encuentro, nunca existe un único camino forzado.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Nodos de Cofre</strong> 📦 añadidos al mapa. Al abrir un cofre puedes encontrar tres destinos posibles:
-                <div class="sub-items">
-                  <div class="sub-item">🪙 <strong>Monedas</strong> — entre 15 y 40 de oro según tu fortuna</div>
-                  <div class="sub-item">🃏 <strong>Carta</strong> — un grimorio con tres cartas para añadir al mazo</div>
-                  <div class="sub-item">💀 <strong>Mímic / Emboscada</strong> — la caja cobra vida, prepárate para combatir</div>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text">
-                <strong>Nodos visitados claramente marcados.</strong> El camino recorrido se muestra visualmente de forma inequívoca para que el jugador siempre sepa dónde ha estado y cuáles son sus próximas opciones.
-              </div>
+              <div class="item-text"><strong>Mapa ramificado al estilo Slay the Spire.</strong> 6 filas de nodos con dos opciones por fila y nodos de Cofre 📦.</div>
             </div>
           </div>
           <div style="margin-top:20px">
-            <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;text-align:center">Vista del mapa — Ejemplo de ruta</div>
             <div class="map-demo">
               <div class="map-col">
                 <div class="map-node mn-boss">👁<span>JEFE</span></div>
@@ -570,7 +693,6 @@
         </div>
       </div>
 
-      <!-- COMBATE -->
       <div class="section s-combat">
         <div class="section-header">
           <div class="section-icon">⚔</div>
@@ -580,110 +702,36 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Múltiples enemigos por encuentro.</strong> Los encuentros ya no son uno contra uno. Los grupos varían según el tipo de nodo:
-                <div class="sub-items">
-                  <div class="sub-item"><strong>Combate común</strong> — grupos de 2 o 3 enemigos de baja vida</div>
-                  <div class="sub-item"><strong>Élite</strong> — 2 élites, o 1 élite + 1 común</div>
-                  <div class="sub-item"><strong>Jefe</strong> — siempre solo, sin modificación de estadísticas</div>
-                </div>
-              </div>
+              <div class="item-text"><strong>Múltiples enemigos por encuentro.</strong> Grupos de 2–3 comunes, élites mixtos o jefe solo. Selección de objetivo con clic.</div>
             </div>
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Selección de objetivo.</strong> Haz clic sobre el enemigo que deseas atacar. El objetivo activo se resalta con un anillo luminoso.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Mano persistente entre turnos.</strong> Las cartas no utilizadas permanecen en mano. Máximo 6 cartas y máximo 2 copias de la misma carta. Al inicio de cada turno solo se reponen las cartas gastadas.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Display de escudo lateral.</strong> Cuando el jugador tiene bloqueo activo, aparece un indicador lateral con el valor exacto de escudo, con animación al activarse.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Animaciones de combate.</strong> Golpe al enemigo con destello de impacto · Números de daño flotantes · Animación de curación en el retrato del héroe · Animación del escudo al bloquearse.
-              </div>
+              <div class="item-text"><strong>Mano persistente entre turnos.</strong> Máximo 6 cartas. Animaciones de combate: golpe, daño flotante, curación, escudo.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- CARTAS -->
-      <div class="section s-cards">
-        <div class="section-header">
-          <div class="section-icon">🃏</div>
-          <div class="section-title">El Grimorio — Nuevas Cartas</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">CARTA</span>
-              <div class="item-text">
-                <strong>Susurro Vital</strong> — Coste: 1 maná · Tipo: Habilidad<br>
-                <em>Recupera 8 de Vitalidad.</em> Una carta de curación para mitigar el daño recibido en encuentros largos.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- UX -->
-      <div class="section s-ux">
-        <div class="section-header">
-          <div class="section-icon">✦</div>
-          <div class="section-title">Experiencia del Héroe</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Pantalla de nombre del héroe.</strong> Antes de cada partida puedes bautizar a tu personaje. Incluye un botón de dado 🎲 que sugiere un nombre al azar entre 20 nombres de temática gótico-victoriana.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Pantalla de Créditos al completar el Acto III.</strong> Al derrotar al jefe final se despliega una pantalla de créditos cinematográfica con animación de aparición progresiva y los nombres de los autores.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DEV MODE -->
       <div class="section s-dev">
         <div class="section-header">
           <div class="section-icon">⚙</div>
-          <div class="section-title">Modo Desarrollador — Herramientas Ocultas</div>
+          <div class="section-title">Modo Desarrollador</div>
         </div>
         <div class="dev-block">
           <div class="prompt">// Consola del navegador (F12) → pestaña Console</div>
-          <div class="cmd-row"><span class="cmd">DEV.invincible()</span><span class="cmd-desc">— activa/desactiva invencibilidad del jugador</span></div>
-          <div class="cmd-row"><span class="cmd">DEV.winCombat()</span><span class="cmd-desc">— termina el combate actual con victoria inmediata</span></div>
-          <div class="cmd-row"><span class="cmd">DEV.addGold(500)</span><span class="cmd-desc">— añade la cantidad indicada de oro a la bolsa</span></div>
-          <div class="cmd-row"><span class="cmd">DEV.skipNode()</span><span class="cmd-desc">— avanza al siguiente nodo sin completar el actual</span></div>
-          <div class="cmd-row"><span class="cmd">DEV.status()</span><span class="cmd-desc">— muestra tabla completa del estado de la partida<span class="cursor"></span></span></div>
-          <div style="margin-top:14px;font-size:11px;color:var(--dim);font-family:'IM Fell English',serif;font-style:italic">
-            Estas herramientas pueden ser eliminadas en versiones de producción.
-          </div>
+          <div class="cmd-row"><span class="cmd">DEV.invincible()</span><span class="cmd-desc">— activa/desactiva invencibilidad</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.winCombat()</span><span class="cmd-desc">— victoria inmediata</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.addGold(500)</span><span class="cmd-desc">— añade oro</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.skipNode()</span><span class="cmd-desc">— avanza nodo</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.status()</span><span class="cmd-desc">— estado completo de la partida<span class="cursor"></span></span></div>
         </div>
       </div>
 
-    </div><!-- /version-body v2.0 -->
-  </div><!-- /version-block v2.0 -->
+    </div>
+  </div>
 
 
-  <!-- CRÉDITOS (siempre al final) -->
+  <!-- CRÉDITOS -->
   <div class="section s-cred" style="margin-top:60px">
     <div class="section-header">
       <div class="section-icon">👑</div>
@@ -723,7 +771,6 @@
     l.appendChild(p);
   }
 })();
-//deshabilitar inspeccion
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
   if(e.key === 'F12') e.preventDefault();
