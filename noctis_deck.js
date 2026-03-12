@@ -45,6 +45,8 @@ const DEFAULT_IMGS = {
   card_headshot:   'resources/cartas/headshot.jpg',
   card_fanfire:    'resources/cartas/fanfire.jpg',
   card_smokebomb:  'resources/cartas/smokebomb.jpg',
+  
+
 };
 // ═══════════════════════════════════════════════
 //  IMÁGENES ALTERNATIVAS (no generadas por IA)
@@ -79,6 +81,8 @@ const ALT_IMGS = {
   card_headshot:   'resources/alt/cartas/headshot.png',
   card_fanfire:    'resources/alt/cartas/fanfire.png',
   card_smokebomb:  'resources/alt/cartas/smokebomb.png',
+  card_nightmare: 'resources/alt/cartas/nightmare.png',
+  card_bloodpact: 'resources/alt/cartas/blood.png',
 };
 
 // ── Imágenes alternativas para reliquias (no-IA) ──
@@ -172,7 +176,7 @@ const CARDS=[
   {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:'Disparo certero y rápido.'},
   // ── INFRECUENTES ──
   {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
-  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:5,  blk:0, bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true},
+  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true}, // ✏ CAMBIO 1: dmg 5→8 (bufeo)
   {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:14,bleed:0,psn:0,desc:'Protección pesada.'},
   {id:'cloud',    name:'Nube Venenosa',    type:'skill',  rarity:'uncommon',  cost:2,dmg:0,  blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
   {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Dos disparos instantáneos.',dbl:true},
@@ -183,8 +187,8 @@ const CARDS=[
   {id:'fanfire',  name:'Fuego Cerrado',    type:'attack', rarity:'rare',      cost:2,dmg:6,  blk:0, bleed:0,psn:0,desc:'Dispara tres veces consecutivas.',triple:true},
   // ── LEGENDARIAS ──
   {id:'headshot', name:'Disparo Certero',  type:'attack', rarity:'legendary', cost:3,dmg:28, blk:0, bleed:0,psn:0,desc:'Un disparo. El fin.'},
-  {id:'bloodpact',name:'Pacto de Sangre',  type:'skill',  rarity:'legendary', cost:2,dmg:0,  blk:0, bleed:6,psn:0,heal:14,desc:'Cura con la sangre del enemigo.'},
-  {id:'nightmare',name:'Pesadilla Eterna', type:'attack', rarity:'legendary', cost:3,dmg:14, blk:0, bleed:3,psn:3,desc:'Inflige todos los males.'},
+  {id:'bloodpact',name:'Pacto de Sangre',  type:'skill',  rarity:'legendary', cost:2,dmg:0,  blk:0, bleed:3,psn:0,heal:10,desc:'Cura con la sangre del enemigo.'}, // ✏ CAMBIO 3: bleed 6→3, heal 14→10 (nerf)
+  {id:'nightmare',name:'Pesadilla Eterna', type:'attack', rarity:'legendary', cost:3,dmg:9,  blk:0, bleed:3,psn:3,desc:'Inflige todos los males.'}, // ✏ CAMBIO 2: dmg 14→9 (nerf)
 ];
 
 // Rareza → peso base y elite
@@ -961,6 +965,15 @@ function showMap(){renderMap();show('map')}
 
 function renderMap(){
   const c=document.getElementById('mapActs');c.innerHTML='';
+  // ✏ CAMBIO 7: mostrar oro del jugador en el mapa
+  let mapGold=document.getElementById('mapGoldDisplay');
+  if(!mapGold){
+    mapGold=document.createElement('div');
+    mapGold.id='mapGoldDisplay';
+    mapGold.className='map-gold-display';
+    document.getElementById('s-map').insertBefore(mapGold,document.getElementById('mapActs'));
+  }
+  mapGold.innerHTML='🪙 <b style="color:var(--gold2);font-family:\'Cinzel Decorative\',cursive">'+(G.gold||0)+'</b> <span style="font-size:0.75em;opacity:.6">oro</span>';
   const IC={combat:'⚔',elite:'💀',rest:'🕯',shop:'🛒',boss:'👁',chest:'📦'};
   const LABEL={combat:'COMBATE',elite:'ÉLITE',rest:'DESCANSO',shop:'TIENDA',boss:'JEFE',chest:'COFRE'};
   const {act:curAct,row:curRow,col:curCol}=G.path;
@@ -1139,7 +1152,7 @@ function renderInfiniteMap() {
 
   const info = document.createElement('div');
   info.style.cssText = 'font-family:"Cinzel",serif;font-size:10px;color:#b8a8c8;letter-spacing:2px;text-align:center';
-  info.innerHTML = `Encuentros: <span style="color:#e8b460">${enc}</span> · Multiplicador: <span style="color:#cc4060">${mult.toFixed(1)}×</span>`;
+  info.innerHTML = `Encuentros: <span style="color:#e8b460">${enc}</span> · Multiplicador: <span style="color:#cc4060">${mult.toFixed(1)}×</span> · 🪙 <span style="color:#e8b460">${G.gold||0} oro</span>`; // ✏ CAMBIO 8: oro en mapa infinito
   wrapper.appendChild(info);
 
   const btnsRow = document.createElement('div');
@@ -1372,6 +1385,79 @@ function getESVG(name,tier){
   return`<svg viewBox="0 0 130 168" fill="none"><ellipse cx="65" cy="141" rx="28" ry="5" fill="#00000066"/><circle cx="65" cy="64" r="28" fill="#1a1428" stroke="#2a1a3a88" stroke-width="1.5"/><circle cx="55" cy="59" r="7" fill="#0a0810" stroke="#4a2a6a66"/><circle cx="75" cy="59" r="7" fill="#0a0810" stroke="#4a2a6a66"/><circle cx="55" cy="59" r="3.5" fill="#5a3a8888"/><circle cx="75" cy="59" r="3.5" fill="#5a3a8888"/><path d="M53 72 Q65 80 77 72" stroke="#3a1a4a" stroke-width="1.5" fill="none"/><rect x="47" y="92" width="36" height="40" rx="4" fill="#13101e" stroke="#2a1a3a66"/><path d="M47 102 Q32 94 30 112 Q38 106 47 110" fill="#0f0c1a"/><path d="M83 102 Q98 94 100 112 Q92 106 83 110" fill="#0f0c1a"/></svg>`;
 }
 
+
+// ✏ CAMBIO 9: TOOLTIP DE ESTADOS ALTERADOS EN CARTAS
+const STATUS_DESCRIPTIONS = {
+  bleed: { label:'🩸 Sangrado', color:'#ff7080',
+    text:'Al final de cada turno el objetivo pierde 2 HP por contador de sangrado. Se reduce en 1 cada turno.' },
+  poison: { label:'☠ Veneno',  color:'#a0e060',
+    text:'Al final de cada turno el objetivo pierde HP igual a su nivel de veneno. Decae en 1 por turno.' },
+  block:  { label:'🛡 Bloqueo', color:'#90c8ff',
+    text:'Absorbe el daño entrante antes de afectar la Vitalidad. Se pierde al inicio del siguiente turno.' },
+};
+
+// Portal dedicado — se añade directamente al <html> para escapar de
+// cualquier stacking context creado por overflow:hidden o transform en #app / .screen
+function _getTipPortal(){
+  let p = document.getElementById('_tipPortal');
+  if(!p){
+    p = document.createElement('div');
+    p.id = '_tipPortal';
+    // Fuera del #app por completo
+    p.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483647;overflow:visible';
+    document.documentElement.appendChild(p); // <html>, no <body>
+  }
+  return p;
+}
+
+let _activeTip = null;
+function _removeTip(){
+  if(_activeTip){ _activeTip.remove(); _activeTip = null; }
+}
+
+function addStatusTooltips(wrapEl, card){
+  wrapEl.querySelectorAll('.fx').forEach(fxEl => {
+    let sk = null;
+    if(fxEl.classList.contains('fx-bl'))     sk = 'bleed';
+    else if(fxEl.classList.contains('fx-p')) sk = 'poison';
+    else if(fxEl.classList.contains('fx-b')) sk = 'block';
+    if(!sk) return;
+    const info = STATUS_DESCRIPTIONS[sk];
+    if(!info) return;
+
+    function showTip(){
+      _removeTip();
+      const rect = fxEl.getBoundingClientRect();
+      const tip = document.createElement('div');
+      tip.className = 'status-tooltip';
+      tip.innerHTML = '<b style="color:'+info.color+'">'+info.label+'</b>'+info.text;
+      // Insertar en el portal invisible primero para medir
+      const portal = _getTipPortal();
+      tip.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
+      portal.appendChild(tip);
+      _activeTip = tip;
+      const tw = tip.offsetWidth  || 200;
+      const th = tip.offsetHeight || 88;
+      // Posición: centrado sobre el badge, preferir arriba
+      let lx = rect.left + rect.width/2 - tw/2;
+      lx = Math.max(8, Math.min(window.innerWidth - tw - 8, lx));
+      let ty = rect.top - th - 10;
+      if(ty < 8) ty = rect.bottom + 8;
+      if(ty + th > window.innerHeight - 8) ty = Math.max(8, (window.innerHeight - th) / 2);
+      tip.style.cssText = 'position:fixed;left:'+lx+'px;top:'+ty+'px;pointer-events:none;visibility:visible';
+    }
+
+    fxEl.addEventListener('mouseenter', e => { e.stopPropagation(); showTip(); });
+    fxEl.addEventListener('mouseleave', () => _removeTip());
+    fxEl.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      if(_activeTip){ _removeTip(); return; }
+      showTip();
+      setTimeout(_removeTip, 3200);
+    }, {passive:true});
+  });
+}
+
 // ═══════════════════════════════════════════════
 //  RENDER HAND
 // ═══════════════════════════════════════════════
@@ -1385,7 +1471,7 @@ function renderHand(){
     wrap.style.cssText=`transform:rotate(${angle}deg) translateY(${Math.abs(angle)*.5}px);z-index:${i+1};margin-left:${i===0?0:-16}px`;
     const can=card.cost<=p.mana;
     const g=document.createElement('div');g.className=`gcard ${card.type} ${can?'playable':'unplayable'}`;
-    const ds=card.dbl?card.dmg*2:card.dmg;
+    const ds=card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg; // ✏ CAMBIO 4: fanfire muestra dmg total (6×3=18)
     let fx='';
     if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;
     if(card.blk)fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
@@ -1395,6 +1481,7 @@ function renderHand(){
     g.innerHTML=`<div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div>`;
     wrap.appendChild(g);
     if(can)wrap.addEventListener('click',()=>playCard(i));
+    addStatusTooltips(wrap, card); // ✏ CAMBIO 9b: activar tooltips de estado en cada carta
     zone.appendChild(wrap);
   });
 }
@@ -1768,6 +1855,7 @@ function renderPS(){
   const p=G.player;
   document.getElementById('hpBar').style.width=(p.hp/p.maxHp*100)+'%';
   document.getElementById('hpNum').textContent=Math.max(0,p.hp);
+  const hpMaxEl=document.getElementById('hpMax');if(hpMaxEl)hpMaxEl.textContent='/'+p.maxHp; // ✏ CAMBIO 5: hpMax dinámico (Espectro 65/65, no 65/70)
   document.getElementById('mpBar').style.width=(p.mana/p.maxMana*100)+'%';
   document.getElementById('mpNum').textContent=p.mana;
   const mpMax=document.getElementById('mpMax');
@@ -1795,6 +1883,8 @@ function renderPS(){
   document.getElementById('dsC').textContent=p.discard.length;
   document.getElementById('goldN').textContent=G.gold;
   document.getElementById('handC').textContent=p.hand.length+'/'+getMaxHand();
+  // ✏ CAMBIO 6: totales del mazo dinámicos — dkTotal y dsTotal si existen
+  const dkTot=document.getElementById('dkTotal');if(dkTot)dkTot.textContent=p.deck.length+p.discard.length+p.hand.length;
 }
 
 function updMana(){const p=G.player;let h='';for(let i=0;i<p.maxMana;i++)h+=`<div class="morb ${i<p.mana?'f':'e'}">${i<p.mana?'◆':'◇'}</div>`;document.getElementById('manaOrbs').innerHTML=h}
@@ -1868,7 +1958,7 @@ function showRew(tier){
   let bossChosen = 0;
   opts.forEach(card=>{
     const w = document.createElement('div'); w.className='rew-wrap';
-    w.innerHTML = buildCardHTML(card, 160, 240, true);
+    w.innerHTML = buildCardHTML(card, 170, 258, true); // ✏ CAMBIO D: reward más grande
     w.addEventListener('click', ()=>{
       if(isBoss){
         if(bossChosen >= 2) return;
@@ -1947,7 +2037,7 @@ function showDeckEditor(context){
       const item = document.createElement('div');
       item.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;cursor:${stillCanDiscard?'pointer':'default'};transition:all .2s;position:relative;opacity:1`;
       item.dataset.idx = idx;
-      item.innerHTML = buildCardHTML(card, 92, 138, false) +
+      item.innerHTML = buildCardHTML(card, 104, 158, true) + // ✏ CAMBIO D: deck editor más grande con desc
         `<div class="de-discard-btn" style="font-size:9px;letter-spacing:1px;color:${stillCanDiscard?'#c0304a':'#444'};font-family:'Cinzel',serif;opacity:${stillCanDiscard?'.8':'.3'};border:1px solid ${stillCanDiscard?'#c0304a44':'#33333344'};border-radius:3px;padding:2px 6px">DESCARTAR</div>`;
       if(stillCanDiscard){
         item.addEventListener('click',()=>{
@@ -2012,11 +2102,9 @@ function showShop(){
   G._shop=stock;
   const c=document.getElementById('shopSt');c.innerHTML='';
   stock.forEach(card=>{
-    const price=(card.cost+1)*8;let fx='';
-    if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${card.dbl?card.dmg*2:card.dmg}</span>`;if(card.blk)fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
-    if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
+    const price=(card.cost+1)*8;
     const w=document.createElement('div');w.className='shop-item';
-    w.innerHTML=`<div class="gcard ${card.type} playable" style="width:91px;height:140px;cursor:pointer"><div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art" style="padding:7px 4px 2px">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div></div><div class="shop-price">🪙 ${price}</div>`;
+    w.innerHTML=buildCardHTML(card, 130, 196, true)+'<div class="shop-price">🪙 '+price+'</div>'; // ✏ CAMBIO D: tienda usa buildCardHTML con desc
     w.addEventListener('click',()=>{
       if(G.gold<price)return;
       G.gold-=price;
@@ -2778,4 +2866,3 @@ loadCustom();
 updateTitle();
 injectStatsButton();
 initMobile();
-document.addEventListener('contextmenu', e => e.preventDefault()); document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault(); if(e.ctrlKey && e.key === 'U') e.preventDefault(); }); 
