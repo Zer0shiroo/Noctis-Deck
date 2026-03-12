@@ -46,8 +46,87 @@ const DEFAULT_IMGS = {
   card_fanfire:    'resources/cartas/fanfire.jpg',
   card_smokebomb:  'resources/cartas/smokebomb.jpg',
 };
+// ═══════════════════════════════════════════════
+//  IMÁGENES ALTERNATIVAS (no generadas por IA)
+//  Cambia estas rutas por tus propias imágenes.
+//  Se usan cuando el jugador desactiva "Imágenes IA" en Ajustes.
+// ═══════════════════════════════════════════════
+const ALT_IMGS = {
+  // ── Personajes ──
+  char_cazador:    'resources/alt/personajes/cazador.png',
+  char_hechicera:  'resources/alt/personajes/hechicera.png',
+  char_espectro:   'resources/alt/personajes/espectro.png',
+  char_pistolero:  'resources/alt/personajes/pistolero.png',
+  // ── Enemigos ──
+  enemy0:          'resources/alt/enemigos/enemigo1.png',
+  enemy1:          'resources/alt/enemigos/enemigo2.png',
+  enemy2:          'resources/alt/enemigos/enemigo3.png',
+  enemy_healer:    'resources/alt/enemigos/healer.png',
+  // ── Cartas ──
+  card_strike:     'resources/alt/cartas/strike.png',
+  card_slash:      'resources/alt/cartas/slash.png',
+  card_lance:      'resources/alt/cartas/lance.png',
+  card_double:     'resources/alt/cartas/double.png',
+  card_shield:     'resources/alt/cartas/shield.png',
+  card_mantle:     'resources/alt/cartas/mantle.png',
+  card_ritual:     'resources/alt/cartas/ritual.png',
+  card_cloud:      'resources/alt/cartas/cloud.png',
+  card_smite:      'resources/alt/cartas/smite.png',
+  card_retaliate:  'resources/alt/cartas/retaliate.png',
+  card_mend:       'resources/alt/cartas/mend.png',
+  card_bullet:     'resources/alt/cartas/bullet.png',
+  card_quickdraw:  'resources/alt/cartas/quickdraw.png',
+  card_headshot:   'resources/alt/cartas/headshot.png',
+  card_fanfire:    'resources/alt/cartas/fanfire.png',
+  card_smokebomb:  'resources/alt/cartas/smokebomb.png',
+};
+
+// ── Imágenes alternativas para reliquias (no-IA) ──
+const ALT_RELIC_IMGS = {
+  corazon_eterno:          'resources/alt/reliquias/corazon_eterno.png',
+  corazon_eterno_locked:   'resources/alt/reliquias/corazon_eterno_locked.png',
+  tomo_envenenado:         'resources/alt/reliquias/tomo_envenenado.png',
+  tomo_envenenado_locked:  'resources/alt/reliquias/tomo_envenenado_locked.png',
+  espejo_espectral:        'resources/alt/reliquias/espejo_espectral.png',
+  espejo_espectral_locked: 'resources/alt/reliquias/espejo_espectral_locked.png',
+  cilindro_veloz:          'resources/alt/reliquias/cilindro_veloz.png',
+  cilindro_veloz_locked:   'resources/alt/reliquias/cilindro_veloz_locked.png',
+  amuleto_carmesi:         'resources/alt/reliquias/amuleto_carmesi.png',
+  amuleto_carmesi_locked:  'resources/alt/reliquias/amuleto_carmesi_locked.png',
+  corona_voraz:            'resources/alt/reliquias/corona_voraz.png',
+  corona_voraz_locked:     'resources/alt/reliquias/corona_voraz_locked.png',
+  orbe_eterno:             'resources/alt/reliquias/orbe_eterno.png',
+  orbe_eterno_locked:      'resources/alt/reliquias/orbe_eterno_locked.png',
+};
+
+// ═══════════════════════════════════════════════
+//  SETTINGS — clave localStorage
+// ═══════════════════════════════════════════════
+const SETTINGS_KEY = 'noctis_cfg_v1';
+
+function loadSettings() {
+  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || { aiImages: true }; }
+  catch(e) { return { aiImages: true }; }
+}
+function saveSettings(s) {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch(e) {}
+}
+function isAiImages() { return loadSettings().aiImages !== false; }
+
+// Devuelve la imagen correcta según el ajuste activo
+function getRelicImg(key) {
+  if (!isAiImages()) return ALT_RELIC_IMGS[key] || null;
+  return RELIC_IMGS[key] || null;
+}
+
 let CUSTOM={};
-function getImg(k){return CUSTOM[k]||DEFAULT_IMGS[k]||null}
+function getImg(k){
+  // Las imágenes personalizadas (CUSTOM) siempre tienen prioridad
+  if(CUSTOM[k]) return CUSTOM[k];
+  // Si el jugador desactivó imágenes IA, usar las alternativas
+  if(!isAiImages() && ALT_IMGS[k]) return ALT_IMGS[k];
+  return DEFAULT_IMGS[k]||null;
+}
 
 // ═══════════════════════════════════════════════
 //  CHARACTERS
@@ -128,23 +207,27 @@ const RARITY_LABELS = {
 function pickRewardCards(count, tier) {
   const tierKey = tier===2?'boss':tier===1?'elite':'base';
   const pool = CARDS.filter(c=>!['strike','shield','bullet'].includes(c.id));
-  const weighted = [];
-  pool.forEach(card=>{
-    const w = RARITY_WEIGHTS[card.rarity]?.[tierKey] || 5;
-    for(let i=0;i<w;i++) weighted.push(card);
-  });
-  shuf(weighted);
-  const picked=[];
-  const seen=new Set();
-  for(const c of weighted){
-    if(!seen.has(c.id)){seen.add(c.id);picked.push(c);}
-    if(picked.length>=count)break;
+
+  // Weighted random sin repetición: para cada selección hacemos una tirada real
+  // en base a los pesos, así todas las rarezas tienen su probabilidad exacta
+  function weightedPick(remaining) {
+    const totalW = remaining.reduce((sum, c) => sum + (RARITY_WEIGHTS[c.rarity]?.[tierKey] || 5), 0);
+    let r = Math.random() * totalW;
+    for(const c of remaining) {
+      r -= (RARITY_WEIGHTS[c.rarity]?.[tierKey] || 5);
+      if(r <= 0) return c;
+    }
+    return remaining[remaining.length - 1];
   }
-  // Fallback: rellenar si el pool ponderado no alcanza el count
-  if(picked.length < count){
-    const remaining = pool.filter(c=>!seen.has(c.id));
-    shuf(remaining);
-    for(const c of remaining){ picked.push(c); if(picked.length>=count) break; }
+
+  const available = [...pool];
+  const picked = [];
+  while(picked.length < count && available.length > 0) {
+    const chosen = weightedPick(available);
+    picked.push(chosen);
+    // Eliminar del pool para no repetir
+    const idx = available.indexOf(chosen);
+    if(idx >= 0) available.splice(idx, 1);
   }
   return picked;
 }
@@ -241,19 +324,19 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
 // Ej: corazon_eterno_locked: 'resources/reliquias/corazon_eterno_locked.png'
 // Si no hay imagen _locked se usa el emoji oscurecido por defecto
 const RELIC_IMGS = {
-  corazon_eterno:          'resources/reliquias/corazon_eterno.jpg',
+  corazon_eterno:          'resources/reliquias/corazon_eterno.png',
   corazon_eterno_locked:   '',   // ← pon aquí la ruta de imagen bloqueada o deja '' para usar el emoji
-  tomo_envenenado:         'resources/reliquias/tomo_envenenado.jpg',
+  tomo_envenenado:         'resources/reliquias/tomo_envenenado.png',
   tomo_envenenado_locked:  '',
-  espejo_espectral:        'resources/reliquias/espejo_espectral.jpg',
+  espejo_espectral:        'resources/reliquias/espejo_espectral.png',
   espejo_espectral_locked: '',
-  cilindro_veloz:          'resources/reliquias/cilindro_veloz.jpg',
+  cilindro_veloz:          'resources/reliquias/cilindro_veloz.png',
   cilindro_veloz_locked:   '',
-  amuleto_carmesi:         'resources/reliquias/amuleto_carmesi.jpg',
+  amuleto_carmesi:         'resources/reliquias/amuleto_carmesi.png',
   amuleto_carmesi_locked:  '',
-  corona_voraz:            'resources/reliquias/corona_voraz.jpg',
+  corona_voraz:            'resources/reliquias/corona_voraz.png',
   corona_voraz_locked:     '',
-  orbe_eterno:             'resources/reliquias/orbe_eterno.jpg',
+  orbe_eterno:             'resources/reliquias/orbe_eterno.png',
   orbe_eterno_locked:      '',
 };
 
@@ -420,7 +503,7 @@ function renderRelicsPanel(){
     const r=getRelicDef(rid); if(!r) return;
     const div=document.createElement('div');
     div.style.cssText=`width:44px;height:44px;border-radius:6px;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${r.color}88;display:flex;align-items:center;justify-content:center;cursor:help;position:relative;transition:transform .2s,box-shadow .2s;box-shadow:0 0 8px ${r.color}33;overflow:hidden;flex-shrink:0;`;
-    const imgSrc=RELIC_IMGS[rid];
+    const imgSrc=getRelicImg(rid);
     if(imgSrc){
       div.innerHTML=`<img src="${imgSrc}" style="width:38px;height:38px;object-fit:contain;border-radius:4px;filter:drop-shadow(0 0 6px ${r.color}66)">`;
     } else {
@@ -479,8 +562,8 @@ function buildUnlocksUI(ov){
     const canEquip=isUnlocked&&!isEquipped&&equipped.length<MAX_EQUIPPED;
     const rc=RARITY_CLR[r.rarity]||'#a0a0b0';
     const rl=RARITY_LBL[r.rarity]||'';
-    const imgSrc=RELIC_IMGS[r.id];
-    const imgLockedSrc=RELIC_IMGS[r.id+'_locked'];
+    const imgSrc=getRelicImg(r.id);
+    const imgLockedSrc=getRelicImg(r.id+'_locked');
     const artHtml=isUnlocked
       ? (imgSrc
           ? `<img src="${imgSrc}" style="width:88px;height:88px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 0 12px ${r.color}66)">`
@@ -1915,7 +1998,18 @@ function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck
 
 function showShop(){
   document.getElementById('shopG').textContent=G.gold;
-  const stock=shuf(CARDS.filter(c=>!['strike','shield'].includes(c.id))).slice(0,4);G._shop=stock;
+  // Tienda: 4 cartas con sistema de pesos igual que las recompensas de combate
+  // Se usa tier 0 (base) pero con pool más amplia y sin excluir bullet
+  const shopPool = CARDS.filter(c=>!['strike','shield'].includes(c.id));
+  function shopWeightedPick(rem) {
+    const tw = rem.reduce((s,c)=>(s+(RARITY_WEIGHTS[c.rarity]?.base||5)),0);
+    let r=Math.random()*tw;
+    for(const c of rem){r-=(RARITY_WEIGHTS[c.rarity]?.base||5);if(r<=0)return c;}
+    return rem[rem.length-1];
+  }
+  const shopAvail=[...shopPool], stock=[];
+  while(stock.length<4&&shopAvail.length>0){const c=shopWeightedPick(shopAvail);stock.push(c);shopAvail.splice(shopAvail.indexOf(c),1);}
+  G._shop=stock;
   const c=document.getElementById('shopSt');c.innerHTML='';
   stock.forEach(card=>{
     const price=(card.cost+1)*8;let fx='';
@@ -2191,21 +2285,6 @@ window.endTurn=function(){
   else{_origEndTurn();}
 };
 console.log('%c[NOCTIS DECK] Herramientas de desarrollador → escribe DEV en la consola.','color:#c9984a;font-style:italic');
-
-// ═══════════════════════════════════════════════
-//  INJECT STATS BUTTON INTO TITLE + PATCH HTML
-// ═══════════════════════════════════════════════
-function injectStatsButton() {
-  const tBtns = document.querySelector('.t-btns');
-  if(!tBtns || document.getElementById('btnStats')) return;
-  const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;margin-top:4px';
-  row.innerHTML = `<button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>`;
-  // Insert before the customize row
-  const smRow = tBtns.querySelector('div');
-  if(smRow) tBtns.insertBefore(row, smRow);
-  else tBtns.appendChild(row);
-}
 
 // ═══════════════════════════════════════════════
 //  MOBILE ENHANCEMENTS
@@ -2527,7 +2606,7 @@ function buildTutorialPage(ov, idx){
     imgHtml=`<div style="display:flex;gap:8px;justify-content:center">${samples.map(card=>{const rc={'common':'#a0a0b0','uncommon':'#4a9fff','rare':'#cc80ff','legendary':'#ffcc44'}[card.rarity]||'#a0a0b0';const cImg=getImg('card_'+card.id);return`<div style="width:58px;height:86px;border-radius:4px;background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid ${rc}55;border-top:2px solid ${rc};display:flex;flex-direction:column;overflow:hidden;position:relative;">${cImg?`<img src="${cImg}" style="width:100%;height:56px;object-fit:cover">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:20px">⚔</div>`}<div style="font-family:'Cinzel',serif;font-size:6.5px;color:#d0c0e0;text-align:center;padding:2px">${card.name}</div><div style="position:absolute;top:3px;right:3px;width:13px;height:13px;border-radius:50%;background:#1a1228;border:1px solid ${rc};display:flex;align-items:center;justify-content:center;font-size:7px;color:${rc}">${card.cost}</div></div>`;}).join('')}</div>`;
   } else if(p.isRelicPage){
     const data=loadRelicData();
-    imgHtml=`<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${RELICS.slice(0,4).map(r=>{const img=RELIC_IMGS[r.id];const unl=data.unlocked.includes(r.id);return`<div style="width:50px;height:50px;border-radius:8px;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${r.color}${unl?'':'22'};display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 ${unl?'10px':'2px'} ${r.color}${unl?'55':'11'}">${img?`<img src="${img}" style="width:42px;height:42px;object-fit:contain;${unl?'':'filter:grayscale(1) brightness(.25)'}">`:`<div style="font-size:24px;${unl?'':'filter:grayscale(1) brightness(.25)'}">${r.icon}</div>`}</div>`;}).join('')}</div>`;
+    imgHtml=`<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${RELICS.slice(0,4).map(r=>{const img=getRelicImg(r.id);const unl=data.unlocked.includes(r.id);return`<div style="width:50px;height:50px;border-radius:8px;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${r.color}${unl?'':'22'};display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 ${unl?'10px':'2px'} ${r.color}${unl?'55':'11'}">${img?`<img src="${img}" style="width:42px;height:42px;object-fit:contain;${unl?'':'filter:grayscale(1) brightness(.25)'}">`:`<div style="font-size:24px;${unl?'':'filter:grayscale(1) brightness(.25)'}">${r.icon}</div>`}</div>`;}).join('')}</div>`;
   } else if(p.isMapPage){
     imgHtml=`<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">${[['⚔','#c03050','Combate'],['💀','#9a2f45','Élite'],['🕯','#4a8aaa','Descanso'],['🛒','#d4a843','Tienda'],['📦','#5aaa30','Cofre']].map(([ico,clr,lbl])=>`<div style="width:50px;height:58px;border-radius:7px;background:linear-gradient(135deg,#1a1228,#0e0b18);border:1px solid ${clr}44;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><div style="font-size:20px">${ico}</div><div style="font-size:7.5px;font-family:'Cinzel',serif;color:${clr};letter-spacing:1px">${lbl}</div></div>`).join('')}</div>`;
   } else if(p.imgKey){
@@ -2557,16 +2636,135 @@ function buildTutorialPage(ov, idx){
 }
 
 // ═══════════════════════════════════════════════
+//  AJUSTES — MENÚ DE CONFIGURACIÓN
+// ═══════════════════════════════════════════════
+function showSettings() {
+  const existing = document.getElementById('settingsOverlay');
+  if(existing) { existing.remove(); return; }
+  const cfg = loadSettings();
+  const aiOn = cfg.aiImages !== false;
+  const ov = document.createElement('div');
+  ov.id = 'settingsOverlay';
+  ov.style.cssText = `position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(5,3,12,.88);backdrop-filter:blur(6px);animation:fadeIn .2s ease;`;
+  ov.innerHTML = `<div style="background:linear-gradient(160deg,#1a1030 0%,#110c20 100%);border:1px solid #d4a84355;border-radius:12px;padding:32px 28px;width:min(440px,92vw);box-shadow:0 0 60px #00000088,0 0 30px #d4a84311;position:relative;font-family:'Cinzel',serif;">
+    <button id="settingsClose" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#7a6888;font-size:20px;cursor:pointer;line-height:1;transition:color .2s;" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a6888'">✕</button>
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:26px;margin-bottom:8px;filter:drop-shadow(0 0 12px #d4a84366)">⚙</div>
+      <div style="font-size:15px;letter-spacing:.25em;text-transform:uppercase;color:#d4a843;text-shadow:0 0 12px #d4a84355">Ajustes</div>
+    </div>
+    <div style="margin-bottom:24px">
+      <div style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a1e3a">🎨 &nbsp; Visual</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:14px 16px;">
+        <div>
+          <div style="font-size:13px;color:#e8d8ba;letter-spacing:.05em;margin-bottom:3px">Imágenes generadas por IA</div>
+          <div style="font-size:11px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic">Personajes, cartas y enemigos con arte IA</div>
+        </div>
+        <button id="aiToggleBtn" onclick="toggleAiImages()" style="width:48px;height:26px;border-radius:13px;border:none;cursor:pointer;background:${aiOn?'#d4a843':'#2a1e3a'};position:relative;transition:background .25s;flex-shrink:0;margin-left:16px;box-shadow:${aiOn?'0 0 10px #d4a84355':'none'};">
+          <span style="position:absolute;top:3px;left:${aiOn?'24px':'3px'};width:20px;height:20px;border-radius:50%;background:${aiOn?'#fff':'#5a4870'};transition:left .25s;display:block;"></span>
+        </button>
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a1e3a">🗑 &nbsp; Borrar Datos</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="settingsDeleteSave()" style="display:flex;align-items:center;gap:12px;width:100%;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;" onmouseover="this.style.borderColor='#c03040';this.style.background='#1e0e1c'" onmouseout="this.style.borderColor='#2a1e3a';this.style.background='#160e26'">
+          <span style="font-size:18px">💾</span>
+          <div><div style="font-size:12px;color:#e8d8ba;font-family:'Cinzel',serif;letter-spacing:.05em">Borrar partida guardada</div><div style="font-size:10px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic;margin-top:2px">Elimina el progreso actual del mapa</div></div>
+        </button>
+        <button onclick="settingsDeleteRelics()" style="display:flex;align-items:center;gap:12px;width:100%;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;" onmouseover="this.style.borderColor='#c03040';this.style.background='#1e0e1c'" onmouseout="this.style.borderColor='#2a1e3a';this.style.background='#160e26'">
+          <span style="font-size:18px">🔮</span>
+          <div><div style="font-size:12px;color:#e8d8ba;font-family:'Cinzel',serif;letter-spacing:.05em">Borrar reliquias desbloqueadas</div><div style="font-size:10px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic;margin-top:2px">Resetea todos los desbloqueos y reliquias equipadas</div></div>
+        </button>
+        <button onclick="settingsDeleteStats()" style="display:flex;align-items:center;gap:12px;width:100%;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;" onmouseover="this.style.borderColor='#c03040';this.style.background='#1e0e1c'" onmouseout="this.style.borderColor='#2a1e3a';this.style.background='#160e26'">
+          <span style="font-size:18px">📊</span>
+          <div><div style="font-size:12px;color:#e8d8ba;font-family:'Cinzel',serif;letter-spacing:.05em">Borrar estadísticas y ranking</div><div style="font-size:10px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic;margin-top:2px">Limpia el historial de partidas y la tabla de clasificación</div></div>
+        </button>
+        <button onclick="settingsDeleteAll()" style="display:flex;align-items:center;gap:12px;width:100%;background:#1a0a0e;border:1px solid #8a1a2a44;border-radius:8px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;margin-top:4px;" onmouseover="this.style.borderColor='#c03040';this.style.background='#220a0e'" onmouseout="this.style.borderColor='#8a1a2a44';this.style.background='#1a0a0e'">
+          <span style="font-size:18px">☠</span>
+          <div><div style="font-size:12px;color:#e87070;font-family:'Cinzel',serif;letter-spacing:.05em">Borrar TODO el progreso</div><div style="font-size:10px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic;margin-top:2px">Elimina partida, reliquias, estadísticas y ranking</div></div>
+        </button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:22px;font-size:10px;color:#3a2a4a;letter-spacing:.15em">NOCTIS DECK · v0.0.5</div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if(e.target === ov) closeSettings(); });
+  document.getElementById('settingsClose').onclick = closeSettings;
+}
+
+function closeSettings() {
+  const ov = document.getElementById('settingsOverlay');
+  if(!ov) return;
+  ov.style.animation = 'fadeOut .15s ease forwards';
+  setTimeout(() => ov.remove(), 160);
+}
+
+function toggleAiImages() {
+  const cfg = loadSettings();
+  cfg.aiImages = cfg.aiImages === false ? true : false;
+  saveSettings(cfg);
+  const btn = document.getElementById('aiToggleBtn');
+  if(!btn) return;
+  const on = cfg.aiImages !== false;
+  btn.style.background = on ? '#d4a843' : '#2a1e3a';
+  btn.style.boxShadow = on ? '0 0 10px #d4a84355' : 'none';
+  const knob = btn.querySelector('span');
+  if(knob) { knob.style.left = on ? '24px' : '3px'; knob.style.background = on ? '#fff' : '#5a4870'; }
+  try { renderRelicsPanel(); } catch(e) {}
+}
+
+function settingsDeleteSave() {
+  if(!confirm('¿Borrar la partida guardada actual?')) return;
+  localStorage.removeItem(SK);
+  updateTitle();
+  showSettingsToast('💾 Partida borrada');
+}
+
+function settingsDeleteRelics() {
+  if(!confirm('¿Borrar todas las reliquias desbloqueadas y equipadas?')) return;
+  localStorage.removeItem(RELIC_UNLOCK_KEY);
+  localStorage.removeItem(RELIC_EQUIP_KEY);
+  showSettingsToast('🔮 Reliquias reseteadas');
+}
+
+function settingsDeleteStats() {
+  if(!confirm('¿Borrar todas las estadísticas y el ranking?')) return;
+  try { localStorage.removeItem('noctis_stats_v1'); } catch(e) {}
+  localStorage.removeItem(LB_KEY);
+  showSettingsToast('📊 Estadísticas borradas');
+}
+
+function settingsDeleteAll() {
+  if(!confirm('⚠ ¿Borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
+  [SK, RELIC_UNLOCK_KEY, RELIC_EQUIP_KEY, LB_KEY, 'noctis_stats_v1'].forEach(k => {
+    try { localStorage.removeItem(k); } catch(e) {}
+  });
+  try { Object.keys(localStorage).filter(k => k.startsWith('ni_')).forEach(k => localStorage.removeItem(k)); } catch(e) {}
+  CUSTOM = {};
+  updateTitle();
+  showSettingsToast('☠ Todo el progreso ha sido borrado');
+}
+
+function showSettingsToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a1030,#2a1a3a);border:1px solid #d4a84355;border-radius:8px;padding:10px 22px;font-family:'Cinzel',serif;font-size:12px;color:#d4a843;letter-spacing:.1em;z-index:9999;animation:fadeIn .2s ease;pointer-events:none;box-shadow:0 4px 20px #00000066;`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.animation='fadeOut .3s ease forwards'; setTimeout(()=>t.remove(),300); }, 2200);
+}
+
+// ═══════════════════════════════════════════════
 //  INJECT STATS BUTTON INTO TITLE + PATCH HTML
 // ═══════════════════════════════════════════════
 function injectStatsButton() {
   const tBtns = document.querySelector('.t-btns');
   if(!tBtns || document.getElementById('btnStats')) return;
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;margin-top:4px';
+  row.style.cssText = 'display:flex;gap:8px;margin-top:4px;flex-wrap:wrap';
   row.innerHTML = `
     <button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>
     <button class="btn-sm" id="btnUnlocks" onclick="showUnlocks()">⚜ Desbloqueos</button>
+    <button class="btn-sm" id="btnSettings" onclick="showSettings()" title="Ajustes" style="padding:6px 11px;font-size:15px;">⚙</button>
   `;
   const smRow = tBtns.querySelector('div');
   if(smRow) tBtns.insertBefore(row, smRow);

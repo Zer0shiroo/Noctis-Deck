@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noctis Deck — Notas de Actualización v0.0.5 · La Gran Actualización</title>
+<title>Noctis Deck — Notas de Actualización v0.0.6 · Ajustes y Recompensas</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
@@ -304,14 +304,142 @@
 
 
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.5 — LA MÁS RECIENTE
+       VERSIÓN 0.0.6 — LA MÁS RECIENTE
        ══════════════════════════════════ -->
   <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- v0.0.6 — AJUSTES, IMÁGENES Y RECOMPENSAS                 -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="version-block">
+    <div class="version-header">
+      <div class="version-num latest">v 0.0.6 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+
+      <!-- AJUSTES -->
+      <div class="section s-ux">
+        <div class="section-header">
+          <div class="section-icon">⚙</div>
+          <div class="section-title">Menú de Ajustes</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">Botón <strong>⚙ Ajustes</strong> en la fila de botones del menú principal, junto a Estadísticas y Desbloqueos.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Toggle «Imágenes generadas por IA»</strong> — activo por defecto. Al desactivarlo el juego carga las rutas alternativas definidas en <code>ALT_IMGS</code> y <code>ALT_RELIC_IMGS</code> (carpeta <code>resources/alt/</code>), permitiendo sustituir todo el arte IA por imágenes propias sin tocar código.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Borrar partida guardada</strong> — elimina únicamente el progreso actual del mapa.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Borrar reliquias desbloqueadas</strong> — resetea todos los desbloqueos y la reliquia equipada.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Borrar estadísticas y ranking</strong> — limpia el historial de partidas y la tabla de clasificación.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Borrar TODO el progreso</strong> — opción nuclear con confirmación; elimina partida, reliquias, estadísticas, ranking e imágenes personalizadas.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">La configuración se persiste en <code>noctis_cfg_v1</code> (localStorage) y se aplica en tiempo real sin recargar la página.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMÁGENES ALTERNATIVAS -->
+      <div class="section s-ui">
+        <div class="section-header">
+          <div class="section-icon">🎨</div>
+          <div class="section-title">Sistema de Imágenes Alternativas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">Constante <code>ALT_IMGS</code> con rutas a <code>resources/alt/</code> para los 4 personajes, 4 enemigos y 17 cartas — art no-IA listo para ser colocado sin tocar código.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">Constante <code>ALT_RELIC_IMGS</code> con rutas alternativas para las 7 reliquias desbloqueadas <em>y</em> sus variantes bloqueadas (<code>_locked</code>).</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">Las reliquias <strong>bloqueadas</strong> en la pantalla de Desbloqueos ahora muestran la imagen <code>_locked</code> correcta (pasando por <code>getRelicImg()</code>) en lugar de ignorarla y mostrar siempre el emoji oscurecido.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text"><code>getImg()</code> y <code>getRelicImg()</code> respetan la prioridad: <strong>imagen personalizada</strong> (Personalizar) > <strong>alt-IA desactivada</strong> > imagen IA por defecto.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECOMPENSAS Y TIENDA -->
+      <div class="section s-rarity">
+        <div class="section-header">
+          <div class="section-icon">🎁</div>
+          <div class="section-title">Recompensas y Tienda</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text"><strong>Recompensas de combate:</strong> el sistema anterior llenaba un array con repeticiones y lo barajaba, lo que sesgaba las tiradas hacia las cartas comunes. Ahora se usa una <strong>tirada aleatoria ponderada real</strong> por cada carta seleccionada, con eliminación progresiva del pool para evitar duplicados. Las infrecuentes y raras aparecen con su probabilidad correcta desde el primer encuentro.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text"><strong>Tienda:</strong> ya no muestra siempre las mismas 3-4 cartas. Sustituido <code>shuf().slice()</code> por el mismo sistema de tiradas ponderadas, generando un stock distinto y con distribución de rareza apropiada en cada visita.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">Los pesos de rareza por tier siguen siendo los mismos <em>(base: común 20 · infrecuente 48 · rara 24 · legendaria 8 / élite: 10·40·35·15 / boss: 5·28·38·29)</em> pero ahora se aplican matemáticamente de forma correcta.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TUTORIAL Y UI MENOR -->
+      <div class="section s-ux">
+        <div class="section-header">
+          <div class="section-icon">❓</div>
+          <div class="section-title">Tutorial y UI</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">Botón <strong>?</strong> (Tutorial) movido del panel izquierdo del combate a la <strong>pantalla de título</strong>, posición superior izquierda. Siempre accesible desde el menú principal sin necesidad de iniciar una partida.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text"><strong>Máximo de reliquias equipadas</strong> reducido de 2 a 1. El selector de Desbloqueos refleja el nuevo límite.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v0.0.6 -->
+  </div><!-- /version-block v0.0.6 -->
+
+  <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+
   <!-- v0.0.5 — LA GRAN ACTUALIZACIÓN                           -->
   <!-- ══════════════════════════════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.5 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num old">v 0.0.5 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
