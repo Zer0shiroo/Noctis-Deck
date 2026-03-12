@@ -37,6 +37,24 @@
 
 <div id="app">
 <div class="screen active" id="s-title">
+  <div id="tutorialBtn" onclick="showTutorial()" title="Tutorial — ¿Cómo jugar?" style="
+      position:absolute;top:10px;left:10px;z-index:100;
+      width:28px;height:28px;border-radius:6px;
+      background:linear-gradient(135deg,#1a1228,#2a1a3a);
+      border:1px solid #d4a84366;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Cinzel',serif;font-size:15px;font-weight:bold;
+      color:#d4a843;cursor:pointer;
+      transition:all .2s;box-shadow:0 0 8px #d4a84322;
+      user-select:none;
+    " onmouseover="this.style.borderColor='#d4a843';this.style.boxShadow='0 0 14px #d4a84444';document.getElementById('tutorialHoverTip').style.opacity='1'" onmouseout="this.style.borderColor='#d4a84366';this.style.boxShadow='0 0 8px #d4a84322';document.getElementById('tutorialHoverTip').style.opacity='0'">?</div>
+    <div id="tutorialHoverTip" style="
+      position:absolute;top:10px;left:46px;z-index:101;
+      background:#1a1228;border:1px solid #d4a84366;border-radius:5px;
+      padding:5px 10px;font-family:'Cinzel',serif;font-size:10px;
+      color:#d4a843;letter-spacing:1.5px;white-space:nowrap;
+      opacity:0;transition:opacity .2s;pointer-events:none;
+    ">Tutorial · ¿Cómo jugar?</div>
   <img src="resources/logo/logo.png" alt="">
   <div class="t-main">Noctis Deck</div>
   <div class="t-sub">✦ &nbsp; Roguelike de Cartas &nbsp; ✦</div>
@@ -55,11 +73,20 @@
      style="position:fixed;bottom:22px;left:24px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9984a;text-decoration:none;opacity:.75;transition:opacity .2s,text-shadow .2s;text-shadow:0 0 8px #c9984a44;z-index:100;"
      onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
      onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'">
-    ✦ Notas del Parche (v0.0.4)
+    ✦ Notas del Parche (v0.0.5)
   </a>
 </div>
 
 <div class="screen" id="s-chars">
+  <button onclick="goTitle()" style="
+    position:absolute;top:18px;left:20px;
+    font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    padding:9px 18px;border:1px solid #d4a84344;border-radius:4px;
+    background:transparent;color:#d4a843;cursor:pointer;transition:all .2s;z-index:10;
+  " onmouseover="this.style.borderColor='#d4a843';this.style.background='#d4a84318'"
+     onmouseout="this.style.borderColor='#d4a84344';this.style.background='transparent'">
+    ← Menú
+  </button>
   <div class="page-title">✦ Elige tu Cazador ✦</div>
   <div class="page-sub">Cada personaje comienza con un mazo y habilidades únicas</div>
   <div class="chars-row" id="charsRow"></div>
@@ -67,6 +94,15 @@
 </div>
 
 <div class="screen" id="s-map">
+  <button onclick="goTitle()" style="
+    position:absolute;top:18px;left:20px;
+    font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    padding:9px 18px;border:1px solid #d4a84344;border-radius:4px;
+    background:transparent;color:#d4a843;cursor:pointer;transition:all .2s;z-index:10;
+  " onmouseover="this.style.borderColor='#d4a843';this.style.background='#d4a84318'"
+     onmouseout="this.style.borderColor='#d4a84344';this.style.background='transparent'">
+    ← Menú
+  </button>
   <div class="page-title">✦ Mapa de la Ciudad ✦</div>
   <div class="map-acts" id="mapActs"></div>
   <div style="font-size:12px;color:var(--fog);font-style:italic">Elige tu próximo destino — izquierda o derecha</div>
@@ -74,6 +110,8 @@
 
 <div class="screen" id="s-game">
   <div class="p-left">
+    <!-- Botón Tutorial arriba a la izquierda -->
+    
     <div class="portrait" id="portrait"><div class="portrait-glow"></div><div id="portContent"></div></div>
     <div class="char-badge" id="charBadge">—</div>
     <div>

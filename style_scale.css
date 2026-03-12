@@ -26,50 +26,52 @@
 .char-title    { font-size: 13px !important; }
 .char-stat     { font-size: 12px !important; }
 .char-passive  { font-size: 12px !important; padding: 7px 9px !important; }
+#s-chars       { position: relative !important; }
+#s-map         { position: relative !important; }
 
 /* ── LAYOUT COMBATE ── */
-.p-left  { width: 250px !important; min-width: 250px !important; padding: 14px 13px !important; gap: 12px !important; }
-.p-right { width: 206px !important; min-width: 206px !important; padding: 14px 11px !important; }
-.char-badge   { font-size: 10px !important; letter-spacing: 3px !important; }
-.stat-lbl     { font-size: 10px !important; letter-spacing: 3px !important; }
-.bar-wrap     { height: 13px !important; border-radius: 3px !important; }
-.stat-nums    { font-size: 14px !important; }
-.p-label      { font-size: 10px !important; }
-.dk-cnt       { font-size: 12px !important; gap: 6px !important; }
-.gold-row     { font-size: 15px !important; }
-.sec-title    { font-size: 10px !important; letter-spacing: 3px !important; }
-.clog         { max-height: 200px !important; }
-.log-e        { font-size: 12px !important; }
-#passiveInfo  { font-size: 12px !important; line-height: 1.7 !important; }
-#targetHints  { font-size: 11px !important; line-height: 1.8 !important; }
+.p-left  { width: 272px !important; min-width: 272px !important; padding: 16px 15px !important; gap: 13px !important; position: relative !important; }
+.p-right { width: 220px !important; min-width: 220px !important; padding: 16px 13px !important; }
+.char-badge   { font-size: 13px !important; letter-spacing: 3px !important; }
+.stat-lbl     { font-size: 13px !important; letter-spacing: 3px !important; }
+.bar-wrap     { height: 14px !important; border-radius: 3px !important; }
+.stat-nums    { font-size: 20px !important; }
+.p-label      { font-size: 13px !important; }
+.dk-cnt       { font-size: 15px !important; gap: 8px !important; }
+.gold-row     { font-size: 20px !important; }
+.sec-title    { font-size: 13px !important; letter-spacing: 3px !important; }
+.clog         { max-height: 260px !important; }
+.log-e        { font-size: 14px !important; }
+#passiveInfo  { font-size: 14px !important; line-height: 1.8 !important; }
+#targetHints  { font-size: 14px !important; line-height: 1.9 !important; }
 
 /* ── ENEMIGOS ── */
-.e-zone { gap: 18px !important; padding: 12px 0 !important; }
-.enemy-wrap { padding: 10px !important; gap: 7px !important; }
-.enemy-wrap .e-name   { font-size: 14px !important; }
-.enemy-wrap .e-sprite { width: 130px !important; height: 172px !important; }
-.enemy-wrap .e-intent { font-size: 12px !important; }
-.enemy-wrap .e-hp-wrap{ height: 14px !important; border-radius: 3px !important; }
-.enemy-wrap .e-hp-txt { font-size: 10px !important; }
-.target-indicator     { font-size: 9px !important; min-height: 14px !important; }
-.si { font-size: 11px !important; padding: 3px 8px !important; }
+.e-zone { gap: 22px !important; padding: 14px 0 !important; }
+.enemy-wrap { padding: 12px !important; gap: 9px !important; }
+.enemy-wrap .e-name   { font-size: 18px !important; }
+.enemy-wrap .e-sprite { width: 140px !important; height: 184px !important; }
+.enemy-wrap .e-intent { font-size: 16px !important; }
+.enemy-wrap .e-hp-wrap{ height: 18px !important; border-radius: 3px !important; }
+.enemy-wrap .e-hp-txt { font-size: 13px !important; }
+.target-indicator     { font-size: 13px !important; min-height: 18px !important; }
+.si { font-size: 13px !important; padding: 4px 10px !important; }
 
 /* ── CARTAS ── */
-.hand-zone { height: 210px !important; padding: 0 20px 12px !important; }
-.gcard     { width: 110px !important; height: 166px !important; }
-.c-cost    { width: 24px !important; height: 24px !important; font-size: 12px !important; top: 5px !important; right: 5px !important; }
-.c-name    { font-size: 9.5px !important; letter-spacing: 1.2px !important; padding: 3px !important; }
-.c-art     { padding: 7px 5px 4px !important; }
-.c-fx      { padding: 3px 4px 6px !important; gap: 3px !important; }
-.fx        { font-size: 9px !important; padding: 2px 5px !important; }
-.c-bar     { height: 5px !important; }
+.hand-zone { height: 230px !important; padding: 0 20px 14px !important; }
+.gcard     { width: 122px !important; height: 185px !important; }
+.c-cost    { width: 28px !important; height: 28px !important; font-size: 14px !important; top: 5px !important; right: 5px !important; }
+.c-name    { font-size: 12px !important; letter-spacing: 1.2px !important; padding: 4px !important; }
+.c-art     { padding: 8px 6px 4px !important; }
+.c-fx      { padding: 4px 5px 7px !important; gap: 4px !important; }
+.fx        { font-size: 11px !important; padding: 3px 7px !important; }
+.c-bar     { height: 6px !important; }
 
 /* ── BARRA INFERIOR ── */
-.bot-bar   { height: 64px !important; padding: 0 22px !important; }
-.morb      { width: 30px !important; height: 30px !important; font-size: 13px !important; }
-.mana-wrap { gap: 5px !important; }
-.btn-end   { font-size: 12px !important; padding: 11px 26px !important; }
-.turn-lbl  { font-size: 12px !important; letter-spacing: 2.5px !important; }
+.bot-bar   { height: 72px !important; padding: 0 22px !important; }
+.morb      { width: 36px !important; height: 36px !important; font-size: 16px !important; }
+.mana-wrap { gap: 6px !important; }
+.btn-end   { font-size: 15px !important; padding: 14px 32px !important; }
+.turn-lbl  { font-size: 15px !important; letter-spacing: 2.5px !important; }
 
 /* ── MAPA ── */
 .map-acts { gap: 48px !important; padding: 10px 0 !important; }
@@ -81,20 +83,28 @@
 .mconn-h  { height: 20px !important; width: 2px !important; }
 
 /* ── RECOMPENSA ── */
-.rew-title  { font-size: 32px !important; margin-bottom: 4px !important; }
-.rew-cards  { gap: 28px !important; align-items: flex-start !important; }
+.rew-title  { font-size: 36px !important; margin-bottom: 6px !important; }
+.rew-cards  { gap: 32px !important; align-items: flex-start !important; }
 
-/* Cartas de recompensa más grandes */
-#s-reward .gcard     { width: 130px !important; height: 196px !important; }
-#s-reward .c-cost    { width: 28px !important; height: 28px !important; font-size: 14px !important; }
-#s-reward .c-name    { font-size: 11px !important; letter-spacing: 1px !important; padding: 4px !important; }
-#s-reward .c-art     { padding: 10px 6px 4px !important; }
-#s-reward .c-fx      { gap: 4px !important; padding: 3px 5px 6px !important; }
-#s-reward .fx        { font-size: 11px !important; padding: 3px 7px !important; }
-#s-reward .c-bar     { height: 6px !important; }
-/* Texto rareza y descripción */
-#s-reward .gcard > div[style*="font-size:6px"] { font-size: 8px !important; }
-#s-reward .gcard > div[style*="font-style:italic"] { font-size: 10px !important; }
+/* Cartas de recompensa — especificidad alta para ganar a .gcard genérico */
+#s-reward .rew-wrap .gcard,
+#s-reward .gcard     { width: 160px !important; height: 240px !important; }
+#s-reward .rew-wrap .c-cost,
+#s-reward .c-cost    { width: 34px !important; height: 34px !important; font-size: 17px !important; }
+#s-reward .rew-wrap .c-name,
+#s-reward .c-name    { font-size: 14px !important; letter-spacing: 1.2px !important; padding: 5px !important; }
+#s-reward .rew-wrap .c-art,
+#s-reward .c-art     { padding: 12px 8px 5px !important; }
+#s-reward .rew-wrap .c-fx,
+#s-reward .c-fx      { gap: 5px !important; padding: 4px 6px 8px !important; }
+#s-reward .rew-wrap .fx,
+#s-reward .fx        { font-size: 13px !important; padding: 4px 9px !important; }
+#s-reward .rew-wrap .c-bar,
+#s-reward .c-bar     { height: 7px !important; }
+/* Texto rareza y descripción en inline style */
+#s-reward .gcard > div[style*="font-size:7px"]      { font-size: 10px !important; }
+#s-reward .gcard > div[style*="font-size:6px"]      { font-size: 10px !important; }
+#s-reward .gcard > div[style*="font-style:italic"]  { font-size: 12px !important; }
 
 /* ── TIENDA ── */
 .shop-price { font-size: 14px !important; margin-top: 7px !important; }
@@ -557,4 +567,87 @@
   transition: border-color .3s !important;
   border-color: var(--gold) !important;
   box-shadow: 0 0 14px #c9984a44 !important;
+}
+
+/* ── TUTORIAL BOTÓN ── */
+#tutorialBtn {
+  position: absolute !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 100 !important;
+}
+#tutorialHoverTip { display: none !important; }
+@media (min-width: 641px) {
+  #tutorialHoverTip { display: block !important; }
+}
+
+/* ── TUTORIAL OVERLAY — contenido ── */
+#tutorialOverlay div ul {
+  padding-left: 18px !important;
+  margin: 8px 0 !important;
+}
+#tutorialOverlay div ul li {
+  margin-bottom: 5px !important;
+  line-height: 1.6 !important;
+}
+#tutorialOverlay div p {
+  margin: 0 0 8px 0 !important;
+}
+
+/* ── PANTALLA DESBLOQUEOS — fuentes más grandes en móvil ── */
+@media (max-width: 640px) {
+  /* Pantalla de desbloqueos: scroll completo */
+  #unlocksOverlay {
+    overflow-y: auto !important;
+    align-items: flex-start !important;
+  }
+  #unlocksOverlay > div {
+    padding: 36px 14px 100px !important;
+    gap: 20px !important;
+  }
+
+  /* Grid de reliquias en móvil: 1 o 2 columnas */
+  #unlocksOverlay [style*="grid-template-columns"] {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  /* Fuentes del tutorial en móvil */
+  #tutorialOverlay div[style*="font-family:'IM Fell English'"] {
+    font-size: 14px !important;
+    line-height: 1.8 !important;
+  }
+
+  /* Tutorial: barra de navegación fija en la parte baja */
+  #tutorialOverlay > div {
+    padding: 22px 16px 18px !important;
+    gap: 12px !important;
+    max-height: 95vh !important;
+  }
+
+  /* Botón tutorial más grande en móvil (táctil) */
+  #tutorialBtn {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 17px !important;
+  }
+
+  /* Ensure minimum font sizes in unlock cards on mobile */
+  #unlocksOverlay [style*="font-size:13px"] { font-size: 13px !important; }
+  #unlocksOverlay [style*="font-size:15px"] { font-size: 15px !important; }
+}
+
+/* ── MÍNIMO global: ningún texto del juego por debajo de 8px en móvil ── */
+@media (max-width: 640px) {
+  .n-lbl    { font-size: 8px !important; }
+  .e-hp-txt { font-size: 8px !important; }
+  .fx       { font-size: 8px !important; }
+  .c-name   { font-size: 8.5px !important; }
+  .act-lbl  { font-size: 10px !important; }
+  .log-e    { font-size: 12px !important; }
+  #passiveInfo  { font-size: 12px !important; }
+  #targetHints  { font-size: 12px !important; }
+  .shop-price   { font-size: 12px !important; }
+  .char-passive { font-size: 11px !important; }
+  .char-stat    { font-size: 11px !important; }
 }

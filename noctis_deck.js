@@ -22,6 +22,7 @@ const DEFAULT_IMGS = {
   char_cazador:    'resources/personajes/cazadora.jpg',
   char_hechicera:  'resources/personajes/maga.jpg',
   char_espectro:   'resources/personajes/espectro.png',
+  // PISTOLERO — coloca tu imagen en resources/personajes/pistolero.png
   char_pistolero:  'resources/personajes/pistolero.png',
   enemy0:          'resources/enemigos/enemigo1.png',
   enemy1:          'resources/enemigos/enemigo2.png',
@@ -33,7 +34,7 @@ const DEFAULT_IMGS = {
   card_double:     'resources/cartas/Golpe doble.png',
   card_shield:     'resources/cartas/escudoarcano.jpg',
   card_mantle:     'resources/cartas/manto de sombras.jpg',
-  card_ritual:     'resources/cartas/ritualofblood.jpg',
+  card_ritual:     'resources/cartas/ritual of blood.jpg',
   card_cloud:      'resources/cartas/nube venenosa.jpg',
   card_smite:      'resources/cartas/golpe sagrado.jpg',
   card_retaliate:  'resources/cartas/cartarepresalia.jpg',
@@ -78,9 +79,9 @@ const CHARS=[
 
 // ═══════════════════════════════════════════════
 //  CARDS  (rarity: 'common'|'uncommon'|'rare'|'legendary')
-//  Pesos de rareza para recompensas normales: common 55%, uncommon 30%, rare 12%, legendary 3%
-//  En recompensa élite: common 30%, uncommon 35%, rare 25%, legendary 10%
-//  En recompensa boss (2 cartas): common 20%, uncommon 35%, rare 30%, legendary 15%
+//  Pesos de rareza: base common 20% · uncommon 48% · rare 24% · legendary 8%
+//  Élite: common 10% · uncommon 40% · rare 35% · legendary 15%
+//  Boss: common 5% · uncommon 28% · rare 38% · legendary 29%
 // ═══════════════════════════════════════════════
 const CARDS=[
   // ── COMUNES ──
@@ -108,11 +109,13 @@ const CARDS=[
 ];
 
 // Rareza → peso base y elite
+// Pool filtrada (sin strike/shield/bullet): 3 comunes · 6 infrecuentes · 3 raras · 3 legendarias
+// Pesos ajustados para dar variedad real en encuentros normales
 const RARITY_WEIGHTS = {
-  common:    {base:55, elite:30, boss:20},
-  uncommon:  {base:30, elite:35, boss:35},
-  rare:      {base:12, elite:25, boss:30},
-  legendary: {base:3,  elite:10, boss:15},
+  common:    {base:20, elite:10, boss:5 },
+  uncommon:  {base:48, elite:40, boss:28},
+  rare:      {base:24, elite:35, boss:38},
+  legendary: {base:8,  elite:15, boss:29},
 };
 const RARITY_COLORS = {
   common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44'
@@ -123,7 +126,6 @@ const RARITY_LABELS = {
 
 // Weighted random card pick for rewards
 function pickRewardCards(count, tier) {
-  // tier: 0=normal, 1=elite, 2=boss
   const tierKey = tier===2?'boss':tier===1?'elite':'base';
   const pool = CARDS.filter(c=>!['strike','shield','bullet'].includes(c.id));
   const weighted = [];
@@ -137,6 +139,12 @@ function pickRewardCards(count, tier) {
   for(const c of weighted){
     if(!seen.has(c.id)){seen.add(c.id);picked.push(c);}
     if(picked.length>=count)break;
+  }
+  // Fallback: rellenar si el pool ponderado no alcanza el count
+  if(picked.length < count){
+    const remaining = pool.filter(c=>!seen.has(c.id));
+    shuf(remaining);
+    for(const c of remaining){ picked.push(c); if(picked.length>=count) break; }
   }
   return picked;
 }
@@ -219,10 +227,341 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
   }
 }
 
+
+// ═══════════════════════════════════════════════
+//  RELICS SYSTEM
+//  ──────────────────────────────────────────────
+//  Imágenes: cambia las rutas en RELIC_IMGS para
+//  personalizar el arte de cada reliquia.
+//  NO existe interfaz de usuario para cambiarlas.
+// ═══════════════════════════════════════════════
+
+// ── Rutas de imagen (edita aquí para cambiar arte) ──
+// Para cambiar la imagen BLOQUEADA de cada reliquia: añade la clave con sufijo _locked
+// Ej: corazon_eterno_locked: 'resources/reliquias/corazon_eterno_locked.png'
+// Si no hay imagen _locked se usa el emoji oscurecido por defecto
+const RELIC_IMGS = {
+  corazon_eterno:          'resources/reliquias/corazon_eterno.png',
+  corazon_eterno_locked:   '',   // ← pon aquí la ruta de imagen bloqueada o deja '' para usar el emoji
+  tomo_envenenado:         'resources/reliquias/tomo_envenenado.png',
+  tomo_envenenado_locked:  '',
+  espejo_espectral:        'resources/reliquias/espejo_espectral.png',
+  espejo_espectral_locked: '',
+  cilindro_veloz:          'resources/reliquias/cilindro_veloz.png',
+  cilindro_veloz_locked:   '',
+  amuleto_carmesi:         'resources/reliquias/amuleto_carmesi.png',
+  amuleto_carmesi_locked:  '',
+  corona_voraz:            'resources/reliquias/corona_voraz.png',
+  corona_voraz_locked:     '',
+  orbe_eterno:             'resources/reliquias/orbe_eterno.png',
+  orbe_eterno_locked:      '',
+};
+
+// ── Definición de reliquias ──
+const RELICS = [
+  // ─── DESBLOQUEABLES CON PERSONAJE ──────────────────────────────────────
+  {
+    id:'corazon_eterno', name:'Corazón Eterno', icon:'❤', color:'#c03050', rarity:'rare',
+    unlockChar:'cazador', unlockDesc:'Completa el juego con El Cazador',
+    desc:'Al inicio de cada combate recuperas 6 HP. Tu HP máximo aumenta en 10.',
+    effect:{ startCombatHeal:6, maxHpBonus:10 },
+  },
+  {
+    id:'tomo_envenenado', name:'Tomo Envenenado', icon:'📖', color:'#5aaa30', rarity:'rare',
+    unlockChar:'hechicera', unlockDesc:'Completa el juego con La Hechicera',
+    desc:'Las cartas de veneno aplican +1 veneno adicional. El veneno no decae al final del turno.',
+    effect:{ poisonBonus:1, poisonNoDecay:true },
+  },
+  {
+    id:'espejo_espectral', name:'Espejo Espectral', icon:'🪞', color:'#4a8aaa', rarity:'rare',
+    unlockChar:'espectro', unlockDesc:'Completa el juego con El Espectro',
+    desc:'El primer golpe de cada combate es ignorado (cualquier personaje). Esquivar un golpe otorga 4 bloqueo.',
+    effect:{ firstHitBlock:true, firstHitBlockBonus:4 },
+  },
+  {
+    id:'cilindro_veloz', name:'Cilindro Veloz', icon:'🔫', color:'#d4804a', rarity:'rare',
+    unlockChar:'pistolero', unlockDesc:'Completa el juego con El Pistolero',
+    desc:'Cada 2 cartas de ataque cargan el Cargador (antes 3). Ganas +1 maná al inicio de cada combate.',
+    effect:{ gunslingerThreshold:2, startCombatMana:1 },
+  },
+  // ─── RELIQUIAS ESPECIALES (desbloqueo más difícil) ──────────────────────
+  {
+    id:'amuleto_carmesi', name:'Amuleto Carmesí', icon:'🔮', color:'#9a2f45', rarity:'legendary',
+    unlockCondition:'all_chars', unlockDesc:'Completa el juego con TODOS los personajes',
+    desc:'Al matar un enemigo robas 1 carta adicional ese turno. Las cartas legendarias cuestan 1 maná menos.',
+    effect:{ drawOnKill:1, legendaryDiscount:1 },
+  },
+  {
+    id:'corona_voraz', name:'Corona Voraz', icon:'👑', color:'#f0c040', rarity:'legendary',
+    unlockCondition:'infinite_10', unlockDesc:'Sobrevive 10 encuentros en Modo Infinito',
+    desc:'Cada encuentro completado otorga +2 HP permanentes (máximo +20 por run). El oro se incrementa en 50%.',
+    effect:{ encounterHpBonus:2, encounterHpMax:20, goldBonus:0.5 },
+  },
+  {
+    id:'orbe_eterno', name:'Orbe Eterno', icon:'🌑', color:'#8060cc', rarity:'legendary',
+    unlockCondition:'infinite_20', unlockDesc:'Sobrevive 20 encuentros en Modo Infinito',
+    desc:'Comienzas cada run con 2 cartas legendarias aleatorias. Tu maná máximo aumenta en 1.',
+    effect:{ startWithLegendaries:2, maxManaBonus:1 },
+  },
+];
+
+const RELIC_UNLOCK_KEY = 'noctis_relics_v1';
+const RELIC_EQUIP_KEY  = 'noctis_equip_v1';
+
+function loadRelicData(){
+  try{ const r=localStorage.getItem(RELIC_UNLOCK_KEY); return r?JSON.parse(r):{unlocked:[],winsPerChar:{}}; }
+  catch(e){ return {unlocked:[],winsPerChar:{}}; }
+}
+function saveRelicData(d){ try{ localStorage.setItem(RELIC_UNLOCK_KEY,JSON.stringify(d)); }catch(e){} }
+function loadEquippedRelics(){ try{ const r=localStorage.getItem(RELIC_EQUIP_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+function saveEquippedRelics(arr){ try{ localStorage.setItem(RELIC_EQUIP_KEY,JSON.stringify(arr)); }catch(e){} }
+function getEquippedRelics(){ return loadEquippedRelics(); }
+function hasRelic(id){ return getEquippedRelics().includes(id); }
+function getRelicDef(id){ return RELICS.find(r=>r.id===id); }
+
+function checkRelicUnlocks(survived){
+  // Reliquias de personaje: solo al ganar (survived=true)
+  if(survived){
+    const data = loadRelicData();
+    const cid = G.charId;
+    if(!data.winsPerChar[cid]) data.winsPerChar[cid]=0;
+    data.winsPerChar[cid]++;
+    // Reliquia por personaje
+    RELICS.forEach(r=>{
+      if(data.unlocked.includes(r.id)) return;
+      if(r.unlockChar && r.unlockChar===cid){ data.unlocked.push(r.id); showRelicUnlockToast(r); }
+    });
+    // Reliquia todos los personajes
+    const allWon = CHARS.every(c=>(data.winsPerChar[c.id]||0)>0);
+    if(allWon){
+      const r=RELICS.find(x=>x.id==='amuleto_carmesi');
+      if(r&&!data.unlocked.includes(r.id)){ data.unlocked.push(r.id); showRelicUnlockToast(r); }
+    }
+    saveRelicData(data);
+  }
+  // Reliquias de Modo Infinito: se desbloquean al alcanzar el umbral (no requieren sobrevivir)
+  checkInfiniteRelicUnlocks();
+}
+
+// Comprueba reliquias de modo infinito al momento de alcanzar el umbral
+// Se llama tanto al morir como al completar encuentros
+function checkInfiniteRelicUnlocks(){
+  if(!G.infiniteMode) return;
+  const enc = G.infiniteEncounters || 0;
+  const data = loadRelicData();
+  let changed = false;
+  if(enc >= 10){
+    const r=RELICS.find(x=>x.id==='corona_voraz');
+    if(r&&!data.unlocked.includes(r.id)){ data.unlocked.push(r.id); showRelicUnlockToast(r); changed=true; }
+  }
+  if(enc >= 20){
+    const r=RELICS.find(x=>x.id==='orbe_eterno');
+    if(r&&!data.unlocked.includes(r.id)){ data.unlocked.push(r.id); showRelicUnlockToast(r); changed=true; }
+  }
+  if(changed) saveRelicData(data);
+}
+
+function showRelicUnlockToast(relic){
+  const toast=document.createElement('div');
+  toast.style.cssText=`position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${relic.color};border-radius:10px;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 0 40px ${relic.color}66;opacity:0;transition:all .4s;max-width:340px;`;
+  toast.innerHTML=`<div style="font-size:32px;filter:drop-shadow(0 0 8px ${relic.color})">${relic.icon}</div><div><div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:${relic.color};text-transform:uppercase;margin-bottom:3px">✦ Reliquia Desbloqueada ✦</div><div style="font-family:'Cinzel Decorative',cursive;font-size:15px;color:#f0e8de">${relic.name}</div><div style="font-size:11px;color:#a090b8;font-style:italic;margin-top:2px">${relic.desc}</div></div>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ toast.style.opacity='1'; toast.style.transform='translateX(-50%) translateY(0)'; }));
+  setTimeout(()=>{ toast.style.opacity='0'; toast.style.transform='translateX(-50%) translateY(-10px)'; setTimeout(()=>toast.remove(),500); },4500);
+}
+
+function applyRelicCombatStart(){
+  const p=G.player;
+  getEquippedRelics().forEach(rid=>{
+    const r=getRelicDef(rid); if(!r) return;
+    const ef=r.effect;
+    if(ef.startCombatHeal){ const h=Math.min(p.maxHp-p.hp,ef.startCombatHeal); if(h>0){p.hp+=h;addLog(`${r.name}: +${h} HP`,'heal');} }
+    if(ef.startCombatMana){ p.mana=Math.min(p.maxMana,p.mana+ef.startCombatMana); addLog(`${r.name}: +${ef.startCombatMana} maná`,'sta'); }
+    if(ef.firstHitBlock){ G._relicFirstHitPending=true; }
+  });
+}
+
+function applyRelicEncounterBonus(){
+  if(!hasRelic('corona_voraz')) return;
+  const p=G.player;
+  const bonus=RELICS.find(r=>r.id==='corona_voraz').effect;
+  const cur=G._coronaBonus||0;
+  if(cur<bonus.encounterHpMax){
+    const gain=Math.min(bonus.encounterHpBonus,bonus.encounterHpMax-cur);
+    p.maxHp+=gain; p.hp=Math.min(p.hp+gain,p.maxHp);
+    G._coronaBonus=(G._coronaBonus||0)+gain;
+    addLog(`Corona Voraz: +${gain} HP permanente`,'heal');
+  }
+}
+
+function applyRelicRunStart(){
+  const p=G.player;
+  getEquippedRelics().forEach(rid=>{
+    const r=getRelicDef(rid); if(!r) return;
+    const ef=r.effect;
+    if(ef.maxHpBonus){ p.maxHp+=ef.maxHpBonus; p.hp+=ef.maxHpBonus; }
+    if(ef.maxManaBonus){ p.maxMana+=ef.maxManaBonus; p.mana+=ef.maxManaBonus; }
+    if(ef.startWithLegendaries){
+      const legends=CARDS.filter(c=>c.rarity==='legendary');
+      for(let i=0;i<ef.startWithLegendaries;i++){
+        const pick=legends[Math.floor(Math.random()*legends.length)];
+        if(pick) p.deck.push(pick.id);
+      }
+    }
+  });
+}
+
+function renderRelicsPanel(){
+  const el=document.getElementById('relics'); if(!el) return;
+  const equipped=getEquippedRelics();
+  if(equipped.length===0){ el.innerHTML='<span style="font-size:11px;color:var(--dim);font-style:italic">Sin reliquias</span>'; return; }
+  el.innerHTML='';
+  equipped.forEach(rid=>{
+    const r=getRelicDef(rid); if(!r) return;
+    const div=document.createElement('div');
+    div.style.cssText=`width:44px;height:44px;border-radius:6px;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${r.color}88;display:flex;align-items:center;justify-content:center;cursor:help;position:relative;transition:transform .2s,box-shadow .2s;box-shadow:0 0 8px ${r.color}33;overflow:hidden;flex-shrink:0;`;
+    const imgSrc=RELIC_IMGS[rid];
+    if(imgSrc){
+      div.innerHTML=`<img src="${imgSrc}" style="width:38px;height:38px;object-fit:contain;border-radius:4px;filter:drop-shadow(0 0 6px ${r.color}66)">`;
+    } else {
+      div.style.fontSize='22px';
+      div.textContent=r.icon;
+    }
+    div.addEventListener('mouseenter',()=>{
+      div.style.transform='scale(1.25)'; div.style.boxShadow=`0 0 18px ${r.color}88`;
+      const tip=document.createElement('div');
+      tip.id='relicTip';
+      const rect=div.getBoundingClientRect();
+      tip.style.cssText=`position:fixed;z-index:9999;background:linear-gradient(135deg,#1a1228,#0e0b18);border:1px solid ${r.color};border-radius:8px;padding:12px 16px;max-width:250px;font-size:13px;color:#e0d8f0;font-style:italic;line-height:1.6;box-shadow:0 0 20px ${r.color}44;pointer-events:none;left:${rect.right+12}px;top:${rect.top-4}px;`;
+      tip.innerHTML=`<b style="font-family:'Cinzel',serif;font-size:12px;color:${r.color};font-style:normal;display:block;margin-bottom:4px">${r.name}</b>${r.desc}`;
+      document.body.appendChild(tip);
+    });
+    div.addEventListener('mouseleave',()=>{ div.style.transform=''; div.style.boxShadow=`0 0 8px ${r.color}33`; document.getElementById('relicTip')?.remove(); });
+    el.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════════
+//  PANTALLA DE DESBLOQUEOS
+// ════════════════════════════════════════════════
+function showUnlocks(){
+  let ov=document.getElementById('unlocksOverlay');
+  if(!ov){ ov=document.createElement('div'); ov.id='unlocksOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:8000;background:#080610f8;display:flex;align-items:flex-start;justify-content:center;opacity:0;transition:opacity .35s;overflow-y:auto;'; document.body.appendChild(ov); }
+  buildUnlocksUI(ov);
+  ov.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ ov.style.opacity='1'; }));
+}
+function closeUnlocks(){
+  const ov=document.getElementById('unlocksOverlay'); if(!ov) return;
+  ov.style.opacity='0'; setTimeout(()=>{ ov.style.display='none'; },350);
+}
+
+function buildUnlocksUI(ov){
+  const data=loadRelicData();
+  const equipped=loadEquippedRelics();
+  const MAX_EQUIPPED=1;
+  const RARITY_CLR={rare:'#cc80ff',legendary:'#ffcc44'};
+  const RARITY_LBL={rare:'RARA',legendary:'LEGENDARIA'};
+
+  const equippedHTML = equipped.length===0
+    ? '<span style="font-size:12px;color:#5a5070;font-style:italic">Ninguna reliquia equipada — selecciona una abajo</span>'
+    : equipped.map(rid=>{
+        const r=getRelicDef(rid); if(!r) return '';
+        return `<div onclick="toggleEquipRelic('${rid}')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;background:#2a1a3a;border:1px solid ${r.color}88;border-radius:8px;cursor:pointer;transition:all .2s;" title="Click para desequipar">
+          <span style="font-size:22px">${r.icon}</span>
+          <div><div style="font-family:'Cinzel',serif;font-size:11px;color:${r.color}">${r.name}</div><div style="font-size:10px;color:#7a6888;font-style:italic">Click para desequipar</div></div>
+        </div>`;
+      }).join('');
+
+  const cardsHTML = RELICS.map(r=>{
+    const isUnlocked=data.unlocked.includes(r.id);
+    const isEquipped=equipped.includes(r.id);
+    const canEquip=isUnlocked&&!isEquipped&&equipped.length<MAX_EQUIPPED;
+    const rc=RARITY_CLR[r.rarity]||'#a0a0b0';
+    const rl=RARITY_LBL[r.rarity]||'';
+    const imgSrc=RELIC_IMGS[r.id];
+    const imgLockedSrc=RELIC_IMGS[r.id+'_locked'];
+    const artHtml=isUnlocked
+      ? (imgSrc
+          ? `<img src="${imgSrc}" style="width:88px;height:88px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 0 12px ${r.color}66)">`
+          : `<div style="font-size:60px;filter:drop-shadow(0 0 16px ${r.color}88);line-height:1">${r.icon}</div>`)
+      : (imgLockedSrc
+          ? `<img src="${imgLockedSrc}" style="width:88px;height:88px;object-fit:contain;border-radius:8px;filter:grayscale(1) brightness(.35) contrast(1.5)">`
+          : `<div style="width:88px;height:88px;border-radius:8px;background:#0a0812;border:2px solid #1a1428;display:flex;align-items:center;justify-content:center;font-size:48px;filter:grayscale(1) brightness(.18)">${r.icon}</div>`);
+    const bdr=isEquipped?r.color:(isUnlocked?r.color+'66':'#2a1f3a');
+    const glow=isEquipped?`0 0 28px ${r.color}55,0 0 8px ${r.color}33`:'none';
+    let btn='';
+    if(isEquipped) btn=`<button onclick="toggleEquipRelic('${r.id}')" style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border:1px solid ${r.color};border-radius:3px;background:${r.color}22;color:${r.color};cursor:pointer;transition:all .2s">✓ Equipada · Desequipar</button>`;
+    else if(canEquip) btn=`<button onclick="toggleEquipRelic('${r.id}')" style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border:1px solid #d4a84366;border-radius:3px;background:#d4a84318;color:#d4a843;cursor:pointer;transition:all .2s">⚔ Equipar</button>`;
+    else if(isUnlocked) btn=`<div style="font-size:12px;color:#5a5070;font-style:italic;padding:4px">Ya tienes una reliquia equipada — desequípala primero</div>`;
+    else btn=`<div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:#4a3a58;padding:6px 12px;border:1px solid #2a1f3a;border-radius:3px;text-transform:uppercase">🔒 Bloqueada</div>`;
+
+    return `<div style="background:linear-gradient(160deg,${isEquipped?'#2a1a3a,#1a1028':'#13101e,#0e0b18'});border:1px solid ${bdr};border-top:2px solid ${bdr};border-radius:12px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden;box-shadow:${glow};transition:transform .2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform=''">
+      <div style="position:absolute;top:9px;right:9px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:${rc};border:1px solid ${rc}44;padding:2px 7px;border-radius:2px;background:${rc}11">${rl}</div>
+      ${artHtml}
+      <div style="text-align:center;width:100%;display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Cinzel Decorative',cursive;font-size:15px;color:${isUnlocked?'#f0e8de':'#3a2e48'};letter-spacing:1px">${r.name}</div>
+        <div style="font-size:13px;line-height:1.65;font-style:italic;color:${isUnlocked?'#c8b8d8':'#3a2e48'}">
+          ${isUnlocked ? r.desc : `<span style="color:#5a4a68">🔒 Reliquia oculta</span>`}
+        </div>
+        ${!isUnlocked?`<div style="border-top:1px solid #2a1f3a;padding-top:9px;margin-top:3px"><div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#7a3a50;text-transform:uppercase;margin-bottom:5px">Cómo desbloquear</div><div style="font-size:13px;color:#a87080;font-style:italic;line-height:1.6">${r.unlockDesc||r.unlockCondition}</div></div>`:''}
+      </div>
+      ${btn}
+    </div>`;
+  }).join('');
+
+  ov.innerHTML=`
+  <div style="width:100%;max-width:960px;padding:52px 28px 110px;display:flex;flex-direction:column;align-items:center;gap:30px;position:relative">
+    <!-- Decoración fondo -->
+    <div style="position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 80% 60% at 50% 0%,#2a0a4a22,transparent),radial-gradient(ellipse 60% 80% at 80% 100%,#6a102022,transparent)"></div>
+
+    <!-- Header -->
+    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="font-size:52px;filter:drop-shadow(0 0 24px #c9984aaa);animation:eyePulse 3s ease-in-out infinite">⚜</div>
+      <div style="font-family:'Cinzel Decorative',cursive;font-size:clamp(22px,4vw,40px);color:#f0c060;text-shadow:0 0 50px #d4a84366,0 0 100px #d4a84322;letter-spacing:5px">DESBLOQUEOS</div>
+      <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:#7a6888">Reliquias del Cazador · Máx. ${MAX_EQUIPPED} equipadas</div>
+      <div style="width:200px;height:1px;background:linear-gradient(90deg,transparent,#d4a84344,transparent);margin-top:4px"></div>
+    </div>
+
+    <!-- Equipadas -->
+    <div style="width:100%;background:linear-gradient(135deg,#1a1228,#13101e);border:1px solid #d4a84333;border-radius:12px;padding:20px 24px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:#d4a843;text-transform:uppercase;border-bottom:1px solid #d4a84333;padding-bottom:8px">⚔ Equipadas (${equipped.length}/${MAX_EQUIPPED})</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;min-height:50px;align-items:center">${equippedHTML}</div>
+    </div>
+
+    <!-- Grid reliquias -->
+    <div style="width:100%">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:#5a4a68;text-transform:uppercase;margin-bottom:14px">✦ Todas las Reliquias</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;width:100%">${cardsHTML}</div>
+    </div>
+
+    <!-- Botón cerrar -->
+    <button onclick="closeUnlocks()" style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:13px 36px;border:1px solid #d4a84366;border-radius:4px;background:linear-gradient(135deg,#1a1228dd,#0e0b18dd);backdrop-filter:blur(8px);color:#d4a843;cursor:pointer;transition:all .25s;z-index:10;clip-path:polygon(8px 0%,calc(100% - 8px) 0%,100% 50%,calc(100% - 8px) 100%,8px 100%,0% 50%)"
+      onmouseover="this.style.borderColor='#d4a843';this.style.boxShadow='0 0 24px #d4a84444'"
+      onmouseout="this.style.borderColor='#d4a84366';this.style.boxShadow=''">
+      ← Volver al Menú
+    </button>
+  </div>`;
+}
+
+function toggleEquipRelic(relicId){
+  const MAX_EQUIPPED=1;
+  let equipped=loadEquippedRelics();
+  const idx=equipped.indexOf(relicId);
+  if(idx>=0){ equipped.splice(idx,1); }
+  else{
+    const data=loadRelicData();
+    if(!data.unlocked.includes(relicId)) return;
+    if(equipped.length>=MAX_EQUIPPED) return;
+    equipped.push(relicId);
+  }
+  saveEquippedRelics(equipped);
+  const ov=document.getElementById('unlocksOverlay');
+  if(ov) buildUnlocksUI(ov);
+}
+
 // ═══════════════════════════════════════════════
 //  STATISTICS
-// ═══════════════════════════════════════════════
-const STATS_KEY = 'noctis_stats_v1';
 const LB_KEY    = 'noctis_lb_v1';
 
 function loadStats() {
@@ -341,6 +680,7 @@ function getRunTime() {
 function finalizeRunStats(survived) {
   if(runFinalized) return; // guard: only once per run
   runFinalized = true;
+  checkRelicUnlocks(survived); // ← desbloquear reliquias si corresponde
   const stats = loadStats();
   stats.totalRuns++;
   const rt = getRunTime();
@@ -387,6 +727,9 @@ function newRun(cid, heroName){
     infiniteEncounters:0
   };
   startRunTracking();
+  applyRelicRunStart(); // ← reliquias equipadas al inicio de run
+  G._coronaBonus = 0;
+  G._relicFirstHitPending = false;
   saveG();
 }
 
@@ -625,6 +968,9 @@ function advance(){
 //  POST-ACT 3 — Menu or Infinite Mode
 // ═══════════════════════════════════════════════
 function showPostAct3() {
+  // ← Desbloquear reliquia de personaje AQUÍ, sin importar qué elija el jugador después
+  checkRelicUnlocks(true);
+
   // Build the prompt overlay
   let overlay = document.getElementById('postAct3Overlay');
   if(!overlay) {
@@ -649,7 +995,7 @@ function showPostAct3() {
 }
 
 function goTitleFromAct3() {
-  finalizeRunStats(true);
+  finalizeRunStats(true);  // stats + leaderboard (checkRelicUnlocks ya fue en showPostAct3)
   const ov = document.getElementById('postAct3Overlay');
   if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
   showCredits();
@@ -658,6 +1004,21 @@ function goTitleFromAct3() {
 function startInfiniteMode() {
   const ov = document.getElementById('postAct3Overlay');
   if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
+  // Guardar stats de la run normal antes de entrar al infinito
+  // (reliquias de personaje ya se dieron en showPostAct3)
+  if(!runFinalized){
+    runFinalized = true;
+    const stats = loadStats();
+    stats.totalRuns++;
+    const rt = getRunTime();
+    stats.totalPlaytime += rt;
+    if(runEncounters > stats.bestRunEncounters){ stats.bestRunEncounters=runEncounters; stats.bestRunTime=rt; stats.bestRunTotalDmg=runTotalDmg; }
+    if(runHighDmg > stats.highestSingleDmg) stats.highestSingleDmg=runHighDmg;
+    if(runDmgTanked > stats.mostDmgTanked)  stats.mostDmgTanked=runDmgTanked;
+    if(runDmgHealed > stats.mostDmgHealed)  stats.mostDmgHealed=runDmgHealed;
+    saveStats(stats);
+  }
+  runFinalized = false; // reset para el modo infinito
   G.infiniteMode = true;
   G.infiniteEncounters = 0;
   saveG();
@@ -729,6 +1090,7 @@ function enterInfiniteNode(type) {
   if(['combat','elite'].includes(type)) {
     G.infiniteEncounters = (G.infiniteEncounters||0) + 1;
     runEncounters++;
+    checkInfiniteRelicUnlocks(); // ← desbloquear en tiempo real al superar umbral
     saveG();
     startCombat(type==='combat'?0:1, true);
   } else if(type==='rest') {
@@ -824,6 +1186,11 @@ function startCombat(tier, isInfinite){
   }
   _gunslingerAttacks = 0;
   _gunslingerReady   = false;
+  // Cilindro Veloz: reduce threshold to 2
+  if(hasRelic('cilindro_veloz')) _gunslingerThreshold = 2;
+  else _gunslingerThreshold = 3;
+  applyRelicCombatStart(); // ← startCombatHeal, firstHitBlock, startCombatMana
+  renderRelicsPanel();
   renderEnemies();
   renderHand();
   renderPS();
@@ -964,13 +1331,16 @@ function getCArt(card){
 // Gunslinger counter: cada 3 ataques jugados, siguiente ataque hace doble daño
 let _gunslingerAttacks = 0;
 let _gunslingerReady   = false;
+let _gunslingerThreshold = 3;
 
 function playCard(hi){
   const p=G.player;
   const id=p.hand[hi];
   const card=cById(id);
   const e=G.enemies[G.targetIdx];
-  if(!card||card.cost>p.mana)return;
+  // Amuleto Carmesí: cartas legendarias cuestan 1 menos (mín 0)
+  const costReduction = (hasRelic('amuleto_carmesi') && card && card.rarity==='legendary') ? 1 : 0;
+  if(!card||(card.cost - costReduction)>p.mana)return;
   if(!e||e.dead){
     const alive = G.enemies.findIndex(en=>!en.dead);
     if(alive>=0) G.targetIdx=alive;
@@ -978,7 +1348,7 @@ function playCard(hi){
   }
   const target = G.enemies[G.targetIdx];
 
-  p.mana-=card.cost;
+  p.mana-=Math.max(0, card.cost - costReduction);
   p.hand.splice(hi,1);
   p.discard.push(id);
   let msg=`Jugaste: ${card.name}`;
@@ -994,7 +1364,7 @@ function playCard(hi){
         addLog('¡Cargador activo! Daño doble 🔥','sta');
       } else {
         _gunslingerAttacks++;
-        if(_gunslingerAttacks>=3){_gunslingerReady=true;_gunslingerAttacks=0;}
+        if(_gunslingerAttacks>=_gunslingerThreshold){_gunslingerReady=true;_gunslingerAttacks=0;}
         updateGunslingerHUD();
       }
     }
@@ -1029,7 +1399,7 @@ function playCard(hi){
   }
   if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');}
   if(card.bleed){target.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`;}
-  if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;target.poison+=ps;msg+=` · ${ps} veneno`;}
+  if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;if(hasRelic('tomo_envenenado'))ps+=1;target.poison+=ps;msg+=` · ${ps} veneno`;}
   if(card.heal){
     const h=Math.min(p.maxHp,p.hp+card.heal)-p.hp;
     p.hp+=h;
@@ -1041,6 +1411,11 @@ function playCard(hi){
 
   if(target.hp<=0){
     target.dead=true;
+    // Amuleto Carmesí: draw 1 card on kill
+    if(hasRelic('amuleto_carmesi')){
+      drawUpTo(G.player.hand.length+1);
+      addLog('Amuleto Carmesí: roba 1 carta','sta');
+    }
     const alive=G.enemies.filter(en=>!en.dead);
     if(alive.length===0){
       renderHand();renderEnemies();renderPS();updMana();
@@ -1057,12 +1432,12 @@ function playCard(hi){
 function updateGunslingerHUD(){
   const el=document.getElementById('gunslingerHUD');
   if(!el)return;
+  if(G.charId!=='pistolero'&&!hasRelic('cilindro_veloz')){el.style.display='none';return;}
   if(G.charId!=='pistolero'){el.style.display='none';return;}
   el.style.display='flex';
-  const needed=3-_gunslingerAttacks;
   el.innerHTML=_gunslingerReady
     ? `<span style="color:#ffcc44;font-size:10px;letter-spacing:1px;font-family:'Cinzel',serif">🔥 ¡CARGADO!</span>`
-    : `<span style="font-size:9px;letter-spacing:1px;color:var(--dim)">🔫 ${_gunslingerAttacks}/3</span>`;
+    : `<span style="font-size:9px;letter-spacing:1px;color:var(--dim)">🔫 ${_gunslingerAttacks}/${_gunslingerThreshold}</span>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -1126,7 +1501,14 @@ function endTurn(){
   // DoTs on enemies
   aliveEnemies.forEach(e=>{
     if(e.bleed>0){const d=2;e.hp=Math.max(0,e.hp-d);e.bleed--;addLog(`${e.name} sangra (-${d})`,'ene');animateHit(e);}
-    if(e.poison>0){const d=e.poison+(G.charId==='hechicera'?1:0);e.hp=Math.max(0,e.hp-d);e.poison=Math.max(0,e.poison-1);addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);}
+    if(e.poison>0){
+      const poisBonus=(G.charId==='hechicera'||hasRelic('tomo_envenenado'))?1:0;
+      const d=e.poison+poisBonus;
+      e.hp=Math.max(0,e.hp-d);
+      // Tomo Envenenado: el veneno no decae
+      if(!hasRelic('tomo_envenenado')) e.poison=Math.max(0,e.poison-1);
+      addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);
+    }
     if(e.hp<=0)e.dead=true;
   });
 
@@ -1143,9 +1525,13 @@ function endTurn(){
     } else {
       // Normal attack
       let actualDmg=e.dmg;
-      if(G.charId==='espectro'&&!G.firstHitUsed){
+      // Espectro firstHit OR Espejo Espectral relic
+      const hasFirstHitEffect = (G.charId==='espectro') || hasRelic('espejo_espectral');
+      if(hasFirstHitEffect && !G.firstHitUsed){
         G.firstHitUsed=true;actualDmg=0;
-        addLog('Forma Etérea: golpe evitado!','sta');
+        const relicBonus=hasRelic('espejo_espectral')&&G.charId!=='espectro';
+        if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+        else addLog('Forma Etérea: golpe evitado!','sta');
       }
       const ab=Math.min(p.block,actualDmg);
       p.block=Math.max(0,p.block-actualDmg);
@@ -1172,6 +1558,7 @@ function endTurn(){
     setTimeout(()=>{
       document.getElementById('s-game').classList.remove('shake');
       localStorage.removeItem(SK);
+      checkInfiniteRelicUnlocks(); // ← comprobar reliquias infinitas al morir
       finalizeRunStats(false);
       document.getElementById('overStats').textContent=`${G.heroName}  ·  Turno ${G.turn}  ·  Oro: ${G.gold}${G.infiniteMode?' · Modo Infinito':''}`;
       show('over');
@@ -1281,9 +1668,12 @@ function animatePlayerHit(){
 }
 
 function combatWin(){
-  const totalRw = G.enemies.reduce((sum,e)=>sum+(e.rw||0),0);
-  G.gold+=totalRw;
+  let totalRw = G.enemies.reduce((sum,e)=>sum+(e.rw||0),0);
+  // Corona Voraz: +50% gold
+  if(hasRelic('corona_voraz')){ totalRw = Math.ceil(totalRw * 1.5); }
+  G.gold += totalRw;
   addLog(`¡Victoria! +${totalRw} oro`,'heal');
+  applyRelicEncounterBonus(); // Corona Voraz: +2 HP permanente
   saveG();
   showRew(G._combatTier||0);
 }
@@ -1361,7 +1751,7 @@ function buildCardHTML(card, w, h, showDesc){
   if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
   const rc = RARITY_COLORS[card.rarity]||'#a0a0b0';
   const rl = RARITY_LABELS[card.rarity]||'';
-  const desc = showDesc ? `<div style="font-size:8px;color:var(--dim);padding:0 4px 4px;text-align:center;line-height:1.4;font-style:italic">${card.desc}</div>` : '';
+  const desc = showDesc ? `<div style="font-size:11px;color:var(--dim);padding:2px 5px 6px;text-align:center;line-height:1.5;font-style:italic">${card.desc}</div>` : '';
   return `<div class="gcard ${card.type} playable" style="width:${w}px;height:${h}px;cursor:pointer;position:relative;border-top:2px solid ${rc}">
     <div class="c-bar"></div>
     <div class="c-cost">${card.cost}</div>
@@ -1395,7 +1785,7 @@ function showRew(tier){
   let bossChosen = 0;
   opts.forEach(card=>{
     const w = document.createElement('div'); w.className='rew-wrap';
-    w.innerHTML = buildCardHTML(card, 126, 190, true);
+    w.innerHTML = buildCardHTML(card, 160, 240, true);
     w.addEventListener('click', ()=>{
       if(isBoss){
         if(bossChosen >= 2) return;
@@ -2068,6 +2458,105 @@ function initMobile() {
 }
 
 // ═══════════════════════════════════════════════
+//  TUTORIAL
+// ═══════════════════════════════════════════════
+const TUTORIAL_PAGES = [
+  {
+    title: '¿Qué es Noctis Deck?',
+    imgKey: 'logo',
+    content: `<p>Noctis Deck es un <b>roguelike de cartas</b> gótico-victoriano.<br>Cada partida es única: elige un personaje, recorre el mapa, derrota enemigos y acumula cartas.</p><p>Si mueres empiezas de cero, pero las <b>Reliquias</b> desbloqueadas te esperan para siempre.</p>`
+  },
+  {
+    title: 'Los Personajes',
+    isCharPage: true,
+    content: `<p>Elige entre <b>4 cazadores</b> con pasiva única:</p><ul><li><b style="color:#c03050">El Cazador</b> — Vampirismo: roba 2 HP por ataque directo.</li><li><b style="color:#5aaa30">La Hechicera</b> — Miasma: el veneno hace +1 daño extra/turno.</li><li><b style="color:#4a8aaa">El Espectro</b> — Forma Etérea: el primer golpe de cada combate se ignora.</li><li><b style="color:#d4804a">El Pistolero</b> — Cargador: cada 3 ataques el siguiente hace el doble.</li></ul>`
+  },
+  {
+    title: 'Maná y Cartas',
+    isCardPage: true,
+    content: `<p>Cada turno recuperas todo tu <b>Maná</b> (◆ abajo). Juega cartas gastando maná según su coste.</p><p><b>Rarezas:</b></p><ul><li><b style="color:#a0a0b0">Común</b> — Básica y fiable.</li><li><b style="color:#4a9fff">Infrecuente</b> — Más potente.</li><li><b style="color:#cc80ff">Rara</b> — Efectos especiales.</li><li><b style="color:#ffcc44">Legendaria</b> — Devastadora.</li></ul><p>Pulsa <b>Fin de Turno</b> cuando termines.</p>`
+  },
+  {
+    title: 'El Combate y los Estados',
+    isEnemyPage: true,
+    content: `<p>Selecciona un enemigo pulsando sobre él. Los enemigos muestran su intención antes de actuar.</p><p><b>Estados:</b></p><ul><li>🛡 <b>Bloqueo</b> — absorbe daño hasta agotarse.</li><li>🩸 <b>Sangrado</b> — pierde 2 HP al fin de turno.</li><li>☠ <b>Veneno</b> — pierde HP igual al nivel, que decae.</li></ul><p>Al ganar obtienes <b>Oro</b> y una nueva carta.</p>`
+  },
+  {
+    title: 'El Mapa',
+    isMapPage: true,
+    content: `<p><b>3 Actos</b>, cada uno con 6 filas y un jefe final.</p><ul><li>⚔ <b>Combate</b> — enemigos normales.</li><li>💀 <b>Élite</b> — enemigos fuertes, mejor recompensa.</li><li>🕯 <b>Descanso</b> — recupera 20 HP.</li><li>🛒 <b>Tienda</b> — compra cartas con oro.</li><li>📦 <b>Cofre</b> — carta o monedas gratis.</li><li>☠☠ <b>Jefe</b> — al ganar eliges 2 cartas.</li></ul>`
+  },
+  {
+    title: 'Las Reliquias',
+    isRelicPage: true,
+    content: `<p>Las <b>Reliquias</b> son objetos poderosos que equipas antes de la partida (máx. 1).</p><p>Se desbloquean completando el juego con cada personaje o superando retos del <b>Modo Infinito</b>.</p><p>La reliquia equipada aparece en el panel izquierdo. Pasa el ratón para ver su efecto.</p><p>Gestiónala en <b>Menú Principal → ⚜ Desbloqueos</b>.</p>`
+  },
+  {
+    title: 'Modo Infinito y Ranking',
+    imgKey: 'logo',
+    content: `<p>Al completar los 3 Actos puedes entrar en el <b>🌑 Modo Infinito</b>.</p><p>Los enemigos escalan con cada 10 encuentros. Sobrevive el máximo posible.</p><p>Superar 10 y 20 encuentros desbloquea <b>Reliquias Legendarias</b> exclusivas.</p><p>Tu récord queda guardado en <b>📊 Estadísticas</b>. ¡Buena caza, Cazador!</p>`
+  },
+];
+
+function showTutorial(page){
+  page = page||0;
+  let ov=document.getElementById('tutorialOverlay');
+  if(!ov){ ov=document.createElement('div'); ov.id='tutorialOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:9500;background:#080610f4;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:16px;'; document.body.appendChild(ov); }
+  buildTutorialPage(ov, page);
+  ov.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ ov.style.opacity='1'; }));
+}
+
+function closeTutorial(){
+  const ov=document.getElementById('tutorialOverlay'); if(!ov) return;
+  ov.style.opacity='0'; setTimeout(()=>{ ov.style.display='none'; },300);
+}
+
+function buildTutorialPage(ov, idx){
+  const p=TUTORIAL_PAGES[idx];
+  const total=TUTORIAL_PAGES.length;
+  const isFirst=idx===0, isLast=idx===total-1;
+
+  let imgHtml='';
+  if(p.isCharPage){
+    imgHtml=`<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${CHARS.map(c=>{const img=getImg(c.imgKey);return`<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:62px;height:78px;border-radius:6px;overflow:hidden;border:1px solid #3a2a4a;background:#0e0b18">${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px">${c.svg||'👤'}</div>`}</div><span style="font-size:9px;font-family:'Cinzel',serif;color:#c8b0d8;text-align:center;max-width:64px">${c.name}</span></div>`;}).join('')}</div>`;
+  } else if(p.isEnemyPage){
+    imgHtml=`<div style="display:flex;gap:8px;justify-content:center">${['enemy0','enemy1','enemy2','enemy_healer'].map(k=>{const img=getImg(k);return`<div style="width:50px;height:64px;border-radius:5px;overflow:hidden;border:1px solid #3a2a4a;background:#0e0b18">${img?`<img src="${img}" style="width:100%;height:100%;object-fit:contain">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px">👹</div>`}</div>`;}).join('')}</div>`;
+  } else if(p.isCardPage){
+    const samples=['strike','shield','ritual'].map(id=>CARDS.find(c=>c.id===id)).filter(Boolean);
+    imgHtml=`<div style="display:flex;gap:8px;justify-content:center">${samples.map(card=>{const rc={'common':'#a0a0b0','uncommon':'#4a9fff','rare':'#cc80ff','legendary':'#ffcc44'}[card.rarity]||'#a0a0b0';const cImg=getImg('card_'+card.id);return`<div style="width:58px;height:86px;border-radius:4px;background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid ${rc}55;border-top:2px solid ${rc};display:flex;flex-direction:column;overflow:hidden;position:relative;">${cImg?`<img src="${cImg}" style="width:100%;height:56px;object-fit:cover">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:20px">⚔</div>`}<div style="font-family:'Cinzel',serif;font-size:6.5px;color:#d0c0e0;text-align:center;padding:2px">${card.name}</div><div style="position:absolute;top:3px;right:3px;width:13px;height:13px;border-radius:50%;background:#1a1228;border:1px solid ${rc};display:flex;align-items:center;justify-content:center;font-size:7px;color:${rc}">${card.cost}</div></div>`;}).join('')}</div>`;
+  } else if(p.isRelicPage){
+    const data=loadRelicData();
+    imgHtml=`<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${RELICS.slice(0,4).map(r=>{const img=RELIC_IMGS[r.id];const unl=data.unlocked.includes(r.id);return`<div style="width:50px;height:50px;border-radius:8px;background:linear-gradient(135deg,#1a1228,#2a1a3a);border:1px solid ${r.color}${unl?'':'22'};display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 ${unl?'10px':'2px'} ${r.color}${unl?'55':'11'}">${img?`<img src="${img}" style="width:42px;height:42px;object-fit:contain;${unl?'':'filter:grayscale(1) brightness(.25)'}">`:`<div style="font-size:24px;${unl?'':'filter:grayscale(1) brightness(.25)'}">${r.icon}</div>`}</div>`;}).join('')}</div>`;
+  } else if(p.isMapPage){
+    imgHtml=`<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">${[['⚔','#c03050','Combate'],['💀','#9a2f45','Élite'],['🕯','#4a8aaa','Descanso'],['🛒','#d4a843','Tienda'],['📦','#5aaa30','Cofre']].map(([ico,clr,lbl])=>`<div style="width:50px;height:58px;border-radius:7px;background:linear-gradient(135deg,#1a1228,#0e0b18);border:1px solid ${clr}44;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><div style="font-size:20px">${ico}</div><div style="font-size:7.5px;font-family:'Cinzel',serif;color:${clr};letter-spacing:1px">${lbl}</div></div>`).join('')}</div>`;
+  } else if(p.imgKey){
+    const imgSrc = p.imgKey==='logo' ? 'resources/logo/logo.png' : getImg(p.imgKey);
+    if(imgSrc) imgHtml=`<img src="${imgSrc}" style="width:72px;height:72px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 0 14px #c9984a88)">`;
+  }
+
+  const dots=Array.from({length:total},(_,i)=>`<div onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${i})" style="width:${i===idx?'22px':'8px'};height:8px;border-radius:4px;background:${i===idx?'#d4a843':'#3a2a4a'};cursor:pointer;transition:all .25s;flex-shrink:0"></div>`).join('');
+
+  ov.innerHTML=`<div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #d4a84366;border-top:2px solid #d4a84388;border-radius:14px;max-width:520px;width:100%;padding:28px 26px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 0 80px #d4a84422;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="closeTutorial()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#7a6888;font-size:20px;cursor:pointer;line-height:1;padding:0" title="Cerrar">✕</button>
+    <div style="text-align:center">
+      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:4px;color:#7a6888;text-transform:uppercase;margin-bottom:6px">${idx+1} / ${total}</div>
+      <div style="font-family:'Cinzel Decorative',cursive;font-size:clamp(15px,3vw,21px);color:#f0c060;letter-spacing:2px;text-shadow:0 0 30px #d4a84466">${p.title}</div>
+    </div>
+    ${imgHtml?`<div style="display:flex;justify-content:center">${imgHtml}</div>`:''}
+    <div style="font-family:'IM Fell English',serif;font-size:clamp(13px,2vw,15px);color:#c8b8d8;line-height:1.85;text-align:left;width:100%">${p.content}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;margin-top:4px">
+      <button onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${idx-1})" ${isFirst?'disabled':''} style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:${isFirst?'#4a3a58':'#d4a843'};cursor:${isFirst?'default':'pointer'};transition:all .2s;white-space:nowrap;flex-shrink:0">← Anterior</button>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center">${dots}</div>
+      ${isLast
+        ?`<button onclick="closeTutorial()" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a843;border-radius:3px;background:#d4a84322;color:#d4a843;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0">✓ ¡Entendido!</button>`
+        :`<button onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${idx+1})" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:#d4a843;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0">Siguiente →</button>`
+      }
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
 //  INJECT STATS BUTTON INTO TITLE + PATCH HTML
 // ═══════════════════════════════════════════════
 function injectStatsButton() {
@@ -2075,7 +2564,10 @@ function injectStatsButton() {
   if(!tBtns || document.getElementById('btnStats')) return;
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;gap:8px;margin-top:4px';
-  row.innerHTML = `<button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>`;
+  row.innerHTML = `
+    <button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>
+    <button class="btn-sm" id="btnUnlocks" onclick="showUnlocks()">⚜ Desbloqueos</button>
+  `;
   const smRow = tBtns.querySelector('div');
   if(smRow) tBtns.insertBefore(row, smRow);
   else tBtns.appendChild(row);
