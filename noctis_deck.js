@@ -241,19 +241,19 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
 // Ej: corazon_eterno_locked: 'resources/reliquias/corazon_eterno_locked.png'
 // Si no hay imagen _locked se usa el emoji oscurecido por defecto
 const RELIC_IMGS = {
-  corazon_eterno:          'resources/reliquias/corazon_eterno.png',
+  corazon_eterno:          'resources/reliquias/corazon_eterno.jpg',
   corazon_eterno_locked:   '',   // ← pon aquí la ruta de imagen bloqueada o deja '' para usar el emoji
-  tomo_envenenado:         'resources/reliquias/tomo_envenenado.png',
+  tomo_envenenado:         'resources/reliquias/tomo_envenenado.jpg',
   tomo_envenenado_locked:  '',
-  espejo_espectral:        'resources/reliquias/espejo_espectral.png',
+  espejo_espectral:        'resources/reliquias/espejo_espectral.jpg',
   espejo_espectral_locked: '',
-  cilindro_veloz:          'resources/reliquias/cilindro_veloz.png',
+  cilindro_veloz:          'resources/reliquias/cilindro_veloz.jpg',
   cilindro_veloz_locked:   '',
-  amuleto_carmesi:         'resources/reliquias/amuleto_carmesi.png',
+  amuleto_carmesi:         'resources/reliquias/amuleto_carmesi.jpg',
   amuleto_carmesi_locked:  '',
-  corona_voraz:            'resources/reliquias/corona_voraz.png',
+  corona_voraz:            'resources/reliquias/corona_voraz.jpg',
   corona_voraz_locked:     '',
-  orbe_eterno:             'resources/reliquias/orbe_eterno.png',
+  orbe_eterno:             'resources/reliquias/orbe_eterno.jpg',
   orbe_eterno_locked:      '',
 };
 
