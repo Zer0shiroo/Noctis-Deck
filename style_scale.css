@@ -159,7 +159,7 @@
   .save-badge { font-size: 12px !important; }
 
   /* ── Selección personaje ── */
-  #s-chars { padding: 14px 10px 70px !important; gap: 10px !important; justify-content: flex-start !important; overflow-y: auto !important; }
+  #s-chars { padding: 62px 10px 70px !important; gap: 10px !important; justify-content: flex-start !important; overflow-y: auto !important; }
   .page-title { font-size: 18px !important; letter-spacing: 2px !important; }
   .page-sub   { font-size: 13px !important; }
   .chars-row  {

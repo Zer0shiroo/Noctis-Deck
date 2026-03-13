@@ -19,12 +19,67 @@ function setMusicVolume(v) {
   try { localStorage.setItem('noctis_music_vol', v); } catch(e){}
   if(_bgAudio) _bgAudio.volume = v;
 }
+function getSfxVolume() {
+  try { const v = parseFloat(localStorage.getItem('noctis_sfx_vol')); return isNaN(v)?0.6:v; } catch(e){ return 0.6; }
+}
+function setSfxVolume(v) {
+  try { localStorage.setItem('noctis_sfx_vol', v); } catch(e){}
+}
 // Arrancar música al primer gesto del usuario
 document.addEventListener('click', ()=>{ initMusic(); }, { once:true });
 
 // ═══════════════════════════════════════════════
-//  FOG PARTICLES
-// ═══════════════════════════════════════════════
+//  UI SOUND SYSTEM
+//  ── Rutas de sonido — edita aquí para cambiarlos ──
+//
+//  UI / menús / fin de turno:
+const UI_SOUND_SRC       = 'resources/music/ui_click.mp3';
+//  Enemigo cuando muere:
+const SFX_ENEMY_DEATH    = 'resources/music/sfx_enemy_death.mp3';
+//  Cuando juegas una carta:
+const SFX_PLAY_CARD      = 'resources/music/sfx_play_card.mp3';
+//  Cuando empieza tu turno:
+const SFX_PLAYER_TURN    = 'resources/music/sfx_player_turn.mp3';
+//  Cuando abres un cofre:
+const SFX_CHEST_OPEN     = 'resources/music/sfx_chest_open.mp3';
+//  Cuando entras en la tienda:
+const SFX_SHOP_ENTER     = 'resources/music/sfx_shop_enter.mp3';
+//  Cuando el jugador golpea a un enemigo:
+const SFX_PLAYER_ATTACK  = 'resources/music/sfx_player_attack.mp3';
+//  Cuando el jugador muere:
+const SFX_PLAYER_DEATH   = 'resources/music/sfx_player_death.mp3';
+//  Cuando recibes un golpe:
+const SFX_PLAYER_HIT     = 'resources/music/sfx_player_hit.mp3';
+//
+// ════════════════════════════════════════════════
+function _playSfx(src) {
+  try {
+    const s = new Audio(src);
+    s.volume = getSfxVolume();
+    s.play().catch(()=>{});
+  } catch(e) {}
+}
+function playUI()          { _playSfx(UI_SOUND_SRC); }
+function sfxEnemyDeath()   { _playSfx(SFX_ENEMY_DEATH); }
+function sfxPlayCard()     { _playSfx(SFX_PLAY_CARD); }
+function sfxPlayerTurn()   { _playSfx(SFX_PLAYER_TURN); }
+function sfxChestOpen()    { _playSfx(SFX_CHEST_OPEN); }
+function sfxShopEnter()    { _playSfx(SFX_SHOP_ENTER); }
+function sfxPlayerHit()    { _playSfx(SFX_PLAYER_HIT); }
+function sfxPlayerAttack() { _playSfx(SFX_PLAYER_ATTACK); }
+function sfxPlayerDeath()  { _playSfx(SFX_PLAYER_DEATH); }
+
+// Deseleccionar carta al pulsar fuera de la mano
+document.addEventListener('click', e => {
+  if(!e.target.closest('.c-slot')) {
+    document.querySelectorAll('.c-slot.card-selected').forEach(el => {
+      el.classList.remove('card-selected');
+      el.style.transform = el._baseTransform || '';
+    });
+  }
+});
+
+
 (()=>{const l=document.getElementById('fogL');for(let i=0;i<8;i++){const p=document.createElement('div');p.className='fog-p';const s=180+Math.random()*380;p.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:-${s}px;animation-duration:${22+Math.random()*26}s;animation-delay:${Math.random()*16}s`;l.appendChild(p)}})();
 
 // ═══════════════════════════════════════════════
@@ -557,7 +612,7 @@ function renderRelicsPanel(){
 // ════════════════════════════════════════════════
 //  PANTALLA DE DESBLOQUEOS
 // ════════════════════════════════════════════════
-function showUnlocks(){
+function showUnlocks(){playUI();
   let ov=document.getElementById('unlocksOverlay');
   if(!ov){ ov=document.createElement('div'); ov.id='unlocksOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:8000;background:#080610f8;display:flex;align-items:flex-start;justify-content:center;opacity:0;transition:opacity .35s;overflow-y:auto;'; document.body.appendChild(ov); }
   buildUnlocksUI(ov);
@@ -565,6 +620,7 @@ function showUnlocks(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ ov.style.opacity='1'; }));
 }
 function closeUnlocks(){
+  playUI();
   const ov=document.getElementById('unlocksOverlay'); if(!ov) return;
   ov.style.opacity='0'; setTimeout(()=>{ ov.style.display='none'; },350);
 }
@@ -658,6 +714,7 @@ function buildUnlocksUI(ov){
 }
 
 function toggleEquipRelic(relicId){
+  playUI();
   const MAX_EQUIPPED=1;
   let equipped=loadEquippedRelics();
   const idx=equipped.indexOf(relicId);
@@ -750,7 +807,7 @@ function saveG(){
   }catch(e){}
 }
 function loadG(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):null}catch(e){return null}}
-function deleteSave(){localStorage.removeItem(SK);updateTitle()}
+function deleteSave(){playUI();localStorage.removeItem(SK);updateTitle()}
 function saveCustom(){
   try{
     const meta={};
@@ -919,7 +976,7 @@ function show(id){
   if(id==='custom')buildCustom();
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
 }
-function goTitle(){updateTitle();show('title')}
+function goTitle(){playUI();updateTitle();show('title')}
 function updateTitle(){
   const sv=loadG();
   const bc=document.getElementById('btnContinue'),sb=document.getElementById('saveBadge'),bd=document.getElementById('btnDel');
@@ -928,9 +985,10 @@ function updateTitle(){
   const db=document.getElementById('diffBadge');
   if(db) db.textContent='';
 }
-function goCharSelect(){renderChars();show('chars')}
+function goCharSelect(){playUI();renderChars();show('chars')}
 
 function continueGame(){
+  playUI();
   const d=loadG();
   if(!d)return;
   restoreRun(d);
@@ -958,6 +1016,7 @@ function rollRandomName() {
   input.value = name;
 }
 function confirmName() {
+  playUI();
   const overlay = document.getElementById('nameOverlay');
   const input   = document.getElementById('nameInput');
   const charId  = overlay.dataset.charId;
@@ -978,7 +1037,7 @@ function renderChars(){
     const port=imgSrc?`<img src="${imgSrc}" alt="${ch.name}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${ch.svg}</div>`;
     const statsH=Object.entries(ch.stats).map(([k,v])=>`<div class="char-stat"><span>${k}</span><span class="sv">${v}</span></div>`).join('');
     card.innerHTML=`<div class="sel-mark">✦</div><div class="char-portrait">${port}</div><div class="char-name">${ch.name}</div><div class="char-title">${ch.title}</div><div class="char-stats">${statsH}</div><div class="char-passive">${ch.passive}</div>`;
-    card.addEventListener('click',()=>{selChar=ch.id;document.querySelectorAll('.char-card').forEach(c=>c.classList.toggle('selected',c.dataset.id===ch.id));const b=document.getElementById('btnStart');b.style.opacity='1';b.style.pointerEvents='';});
+    card.addEventListener('click',()=>{playUI();selChar=ch.id;document.querySelectorAll('.char-card').forEach(c=>c.classList.toggle('selected',c.dataset.id===ch.id));const b=document.getElementById('btnStart');b.style.opacity='1';b.style.pointerEvents='';});
     row.appendChild(card);
   });
 }
@@ -1054,14 +1113,15 @@ function enterNode(ai,ri,ci){
   const node = ri===6 ? G.map[ai].boss : G.map[ai].rows[ri][ci];
   if(!node)return;
   if(['combat','elite','boss'].includes(node.type)){
+    playUI();
     runEncounters++;
     startCombat(node.type==='combat'?0:node.type==='elite'?1:2);
   } else if(node.type==='rest'){
-    show('rest');
+    playUI(); show('rest');
   } else if(node.type==='shop'){
-    showShop();
+    playUI(); showShop();
   } else if(node.type==='chest'){
-    showChest();
+    playUI(); showChest();
   }
 }
 
@@ -1238,6 +1298,7 @@ function renderInfiniteMap() {
 }
 
 function enterInfiniteNode(type) {
+  playUI();
   G.infiniteEncounters = (G.infiniteEncounters||0) + 1;
   runEncounters++;
   checkInfiniteRelicUnlocks();
@@ -1542,7 +1603,22 @@ function renderHand(){
     if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
     g.innerHTML=`<div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div>`;
     wrap.appendChild(g);
-    if(can)wrap.addEventListener('click',()=>playCard(i));
+    if(can) wrap.addEventListener('click', ()=>{
+      // Si esta carta ya está seleccionada → ejecutar
+      if(wrap.classList.contains('card-selected')){
+        playCard(i);
+        return;
+      }
+      // Deseleccionar cualquier otra carta previamente destacada
+      document.querySelectorAll('.c-slot.card-selected').forEach(el=>{
+        el.classList.remove('card-selected');
+        el.style.transform = el._baseTransform || '';
+      });
+      // Guardar transform base y destacar esta
+      wrap._baseTransform = wrap.style.transform;
+      wrap.classList.add('card-selected');
+      wrap.style.transform = (wrap._baseTransform||'') + ' translateY(-48px) scale(1.12)';
+    });
     addStatusTooltips(wrap, card); // ✏ CAMBIO 9b: activar tooltips de estado en cada carta
     zone.appendChild(wrap);
   });
@@ -1566,6 +1642,7 @@ let _gunslingerReady   = false;
 let _gunslingerThreshold = 3;
 
 function playCard(hi){
+  sfxPlayCard();
   const p=G.player;
   const id=p.hand[hi];
   const card=cById(id);
@@ -1603,6 +1680,7 @@ function playCard(hi){
 
     let hits = card.triple ? 3 : (card.dbl ? 2 : 1);
     let totalDmgDealt = 0;
+    sfxPlayerAttack();
     for(let h=0;h<hits;h++){
       let d = card.dmg * bonusMult;
       const ab=Math.min(target.block,d);
@@ -1643,6 +1721,7 @@ function playCard(hi){
 
   if(target.hp<=0){
     target.dead=true;
+    sfxEnemyDeath();
     // Amuleto Carmesí: draw 1 card on kill
     if(hasRelic('amuleto_carmesi')){
       drawUpTo(G.player.hand.length+1);
@@ -1727,6 +1806,7 @@ function animateHeal(amount) {
 //  END TURN — healer actions included
 // ═══════════════════════════════════════════════
 function endTurn(){
+  playUI();
   const p=G.player;
   const aliveEnemies = G.enemies.filter(e=>!e.dead);
 
@@ -1741,7 +1821,7 @@ function endTurn(){
       if(!hasRelic('tomo_envenenado')) e.poison=Math.max(0,e.poison-1);
       addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);
     }
-    if(e.hp<=0)e.dead=true;
+    if(e.hp<=0){ e.dead=true; sfxEnemyDeath(); }
   });
 
   if(G.enemies.filter(e=>!e.dead).length===0){
@@ -1785,6 +1865,7 @@ function endTurn(){
   if(p.poison>0){p.hp=Math.max(0,p.hp-p.poison);p.poison=Math.max(0,p.poison-1);}
 
   if(p.hp<=0){
+    sfxPlayerDeath();
     renderPS();
     document.getElementById('s-game').classList.add('shake');
     setTimeout(()=>{
@@ -1799,6 +1880,7 @@ function endTurn(){
   }
 
   G.turn++;
+  sfxPlayerTurn();
   p.block=0;
   p.mana=p.maxMana;
   drawUpTo(getMaxHand());
@@ -1875,6 +1957,7 @@ function animateHit(e) {
 }
 
 function animatePlayerHit(){
+  sfxPlayerHit();
   // Red vignette flash over entire combat screen
   let vfx = document.getElementById('playerHitVFX');
   if(!vfx){
@@ -2025,6 +2108,7 @@ function showRew(tier){
     w.addEventListener('click', ()=>{
       if(isBoss){
         if(bossChosen >= 2) return;
+        playUI();
         G.player.deck.push(card.id);
         bossChosen++;
         w.style.opacity='.3'; w.style.pointerEvents='none';
@@ -2032,6 +2116,7 @@ function showRew(tier){
         if(subEl) subEl.textContent=`${2-bossChosen} carta(s) restante(s)`;
         if(bossChosen>=2){ saveG(); setTimeout(()=>doAdvance(),600); }
       } else {
+        playUI();
         G.player.deck.push(card.id);
         saveG();
         doAdvance();
@@ -2134,16 +2219,18 @@ function showDeckEditor(context){
 }
 
 function skipRew(){
+  playUI();
   if(G.infiniteMode) {
     advanceInfinite();
   } else {
     advance();
   }
 }
-function doHeal(){const p=G.player;p.hp=Math.min(p.maxHp,p.hp+20);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
+function doHeal(){playUI();const p=G.player;p.hp=Math.min(p.maxHp,p.hp+20);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
 function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck.splice(i,1);saveG();if(G.infiniteMode)advanceInfinite();else advance();}
 
 function showShop(){
+  sfxShopEnter();
   document.getElementById('shopG').textContent=G.gold;
   // Tienda: 4 cartas con sistema de pesos igual que las recompensas de combate
   // Se usa tier 0 (base) pero con pool más amplia y sin excluir bullet
@@ -2165,6 +2252,7 @@ function showShop(){
     requestAnimationFrame(()=>addStatusTooltips(w, card)); // ✏ FIX 3b: tooltips en tienda
     w.addEventListener('click',()=>{
       if(G.gold<price)return;
+      playUI();
       G.gold-=price;
       G.player.deck.push(card.id);
       w.style.opacity='.2';w.style.pointerEvents='none';
@@ -2208,6 +2296,7 @@ function showShop(){
     </div>
     <div class="shop-price" id="shopDiscardPrice">🪙 ${discardCost}</div>`;
   dItem.addEventListener('click', ()=>{
+    playUI();
     shopDiscard();
   });
   c.appendChild(dItem);
@@ -2216,6 +2305,7 @@ function showShop(){
 }
 
 function leaveShop(){
+  playUI();
   if(G.infiniteMode) advanceInfinite();
   else advance();
 }
@@ -2283,6 +2373,7 @@ function showDeckEditorShop(){
   requestAnimationFrame(()=>{ overlay.style.transition='opacity .3s'; overlay.style.opacity='1'; });
 
   window.confirmShopDiscard = function(){
+    playUI();
     G.player.deck = pending;
     G.player.hand = [];
     G.player.discard = [];
@@ -2299,6 +2390,7 @@ function showDeckEditorShop(){
 //  CHEST
 // ═══════════════════════════════════════════════
 function showChest(){
+  sfxChestOpen();
   const roll=Math.random();
   const el=document.getElementById('chestContent');
   el.innerHTML='';
@@ -2312,8 +2404,8 @@ function showChest(){
   }
   show('chest');
 }
-function chestGold(n){G.gold+=n;saveG();if(G.infiniteMode)advanceInfinite();else advance();}
-function chestCard(){showRew();}
+function chestGold(n){playUI();G.gold+=n;saveG();if(G.infiniteMode)advanceInfinite();else advance();}
+function chestCard(){playUI();showRew();}
 function chestMimic(){
   const mimic={name:'Mímic Devorador',hp:38,maxHp:38,dmg:13,bleed:2,psn:0,block:0,poison:0,tier:1,rw:25,dead:false};
   G.enemies=[mimic];
@@ -2337,6 +2429,7 @@ function chestMimic(){
 //  STATISTICS SCREEN
 // ═══════════════════════════════════════════════
 function showStats() {
+  playUI();
   let ov = document.getElementById('statsOverlay');
   if(!ov) {
     ov = document.createElement('div');
@@ -2411,6 +2504,7 @@ function showStats() {
 }
 
 function closeStats() {
+  playUI();
   const ov = document.getElementById('statsOverlay');
   if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
 }
@@ -2514,7 +2608,7 @@ function dzLeave(el){el.classList.remove('drag-over')}
 function dzDrop(e,key,el){e.preventDefault();el.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f,key,el)}
 function dzFile(e,key,el){const f=e.target.files[0];if(f)loadImg(f,key,el)}
 function dzClr(key,el,e){e.stopPropagation();delete CUSTOM[key];const i=el.querySelector('img');if(i)i.remove();el.classList.remove('has-img')}
-function saveCustomAndReturn(){saveCustom();goTitle()}
+function saveCustomAndReturn(){playUI();saveCustom();goTitle()}
 
 // ═══════════════════════════════════════════════
 //  CREDITS
@@ -3005,6 +3099,7 @@ function buildTutorialPage(ov, idx){
 //  AJUSTES — MENÚ DE CONFIGURACIÓN
 // ═══════════════════════════════════════════════
 function showSettings() {
+  playUI();
   const existing = document.getElementById('settingsOverlay');
   if(existing) { existing.remove(); return; }
   const cfg = loadSettings();
@@ -3031,6 +3126,16 @@ function showSettings() {
         <input id="musicVolSlider" type="range" min="0" max="100" value="${Math.round(getMusicVolume()*100)}"
           style="width:100%;accent-color:#d4a843;cursor:pointer"
           oninput="setMusicVolume(this.value/100);document.getElementById('musicVolLabel').textContent=this.value+'%'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+          <div>
+            <div style="font-size:13px;color:#e8d8ba;letter-spacing:.05em;margin-bottom:3px">Volumen de efectos de sonido</div>
+            <div style="font-size:11px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic">Cartas, golpes, menús, muerte...</div>
+          </div>
+          <span id="sfxVolLabel" style="font-family:'Cinzel',serif;font-size:12px;color:#d4a843;min-width:36px;text-align:right">${Math.round(getSfxVolume()*100)}%</span>
+        </div>
+        <input id="sfxVolSlider" type="range" min="0" max="100" value="${Math.round(getSfxVolume()*100)}"
+          style="width:100%;accent-color:#d4a843;cursor:pointer"
+          oninput="setSfxVolume(this.value/100);document.getElementById('sfxVolLabel').textContent=this.value+'%'">
       </div>
     </div>
     <div style="margin-bottom:24px">
@@ -3074,6 +3179,7 @@ function showSettings() {
 }
 
 function closeSettings() {
+  playUI();
   const ov = document.getElementById('settingsOverlay');
   if(!ov) return;
   ov.style.animation = 'fadeOut .15s ease forwards';
@@ -3096,6 +3202,7 @@ function toggleAiImages() {
 
 function settingsDeleteSave() {
   if(!confirm('¿Borrar la partida guardada actual?')) return;
+  playUI();
   localStorage.removeItem(SK);
   updateTitle();
   showSettingsToast('💾 Partida borrada');
@@ -3103,6 +3210,7 @@ function settingsDeleteSave() {
 
 function settingsDeleteRelics() {
   if(!confirm('¿Borrar todas las reliquias desbloqueadas y equipadas?')) return;
+  playUI();
   localStorage.removeItem(RELIC_UNLOCK_KEY);
   localStorage.removeItem(RELIC_EQUIP_KEY);
   showSettingsToast('🔮 Reliquias reseteadas');
@@ -3110,6 +3218,7 @@ function settingsDeleteRelics() {
 
 function settingsDeleteStats() {
   if(!confirm('¿Borrar todas las estadísticas y el ranking?')) return;
+  playUI();
   try { localStorage.removeItem('noctis_stats_v1'); } catch(e) {}
   localStorage.removeItem(LB_KEY);
   showSettingsToast('📊 Estadísticas borradas');
@@ -3117,6 +3226,7 @@ function settingsDeleteStats() {
 
 function settingsDeleteAll() {
   if(!confirm('⚠ ¿Borrar TODO el progreso? Esta acción no se puede deshacer.')) return;
+  playUI();
   [SK, RELIC_UNLOCK_KEY, RELIC_EQUIP_KEY, LB_KEY, 'noctis_stats_v1'].forEach(k => {
     try { localStorage.removeItem(k); } catch(e) {}
   });

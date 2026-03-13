@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noctis Deck — Notas de Actualización v0.0.7 · Música, Dificultad e Infinito</title>
+<title>Noctis Deck — Notas de Actualización v0.0.8 · Sonido y Cartas</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
@@ -303,17 +303,128 @@
   </div>
 
 
+  <!-- ══════════════════════════════════
+       VERSIÓN 0.0.8 — LA MÁS RECIENTE
+       ══════════════════════════════════ -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- v0.0.7 — MÚSICA, DIFICULTAD Y MODO INFINITO PROCEDURAL   -->
+  <!-- v0.0.8 — SONIDO COMPLETO Y CONFIRMACIÓN DE CARTAS        -->
   <!-- ══════════════════════════════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.7 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num latest">v 0.0.8 <span class="version-tag vtag-new">ÚLTIMA</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
 
-      <!-- MÚSICA -->
+      <!-- SONIDO -->
+      <div class="section s-ux">
+        <div class="section-header">
+          <div class="section-icon">🔊</div>
+          <div class="section-title">Sistema de Sonido Completo</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>8 efectos de sonido independientes</strong> — cada acción relevante del juego tiene ahora su propio SFX. Las rutas son constantes configurables al inicio de <code>noctis_deck.js</code>.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_player_attack</strong> — suena al inicio de cualquier carta de ataque que golpee a un enemigo.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_player_hit</strong> — suena junto al vignette rojo y el shake de pantalla al recibir daño.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_player_death</strong> — suena en el instante en que el HP llega a 0, antes de la transición a la pantalla de Game Over.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_enemy_death</strong> — se dispara al morir un enemigo, tanto por daño de carta como por sangrado o veneno al final del turno.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_play_card</strong> — confirmación sonora al jugar cualquier carta de la mano.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_player_turn</strong> — indica el inicio de cada nuevo turno del jugador.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>sfx_chest_open</strong> y <strong>sfx_shop_enter</strong> — sonidos de apertura de cofre y entrada en tienda respectivamente.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>ui_click</strong> — todos los botones de navegación, menús, ajustes, fin de turno y acciones de mapa reproducen un sonido de interfaz unificado.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VOLUMEN SFX -->
+      <div class="section s-ui">
+        <div class="section-header">
+          <div class="section-icon">⚙</div>
+          <div class="section-title">Control de Volumen en Ajustes</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">Slider <strong>«Volumen de efectos de sonido»</strong> en el menú de Ajustes, completamente independiente del volumen de música. Controla los 8 SFX de forma unificada. Se persiste en <code>noctis_sfx_vol</code> (localStorage). Valor por defecto: 60%.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">El volumen de SFX ya no se deriva del volumen de música — ambos son canales completamente separados.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIRMACIÓN DE CARTAS -->
+      <div class="section s-rarity">
+        <div class="section-header">
+          <div class="section-icon">🎴</div>
+          <div class="section-title">Doble Confirmación para Jugar Cartas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Primer clic</strong> — la carta se eleva 48px, escala a 1.12× y muestra un borde dorado pulsante con la etiqueta <strong>✦ CONFIRMAR ✦</strong> flotante. Queda visualmente destacada por encima del resto de la mano.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Segundo clic</strong> sobre la misma carta — la ejecuta normalmente, igual que antes.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">Seleccionar otra carta deselecciona la anterior automáticamente. Pulsar fuera de la mano también cancela la selección activa.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v0.0.8 -->
+  </div><!-- /version-block v0.0.8 -->
+
+  <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       VERSIÓN 0.0.7 — ANTERIOR
+       ══════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- v0.0.7 — MÚSICA, DIFICULTAD E INFINITO                   -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="version-block" style="opacity:.9">
+    <div class="version-header">
+      <div class="version-num old">v 0.0.7 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
       <div class="section s-ux">
         <div class="section-header">
           <div class="section-icon">🎵</div>
@@ -323,18 +434,12 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text"><strong>Música de fondo</strong> en bucle durante toda la partida. Coloca tu canción en <code>resources/music/background.mp3</code> (también acepta <code>.ogg</code> y <code>.wav</code>). Se activa automáticamente al primer clic del usuario.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text"><strong>Slider de volumen</strong> en el menú de Ajustes (sección 🎵 Música). El valor se guarda entre sesiones. Rango 0–100%.</div>
+              <div class="item-text">Música de fondo en bucle (<code>resources/music/background.mp3</code>) que se activa al primer clic. Slider de volumen 0–100% en Ajustes, guardado en <code>noctis_music_vol</code>.</div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- DIFICULTAD -->
-      <div class="section s-combat">
+      <div class="section s-ui">
         <div class="section-header">
           <div class="section-icon">⚔</div>
           <div class="section-title">Escalado de Dificultad por Acto</div>
@@ -343,99 +448,51 @@
           <div class="items">
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Los enemigos escalan en <strong>HP y daño × 1.5 por cada acto completado</strong>. La progresión queda así:
-                <div class="sub-items">
-                  <div class="sub-item"><strong>Acto 1</strong> — multiplicador ×1.0 (base)</div>
-                  <div class="sub-item"><strong>Acto 2</strong> — multiplicador ×1.5</div>
-                  <div class="sub-item"><strong>Acto 3</strong> — multiplicador ×2.25</div>
-                </div>
-                Se combina correctamente con el multiplicador del Modo Infinito.
-              </div>
+              <div class="item-text">Los enemigos escalan ×1.5 por acto: Acto 1 → ×1.0 · Acto 2 → ×1.5 · Acto 3 → ×2.25. Compatible con el multiplicador del Modo Infinito.</div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- MODO INFINITO -->
-      <div class="section s-inf">
+      <div class="section s-rarity">
         <div class="section-header">
           <div class="section-icon">🌑</div>
-          <div class="section-title">Modo Infinito — Encuentros Procedurales</div>
+          <div class="section-title">Modo Infinito Procedural</div>
         </div>
         <div class="card">
           <div class="items">
             <div class="item">
-              <span class="item-tag tag-change">REWORK</span>
-              <div class="item-text"><strong>El jugador ya no elige el tipo de encuentro.</strong> El sistema genera proceduralmente el siguiente nodo y muestra una tarjeta con su símbolo, nombre y descripción antes de entrar. Pulsa la tarjeta para continuar.</div>
-            </div>
-            <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text"><strong>Jefe cada 10 encuentros.</strong> Los encuentros 9, 19, 29… siempre son un Jefe. La interfaz muestra un aviso indicando cuántos encuentros faltan para el próximo.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text"><strong>Cofre añadido al Modo Infinito.</strong> El tipo 📦 Cofre ya puede aparecer como encuentro procedural.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-change">BALANCE</span>
-              <div class="item-text"><strong>Probabilidades de encuentros de alivio decrecientes.</strong> Cada 10 encuentros la probabilidad de obtener Descanso, Tienda o Cofre se reduce un 15%, haciendo el avance progresivamente más hostil.
-                <div class="sub-items">
-                  <div class="sub-item">Encuentros 1–9 → probabilidad base completa</div>
-                  <div class="sub-item">Encuentros 10–19 → −15% sobre descanso/tienda/cofre</div>
-                  <div class="sub-item">Encuentros 20–29 → −30% sobre descanso/tienda/cofre</div>
-                  <div class="sub-item">Y así sucesivamente hasta llegar a 0%</div>
-                </div>
-              </div>
+              <div class="item-text">Los encuentros se generan de forma procedural. Cada 10 encuentros hay un Jefe garantizado (enc. 9, 19, 29…). Las probabilidades de eventos positivos (descanso, tienda, cofre) se reducen gradualmente a medida que avanza la partida.</div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- DESCANSO -->
-      <div class="section s-heal">
+      <div class="section s-ux">
         <div class="section-header">
           <div class="section-icon">🕯</div>
-          <div class="section-title">Santuario — Simplificado</div>
+          <div class="section-title">Santuario Simplificado · Descarte solo en Tienda</div>
         </div>
         <div class="card">
           <div class="items">
             <div class="item">
               <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text"><strong>Eliminada la opción «Purgar»</strong> del Santuario Olvidado. Ahora solo existe la acción <strong>❤ Curar</strong> (recupera 20 HP). La única forma de descartar cartas es a través de la <strong>Tienda</strong>.</div>
+              <div class="item-text">El Santuario de Descanso solo ofrece curación (❤ +20 HP). La opción de purgar cartas se ha eliminado. El descarte de mazo queda exclusivamente en la Tienda.</div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- DESCARTE -->
-      <div class="section s-deck">
-        <div class="section-header">
-          <div class="section-icon">🗑</div>
-          <div class="section-title">Descarte de Cartas — Solo en Tienda</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text"><strong>Eliminado el editor de mazo al final de acto y en Modo Infinito.</strong> Antes aparecía un overlay tras derrotar al jefe y cada 10 encuentros en infinito permitiendo descartar hasta 5 cartas gratis. Ahora esas pantallas ya no aparecen — el descarte es exclusivo de la Tienda y tiene coste en oro.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div><!-- /version-body v0.0.7 -->
   </div><!-- /version-block v0.0.7 -->
 
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.6 — LA MÁS RECIENTE
+       VERSIÓN 0.0.6 — ANTERIOR
        ══════════════════════════════════ -->
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- v0.0.6 — AJUSTES, IMÁGENES Y RECOMPENSAS                 -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <div class="version-block">
+  <div class="version-block" style="opacity:.85">
     <div class="version-header">
       <div class="version-num old">v 0.0.6 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>

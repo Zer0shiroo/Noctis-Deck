@@ -140,6 +140,34 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .gcard{width:104px;height:158px;border-radius:6px;border:1px solid var(--border);background:linear-gradient(160deg,#1a1228,#12101c);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 24px #00000088;position:relative;user-select:none;transition:border-color .2s,box-shadow .2s}
 .gcard.playable{border-color:var(--gold);box-shadow:0 8px 24px #00000088,0 0 12px #c9984a44}
 .gcard.unplayable{opacity:.38}
+/* Carta seleccionada para confirmar — efecto muy visible */
+.c-slot.card-selected { z-index:200 !important; }
+.c-slot.card-selected .gcard {
+  border:2px solid #fff !important;
+  box-shadow:0 0 0 2px #d4a843, 0 0 28px #d4a843cc, 0 0 60px #d4a84377, 0 -8px 32px #c9984a66 !important;
+  animation: cardPulse .5s ease-in-out infinite alternate !important;
+}
+.c-slot.card-selected::after {
+  position:absolute;
+  top:-26px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:2px;
+  color:#fff;
+  background:linear-gradient(135deg,#d4a843,#c9984a);
+  padding:3px 8px;
+  border-radius:3px;
+  white-space:nowrap;
+  pointer-events:none;
+  box-shadow:0 0 12px #d4a84388;
+  z-index:201;
+}
+@keyframes cardPulse {
+  from { box-shadow:0 0 0 2px #d4a843, 0 0 20px #d4a843aa, 0 0 40px #d4a84355, 0 -8px 24px #c9984a44; }
+  to   { box-shadow:0 0 0 3px #fff,    0 0 36px #d4a843ff, 0 0 80px #d4a84399, 0 -8px 40px #c9984a88; }
+}
 .gcard.attack .c-bar{background:linear-gradient(90deg,var(--wine),var(--wine2))}
 .gcard.defense .c-bar{background:linear-gradient(90deg,#1a3a7a,#3a6acc)}
 .gcard.skill .c-bar{background:linear-gradient(90deg,#3a1a5a,#7a3acc)}
