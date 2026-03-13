@@ -1,4 +1,28 @@
 // ═══════════════════════════════════════════════
+//  MUSIC SYSTEM
+//  Pon tu canción en: resources/music/background.mp3
+//  (también acepta .ogg y .wav)
+// ═══════════════════════════════════════════════
+const MUSIC_SRC = 'resources/music/background.mp3';
+let _bgAudio = null;
+function initMusic() {
+  if(_bgAudio) return;
+  _bgAudio = new Audio(MUSIC_SRC);
+  _bgAudio.loop = true;
+  _bgAudio.volume = getMusicVolume();
+  _bgAudio.play().catch(()=>{});
+}
+function getMusicVolume() {
+  try { const v = parseFloat(localStorage.getItem('noctis_music_vol')); return isNaN(v)?0.5:v; } catch(e){ return 0.5; }
+}
+function setMusicVolume(v) {
+  try { localStorage.setItem('noctis_music_vol', v); } catch(e){}
+  if(_bgAudio) _bgAudio.volume = v;
+}
+// Arrancar música al primer gesto del usuario
+document.addEventListener('click', ()=>{ initMusic(); }, { once:true });
+
+// ═══════════════════════════════════════════════
 //  FOG PARTICLES
 // ═══════════════════════════════════════════════
 (()=>{const l=document.getElementById('fogL');for(let i=0;i<8;i++){const p=document.createElement('div');p.className='fog-p';const s=180+Math.random()*380;p.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:-${s}px;animation-duration:${22+Math.random()*26}s;animation-delay:${Math.random()*16}s`;l.appendChild(p)}})();
@@ -278,7 +302,9 @@ function getHealerAction(e, turnInCombat) {
 }
 
 function buildEnemyGroup(tier, infiniteMultiplier) {
-  const mult = infiniteMultiplier || 1;
+  // Multiplicador base: ×1.5 por cada acto completado en modo normal
+  const actMult = (!infiniteMultiplier && G.path) ? Math.pow(1.5, G.path.act || 0) : 1;
+  const mult = (infiniteMultiplier || 1) * actMult;
   const rnd = t => ENM_TEMPLATES[t][Math.floor(Math.random()*ENM_TEMPLATES[t].length)];
   const mkE = (tpl, ti) => ({
     ...tpl,
@@ -1135,15 +1161,45 @@ function showInfiniteMap() {
   show('map');
 }
 
+function pickInfiniteType(enc) {
+  // Encuentros 9, 19, 29... → jefe (índice base-0 antes de incrementar)
+  if((enc + 1) % 10 === 0) return 'boss';
+  // Cada 10 encuentros la probabilidad de tienda/descanso/cofre baja un 15%
+  const cycles = Math.floor(enc / 10);
+  const bonusMult = Math.max(0, 1 - cycles * 0.15);
+  const r = Math.random();
+  const rest  = 0.16 * bonusMult;
+  const shop  = rest  + 0.12 * bonusMult;
+  const chest = shop  + 0.12 * bonusMult;
+  const elite = chest + 0.18;
+  if(r < rest)  return 'rest';
+  if(r < shop)  return 'shop';
+  if(r < chest) return 'chest';
+  if(r < elite) return 'elite';
+  return 'combat';
+}
+
 function renderInfiniteMap() {
   const c = document.getElementById('mapActs');
   c.innerHTML = '';
 
   const mult = getInfiniteMultiplier();
   const enc  = G.infiniteEncounters || 0;
+  const nextType = pickInfiniteType(enc);
+
+  const IC    = {combat:'⚔',elite:'💀',rest:'🕯',shop:'🛒',chest:'📦',boss:'👁'};
+  const LABEL = {combat:'COMBATE',elite:'ÉLITE',rest:'DESCANSO',shop:'TIENDA',chest:'COFRE',boss:'JEFE'};
+  const DESC  = {
+    combat:'Un grupo de enemigos acecha entre las sombras.',
+    elite:'Criaturas de élite bloquean tu camino.',
+    rest:'Un santuario olvidado. Recupera fuerzas.',
+    shop:'La Botica del Heraldo. Gasta tu oro con sabiduría.',
+    chest:'Un cofre misterioso aguarda en la oscuridad.',
+    boss:'El terror hecho carne te espera. Prepárate.'
+  };
 
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:20px';
+  wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:24px';
 
   const title = document.createElement('div');
   title.style.cssText = 'font-family:"Cinzel Decorative",cursive;font-size:16px;color:#9a2f45;letter-spacing:3px;text-shadow:0 0 30px #c0305066';
@@ -1152,62 +1208,59 @@ function renderInfiniteMap() {
 
   const info = document.createElement('div');
   info.style.cssText = 'font-family:"Cinzel",serif;font-size:10px;color:#b8a8c8;letter-spacing:2px;text-align:center';
-  info.innerHTML = `Encuentros: <span style="color:#e8b460">${enc}</span> · Multiplicador: <span style="color:#cc4060">${mult.toFixed(1)}×</span> · 🪙 <span style="color:#e8b460">${G.gold||0} oro</span>`; // ✏ CAMBIO 8: oro en mapa infinito
+  info.innerHTML = `Encuentros: <span style="color:#e8b460">${enc}</span> · Multiplicador: <span style="color:#cc4060">${mult.toFixed(1)}×</span> · 🪙 <span style="color:#e8b460">${G.gold||0} oro</span>`;
   wrapper.appendChild(info);
 
-  const btnsRow = document.createElement('div');
-  btnsRow.style.cssText = 'display:flex;gap:14px;flex-wrap:wrap;justify-content:center';
+  // Tarjeta del próximo encuentro
+  const isBoss = nextType === 'boss';
+  const card = document.createElement('div');
+  card.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:16px;background:linear-gradient(160deg,#1a1228,#0e0b18);border:2px solid ${isBoss?'#c03040':'#d4a84366'};border-radius:14px;padding:32px 48px;cursor:pointer;transition:all .25s;box-shadow:0 0 ${isBoss?'40px #c0304055':'20px #d4a84322'}`;
+  card.innerHTML = `
+    <div style="font-size:52px;filter:drop-shadow(0 0 20px ${isBoss?'#c03040aa':'#d4a843aa'})">${IC[nextType]}</div>
+    <div style="font-family:'Cinzel Decorative',cursive;font-size:16px;color:${isBoss?'#e85060':'#d4a843'};letter-spacing:3px">${LABEL[nextType]}</div>
+    <div style="font-family:'IM Fell English',serif;font-style:italic;font-size:12px;color:#7a6888;text-align:center;max-width:240px;line-height:1.6">${DESC[nextType]}</div>
+    <div style="font-size:10px;color:#5a4870;font-family:'Cinzel',serif;letter-spacing:2px">Pulsa para continuar →</div>`;
+  card.addEventListener('mouseenter', ()=>{ card.style.transform='translateY(-4px)'; card.style.boxShadow=`0 0 ${isBoss?'60px #c0304077':'36px #d4a84344'}`; });
+  card.addEventListener('mouseleave', ()=>{ card.style.transform=''; card.style.boxShadow=`0 0 ${isBoss?'40px #c0304055':'20px #d4a84322'}`; });
+  card.addEventListener('click', ()=> enterInfiniteNode(nextType));
+  wrapper.appendChild(card);
 
-  const types = [
-    {type:'combat', ico:'⚔', lbl:'COMBATE'},
-    {type:'elite',  ico:'💀', lbl:'ÉLITE'},
-    {type:'rest',   ico:'🕯', lbl:'DESCANSO'},
-    {type:'shop',   ico:'🛒', lbl:'TIENDA'},
-  ];
-  types.forEach(t => {
-    const btn = document.createElement('div');
-    btn.className = 'mnode cur' + (t.type==='elite'?' elite':'');
-    btn.style.cssText = 'width:90px;height:72px;cursor:pointer';
-    btn.innerHTML = `<div class="n-ico">${t.ico}</div><div class="n-lbl">${t.lbl}</div>`;
-    btn.addEventListener('click', () => enterInfiniteNode(t.type));
-    btnsRow.appendChild(btn);
-  });
-  wrapper.appendChild(btnsRow);
-
-  const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:11px;color:#5a5070;font-style:italic';
-  hint.textContent = 'La ciudad nunca duerme. Elige tu próximo destino.';
-  wrapper.appendChild(hint);
+  // Próximo jefe
+  const next10 = 10 - (enc % 10);
+  if(nextType !== 'boss'){
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:10px;color:#5a4070;font-family:"Cinzel",serif;letter-spacing:1.5px;font-style:italic';
+    hint.textContent = next10 === 1 ? '⚠ El siguiente encuentro es un Jefe' : `👁 Jefe en ${next10} encuentros`;
+    wrapper.appendChild(hint);
+  }
 
   c.appendChild(wrapper);
 }
 
 function enterInfiniteNode(type) {
-  if(['combat','elite'].includes(type)) {
-    G.infiniteEncounters = (G.infiniteEncounters||0) + 1;
-    runEncounters++;
-    checkInfiniteRelicUnlocks(); // ← desbloquear en tiempo real al superar umbral
-    saveG();
-    startCombat(type==='combat'?0:1, true);
-  } else if(type==='rest') {
+  G.infiniteEncounters = (G.infiniteEncounters||0) + 1;
+  runEncounters++;
+  checkInfiniteRelicUnlocks();
+  saveG();
+  if(type === 'combat') {
+    startCombat(0, true);
+  } else if(type === 'elite') {
+    startCombat(1, true);
+  } else if(type === 'boss') {
+    startCombat(2, true);
+  } else if(type === 'rest') {
     show('rest');
-  } else if(type==='shop') {
+  } else if(type === 'shop') {
     showShop();
+  } else if(type === 'chest') {
+    showChest();
   }
 }
 
 function advanceInfinite() {
   saveG();
   const enc = G.infiniteEncounters || 0;
-  // Every 10 encounters in infinite mode → deck editor
-  if(enc > 0 && enc % 10 === 0 && !G._deckEditedAt || G._pendingDeckEdit){
-    G._deckEditedAt = enc;
-    G._pendingDeckEdit = false;
-    saveG();
-    showDeckEditor('infinite');
-  } else {
-    showInfiniteMap();
-  }
+  showInfiniteMap();
 }
 
 // ═══════════════════════════════════════════════
@@ -1280,6 +1333,8 @@ function startCombat(tier, isInfinite){
     document.getElementById('passiveInfo').textContent = (ch ? ch.passive + '\n' : '') +
       `🌑 Modo Infinito · Encuentro ${G.infiniteEncounters} · ${mult.toFixed(1)}×`;
   }
+  // En móvil: ocultar passiveInfo del panel (va al popup)
+  if(isMobile()) { const pi = document.getElementById('passiveInfo'); if(pi) pi.style.display='none'; }
   _gunslingerAttacks = 0;
   _gunslingerReady   = false;
   // Cilindro Veloz: reduce threshold to 2
@@ -1296,6 +1351,13 @@ function startCombat(tier, isInfinite){
   document.getElementById('clog').innerHTML = '';
   addLog(`¡Combate! ${G.enemies.map(e=>e.name).join(', ')}`, 'ene');
   show('game');
+  // Móvil: asegurar que los bloques HP/MANA tienen la clase correcta
+  if(isMobile()) {
+    markMobileStatBlocks();
+    // Ocultar pasiva del panel
+    const pi = document.getElementById('passiveInfo');
+    if(pi) pi.style.setProperty('display','none','important');
+  }
 }
 
 function applyPort(){
@@ -1959,6 +2021,7 @@ function showRew(tier){
   opts.forEach(card=>{
     const w = document.createElement('div'); w.className='rew-wrap';
     w.innerHTML = buildCardHTML(card, 170, 258, true); // ✏ CAMBIO D: reward más grande
+    requestAnimationFrame(()=>addStatusTooltips(w, card)); // ✏ FIX 3a: tooltips en reward
     w.addEventListener('click', ()=>{
       if(isBoss){
         if(bossChosen >= 2) return;
@@ -1980,11 +2043,7 @@ function showRew(tier){
 }
 
 function doAdvance(){
-  // After boss fight, offer deck editing before advancing
-  const {row} = G.path;
-  if(row===6 && !G.infiniteMode){
-    showDeckEditor('post-boss');
-  } else if(G.infiniteMode) {
+  if(G.infiniteMode) {
     advanceInfinite();
   } else {
     advance();
@@ -2048,6 +2107,7 @@ function showDeckEditor(context){
         item.addEventListener('mouseenter',()=>{ item.style.transform='translateY(-6px)'; });
         item.addEventListener('mouseleave',()=>{ item.style.transform=''; });
       }
+      requestAnimationFrame(()=>addStatusTooltips(item, card)); // ✏ FIX 3c: tooltips en deck editor
       grid.appendChild(item);
     });
   }
@@ -2074,10 +2134,7 @@ function showDeckEditor(context){
 }
 
 function skipRew(){
-  if(G._combatTier===2){
-    // Boss skip still goes to deck editor
-    showDeckEditor('post-boss');
-  } else if(G.infiniteMode) {
+  if(G.infiniteMode) {
     advanceInfinite();
   } else {
     advance();
@@ -2105,6 +2162,7 @@ function showShop(){
     const price=(card.cost+1)*8;
     const w=document.createElement('div');w.className='shop-item';
     w.innerHTML=buildCardHTML(card, 130, 196, true)+'<div class="shop-price">🪙 '+price+'</div>'; // ✏ CAMBIO D: tienda usa buildCardHTML con desc
+    requestAnimationFrame(()=>addStatusTooltips(w, card)); // ✏ FIX 3b: tooltips en tienda
     w.addEventListener('click',()=>{
       if(G.gold<price)return;
       G.gold-=price;
@@ -2115,12 +2173,126 @@ function showShop(){
     });
     c.appendChild(w);
   });
+  // ✏ FIX 4b: Añadir item de descarte de carta en la tienda
+  const discardCost = G.discardCost || 40;
+  const dItem = document.createElement('div');
+  dItem.className = 'shop-item';
+  dItem.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;opacity:'+( G.player.deck.length + G.player.hand.length + G.player.discard.length > 4 ? '1' : '.4')+';pointer-events:'+(G.player.deck.length + G.player.hand.length + G.player.discard.length > 4 ? 'auto' : 'none');
+  // Construir la carta de descarte con el mismo aspecto que las demás
+  const discardImgSrc = 'resources/alt/cartas/cubobasura.png';
+  dItem.innerHTML = `
+    <div style="
+      width:130px;height:196px;border-radius:6px;position:relative;
+      border:1px solid #c0304a88;border-top:2px solid #c0304a;
+      background:linear-gradient(160deg,#1a0a14,#0e0b18);
+      display:flex;flex-direction:column;overflow:hidden;
+      box-shadow:0 8px 24px #00000088,0 0 14px #c0304a22;
+      cursor:pointer;
+    ">
+      <!-- Barra superior de tipo (igual que .c-bar) -->
+      <div style="height:3px;background:linear-gradient(90deg,#c0304a,#ff4060,#c0304a);opacity:.7;flex-shrink:0"></div>
+      <!-- Coste en círculo -->
+      <div style="position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#1a0a14;border:1px solid #c0304a88;display:flex;align-items:center;justify-content:center;font-size:11px;color:#cc4060;font-family:'Cinzel',serif;z-index:2">✂</div>
+      <!-- Label rareza -->
+      <div style="position:absolute;top:8px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:1.5px;color:#c0304a;font-family:'Cinzel',serif;opacity:.9">ESPECIAL</div>
+      <!-- Arte: imagen propia a tamaño completo de la zona c-art -->
+      <div style="flex:1;padding:9px 5px 3px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0">
+        <img src="${discardImgSrc}"
+          onerror="this.parentNode.innerHTML='<div style=\'font-size:40px;text-align:center\'>🗑️</div>'"
+          style="width:100%;height:100%;object-fit:cover;border-radius:2px;display:block">
+      </div>
+      <!-- Nombre -->
+      <div style="font-family:'Cinzel',serif;font-size:10px;color:#e8c0c8;text-align:center;padding:3px 5px 2px;letter-spacing:.5px;background:#1a0a1488;flex-shrink:0">Descartar Carta</div>
+      <!-- Descripción -->
+      <div style="font-size:9px;color:var(--dim);padding:2px 5px 5px;text-align:center;line-height:1.4;font-style:italic;flex-shrink:0">Elimina 1 carta del mazo</div>
+    </div>
+    <div class="shop-price" id="shopDiscardPrice">🪙 ${discardCost}</div>`;
+  dItem.addEventListener('click', ()=>{
+    shopDiscard();
+  });
+  c.appendChild(dItem);
+
   show('shop');
 }
 
 function leaveShop(){
   if(G.infiniteMode) advanceInfinite();
   else advance();
+}
+
+// ✏ FIX 4: Descarte en tienda — muestra deckEditor de 1 sola carta
+function shopDiscard(){
+  const cost = G.discardCost || 40;
+  if(G.gold < cost){ addLog('No tienes suficiente oro para descartar.','sta'); return; }
+  G.gold -= cost;
+  G.discardCost = cost + 20; // próxima vez cuesta más
+  saveG();
+  // Mostrar deckEditor especial: sólo 1 descarte permitido
+  showDeckEditorShop();
+}
+
+function showDeckEditorShop(){
+  const allCards = [...G.player.deck, ...G.player.hand, ...G.player.discard];
+  let pending = [...allCards];
+  let discarded = 0;
+  const MAX = 1;
+  const MIN = 4;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'deckEditorOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:#080610ee;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s';
+
+  function buildUI(){
+    const canDiscard = discarded < MAX && pending.length > MIN;
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid var(--gold);border-radius:14px;padding:28px 24px;max-width:860px;width:96%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;box-shadow:0 0 80px #c9984a33">
+        <div style="font-family:'Cinzel Decorative',cursive;font-size:18px;color:var(--gold);text-align:center;letter-spacing:2px">✂ Descartar Carta</div>
+        <div style="font-size:12px;color:var(--dim);text-align:center;font-style:italic">
+          Elige una carta de tu mazo para eliminarla permanentemente.
+          <br><span style="color:var(--fog)">Cartas: <b style="color:var(--gold)">${pending.length}</b></span>
+          ${discarded >= MAX ? '&nbsp;·&nbsp;<span style="color:#c0304a">Ya has descartado una carta.</span>' : ''}
+        </div>
+        <div id="deDeckGrid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:8px 0"></div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:4px">
+          <button class="btn" onclick="confirmShopDiscard()">Confirmar y Continuar →</button>
+        </div>
+      </div>`;
+
+    const grid = overlay.querySelector('#deDeckGrid');
+    pending.forEach((cardId, idx)=>{
+      const card = cById(cardId);
+      if(!card) return;
+      const canDo = discarded < MAX && pending.length > MIN;
+      const item = document.createElement('div');
+      item.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;cursor:${canDo?'pointer':'default'};transition:all .2s;position:relative`;
+      item.innerHTML = buildCardHTML(card, 104, 158, true) +
+        `<div style="font-size:9px;letter-spacing:1px;color:${canDo?'#c0304a':'#444'};font-family:'Cinzel',serif;opacity:${canDo?'.8':'.3'};border:1px solid ${canDo?'#c0304a44':'#33333344'};border-radius:3px;padding:2px 6px">DESCARTAR</div>`;
+      if(canDo){
+        item.addEventListener('click',()=>{ pending.splice(idx,1); discarded++; buildUI(); });
+        item.addEventListener('mouseenter',()=>{ item.style.transform='translateY(-6px)'; });
+        item.addEventListener('mouseleave',()=>{ item.style.transform=''; });
+      }
+      requestAnimationFrame(()=>addStatusTooltips(item, card));
+      grid.appendChild(item);
+    });
+  }
+
+  buildUI();
+  document.body.appendChild(overlay);
+  overlay.style.opacity='0';
+  requestAnimationFrame(()=>{ overlay.style.transition='opacity .3s'; overlay.style.opacity='1'; });
+
+  window.confirmShopDiscard = function(){
+    G.player.deck = pending;
+    G.player.hand = [];
+    G.player.discard = [];
+    saveG();
+    overlay.style.opacity='0';
+    setTimeout(()=>{ overlay.remove(); delete window.confirmShopDiscard; }, 300);
+    // Actualizar precio en la tienda si sigue abierta
+    const priceEl = document.getElementById('shopDiscardPrice');
+    if(priceEl) priceEl.textContent = '🪙 '+(G.discardCost||40);
+  };
 }
 
 // ═══════════════════════════════════════════════
@@ -2385,19 +2557,20 @@ function injectMobileLogBtn() {
   if(!isMobile()) return;
   if(document.getElementById('mobileLogBtn')) return;
 
-  // ── Portrait button (left side) ──────────────
+  // ── Portrait button — se inyecta en el DOM del body (position:fixed en la barra) ──
   const portBtn = document.createElement('button');
   portBtn.id = 'mobilePortBtn';
   portBtn.innerHTML = '👤';
   portBtn.style.cssText = `
-    position:fixed;bottom:68px;left:12px;
-    width:44px;height:44px;border-radius:50%;
+    position:fixed;top:6px;left:8px;
+    width:46px;height:46px;border-radius:50%;
     background:linear-gradient(135deg,#1a1228,#0e0b18);
-    border:1px solid var(--border);color:var(--fog);
-    font-size:18px;cursor:pointer;z-index:500;
-    box-shadow:0 0 14px #4a2a6a44;
+    border:2px solid #4a3a5a;color:#b8a8c8;
+    font-size:20px;cursor:pointer;z-index:490;
     display:none;align-items:center;justify-content:center;
-    transition:all .2s;overflow:hidden;padding:0;
+    overflow:hidden;padding:0;
+    transition:border-color .2s,box-shadow .2s;
+    box-shadow:0 0 12px #4a2a6a44;
   `;
   portBtn.onclick = toggleMobilePortrait;
   document.body.appendChild(portBtn);
@@ -2406,29 +2579,73 @@ function injectMobileLogBtn() {
   const portOverlay = document.createElement('div');
   portOverlay.id = 'mobilePortOverlay';
   portOverlay.style.cssText = `
-    position:fixed;inset:0;z-index:700;
+    position:fixed;inset:0;z-index:9000;
     background:#080610ee;
-    display:none;
+    display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     gap:16px;
+    visibility:hidden;
+    opacity:0;
+    transition:opacity .25s;
+    pointer-events:none;
   `;
   portOverlay.innerHTML = `
-    <div id="mobilePortContent" style="
-      width:min(340px,88vw);
+    <div style="
+      width:min(400px,96vw);
+      max-height:88vh;
+      overflow-y:auto;
+      background:linear-gradient(160deg,#13101e,#0e0b18);
       border:1px solid var(--gold);
-      border-radius:12px;
-      overflow:hidden;
-      box-shadow:0 0 60px #c9984a44;
-      aspect-ratio:3/4;
-      background:#0e0b18;
-      display:flex;align-items:center;justify-content:center;
-    "></div>
-    <div id="mobilePortName" style="font-family:'Cinzel Decorative',cursive;font-size:16px;color:var(--gold);letter-spacing:3px;text-shadow:0 0 20px #c9984a88"></div>
-    <div id="mobilePortPassive" style="font-size:11px;color:var(--dim);font-style:italic;max-width:300px;text-align:center;line-height:1.6;padding:0 20px"></div>
-    <div id="mobilePortStats" style="display:flex;gap:16px;font-size:12px;color:var(--fog);font-family:'Cinzel',serif"></div>
-    <button class="btn-sm" onclick="toggleMobilePortrait()" style="margin-top:8px">Cerrar</button>
+      border-radius:14px;
+      box-shadow:0 0 60px #c9984a33;
+      padding:20px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+    ">
+      <!-- Cerrar -->
+      <button onclick="toggleMobilePortrait()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:#7a6888;font-size:20px;cursor:pointer;line-height:1;padding:0" title="Cerrar">✕</button>
+
+      <!-- Foto + nombre + pasiva -->
+      <div style="display:flex;gap:14px;align-items:center">
+        <div id="mobilePortContent" style="
+          width:72px;height:72px;border-radius:50%;
+          border:2px solid var(--gold);overflow:hidden;
+          background:#0e0b18;flex-shrink:0;
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 20px #c9984a44;
+        "></div>
+        <div style="flex:1;min-width:0">
+          <div id="mobilePortName" style="font-family:'Cinzel Decorative',cursive;font-size:15px;color:var(--gold);letter-spacing:2px;text-shadow:0 0 16px #c9984a88;margin-bottom:4px"></div>
+          <div id="mobilePortPassive" style="font-size:11px;color:var(--dim);font-style:italic;line-height:1.5"></div>
+        </div>
+      </div>
+
+      <!-- Stats vitales -->
+      <div id="mobilePortStats" style="
+        display:grid;grid-template-columns:1fr 1fr;
+        gap:6px;font-size:12px;color:var(--fog);font-family:'Cinzel',serif;
+        background:#0a081244;border:1px solid #2a1f3a;border-radius:8px;
+        padding:10px 12px;
+      "></div>
+
+      <!-- Separador -->
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)"></div>
+
+      <!-- Registro de combate -->
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:8px">📜 Registro de Combate</div>
+        <div id="mobilePortLog" style="
+          font-size:11px;color:var(--fog);
+          display:flex;flex-direction:column;gap:3px;
+          max-height:160px;overflow-y:auto;
+          font-style:italic;
+        "></div>
+      </div>
+    </div>
   `;
   portOverlay.addEventListener('click', e=>{ if(e.target===portOverlay) toggleMobilePortrait(); });
   document.body.appendChild(portOverlay);
@@ -2506,7 +2723,7 @@ function toggleMobileLog() {
 function toggleMobilePortrait(){
   const ov = document.getElementById('mobilePortOverlay');
   if(!ov) return;
-  const open = ov.style.display === 'flex';
+  const open = ov.style.visibility === 'visible';
   if(!open){
     // Populate with current character data
     const ch = chById(G.charId);
@@ -2523,26 +2740,41 @@ function toggleMobilePortrait(){
     if(passEl && ch) passEl.textContent = ch.passive;
     const statsEl = document.getElementById('mobilePortStats');
     if(statsEl && p){
-      statsEl.innerHTML = `
-        <span>❤ ${p.hp}/${p.maxHp}</span>
-        <span>◆ ${p.mana}/${p.maxMana}</span>
-        <span>🪙 ${G.gold}</span>
-        ${p.block?`<span>🛡 ${p.block}</span>`:''}
-        ${p.bleed?`<span>🩸 ${p.bleed}</span>`:''}
-        ${p.poison?`<span>☠ ${p.poison}</span>`:''}
-      `;
+      const statRow = (ico, label, val, cls='') =>
+        `<div style="display:flex;align-items:center;gap:5px${cls?';color:'+cls:''}">
+          <span style="font-size:14px">${ico}</span>
+          <span style="font-size:10px;letter-spacing:1px;color:var(--dim);text-transform:uppercase">${label}</span>
+          <span style="margin-left:auto;font-size:13px;color:var(--mist)">${val}</span>
+        </div>`;
+      statsEl.innerHTML =
+        statRow('❤','Vida', `${p.hp}/${p.maxHp}`, '#cc4060') +
+        statRow('◆','Maná', `${p.mana}/${p.maxMana}`, '#3a6acc') +
+        statRow('🪙','Oro', G.gold) +
+        (p.block ? statRow('🛡','Escudo', p.block, '#6090ee') : '') +
+        (p.bleed ? statRow('🩸','Sangrado', p.bleed, '#f07080') : '') +
+        (p.poison ? statRow('☠','Veneno', p.poison, '#a8e060') : '') +
+        statRow('📚','Mazo', `${p.deck.length+p.discard.length+p.hand.length} cartas`) +
+        statRow('✋','Mano', `${p.hand.length}/${getMaxHand()}`) +
+        statRow('🗑','Descarte', p.discard.length);
     }
+    // Registro de combate
+    const logEl = document.getElementById('mobilePortLog');
+    const clogEl = document.getElementById('clog');
+    if(logEl && clogEl) logEl.innerHTML = clogEl.innerHTML || '<span style="color:var(--dim);font-style:italic">Sin entradas aún.</span>';
     // Update portrait button image
     const portBtn = document.getElementById('mobilePortBtn');
     if(portBtn && img){
       portBtn.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    } else if(portBtn && ch){
+      portBtn.innerHTML = `<div style="transform:scale(1.4)">${ch.svg}</div>`;
     }
-    ov.style.display='flex';
-    ov.style.opacity='0';
-    requestAnimationFrame(()=>{ ov.style.transition='opacity .25s'; ov.style.opacity='1'; });
+    ov.style.visibility='visible';
+    ov.style.pointerEvents='auto';
+    requestAnimationFrame(()=>{ ov.style.opacity='1'; });
   } else {
     ov.style.opacity='0';
-    setTimeout(()=>{ ov.style.display='none'; },250);
+    ov.style.pointerEvents='none';
+    setTimeout(()=>{ ov.style.visibility='hidden'; },260);
   }
 }
 
@@ -2550,10 +2782,19 @@ function showMobileLogBtn(visible) {
   const btn  = document.getElementById('mobileLogBtn');
   const pbtn = document.getElementById('mobilePortBtn');
   if(btn)  btn.style.display  = visible ? 'flex' : 'none';
+  // portBtn está en .p-left — su visibilidad la gestiona CSS en combate
+  // pero forzamos display:flex cuando visible para que arranque bien
   if(pbtn) pbtn.style.display = visible ? 'flex' : 'none';
+  if(visible){
+    // Actualizar imagen del botón portrait con el personaje actual
+    const ch = chById(G.charId);
+    const img = ch ? getImg(ch.imgKey) : null;
+    if(pbtn && img) pbtn.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    else if(pbtn && ch) pbtn.innerHTML = `<div style="transform:scale(1.4)">${ch.svg}</div>`;
+  }
   if(!visible){
     const ov = document.getElementById('mobilePortOverlay');
-    if(ov) { ov.style.display='none'; }
+    if(ov){ ov.style.opacity='0'; ov.style.pointerEvents='none'; ov.style.visibility='hidden'; }
   }
 }
 
@@ -2566,6 +2807,26 @@ function injectMobileRelicsIndicator() {
 }
 
 // ─── SWIPE TO DISMISS OVERLAYS ─────────────────
+function fixNameModalMobile() {
+  // ✏ BLOQUE 3: name-modal en móvil — evitar overflow del dado
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width:640px){
+      .name-modal{ padding:24px 18px; width:94vw; max-width:94vw; box-sizing:border-box; }
+      .name-title{ font-size:18px; letter-spacing:1px; }
+      .name-sub{ font-size:13px; }
+      .name-row{ width:100%; box-sizing:border-box; display:flex; gap:6px; }
+      .name-input{ font-size:15px; padding:8px 10px; min-width:0; flex:1; }
+      .name-dice{ width:38px; height:38px; font-size:18px; flex-shrink:0; }
+      .name-hint{ font-size:12px; }
+      /* ✏ BLOQUE 4: mapa oro no se desborda */
+      #s-map{ overflow:visible !important; }
+      .map-gold-display{ position:relative; z-index:2; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function addSwipeHandlers() {
   let startY = 0;
   document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive:true});
@@ -2615,15 +2876,32 @@ function fixMobileVh() {
 // ─── INIT MOBILE ───────────────────────────────
 function initMobile() {
   if(!isMobile()) return;
+  markMobileStatBlocks();
   injectMobileLogBtn();
   addSwipeHandlers();
   preventDoubleTapZoom();
   fixMobileVh();
-  // Patch body height to use real viewport height
+  fixNameModalMobile();
   document.body.style.height = '100dvh';
   document.getElementById('app').style.height = '100dvh';
 }
 
+
+function markMobileStatBlocks() {
+  if(!isMobile()) return;
+  // Marcar el div-bloque que contiene hpBar con mobile-stat-block
+  ['hpBar','mpBar'].forEach(barId => {
+    const bar = document.getElementById(barId);
+    if(!bar) return;
+    const bw  = bar.closest('.bar-wrap') || bar.parentElement;
+    if(!bw) return;
+    const blk = bw.parentElement;
+    const pLeft = document.querySelector('.p-left');
+    if(blk && blk !== pLeft && blk.parentElement === pLeft){
+      blk.classList.add('mobile-stat-block');
+    }
+  });
+}
 // ═══════════════════════════════════════════════
 //  TUTORIAL
 // ═══════════════════════════════════════════════
@@ -2741,6 +3019,21 @@ function showSettings() {
       <div style="font-size:15px;letter-spacing:.25em;text-transform:uppercase;color:#d4a843;text-shadow:0 0 12px #d4a84355">Ajustes</div>
     </div>
     <div style="margin-bottom:24px">
+      <div style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a1e3a">🎵 &nbsp; Música</div>
+      <div style="background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;color:#e8d8ba;letter-spacing:.05em;margin-bottom:3px">Volumen de música</div>
+            <div style="font-size:11px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic">Archivo: resources/music/background.mp3</div>
+          </div>
+          <span id="musicVolLabel" style="font-family:'Cinzel',serif;font-size:12px;color:#d4a843;min-width:36px;text-align:right">${Math.round(getMusicVolume()*100)}%</span>
+        </div>
+        <input id="musicVolSlider" type="range" min="0" max="100" value="${Math.round(getMusicVolume()*100)}"
+          style="width:100%;accent-color:#d4a843;cursor:pointer"
+          oninput="setMusicVolume(this.value/100);document.getElementById('musicVolLabel').textContent=this.value+'%'">
+      </div>
+    </div>
+    <div style="margin-bottom:24px">
       <div style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a1e3a">🎨 &nbsp; Visual</div>
       <div style="display:flex;align-items:center;justify-content:space-between;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:14px 16px;">
         <div>
@@ -2773,7 +3066,7 @@ function showSettings() {
         </button>
       </div>
     </div>
-    <div style="text-align:center;margin-top:22px;font-size:10px;color:#3a2a4a;letter-spacing:.15em">NOCTIS DECK · v0.0.5</div>
+    <div style="text-align:center;margin-top:22px;font-size:10px;color:#3a2a4a;letter-spacing:.15em">NOCTIS DECK · v0.0.7</div>
   </div>`;
   document.body.appendChild(ov);
   ov.addEventListener('click', e => { if(e.target === ov) closeSettings(); });
@@ -2847,16 +3140,32 @@ function showSettingsToast(msg) {
 function injectStatsButton() {
   const tBtns = document.querySelector('.t-btns');
   if(!tBtns || document.getElementById('btnStats')) return;
+  // Fila principal: stats + desbloqueos
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;margin-top:4px;flex-wrap:wrap';
+  row.style.cssText = 'display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center;justify-content:center;width:100%';
   row.innerHTML = `
     <button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>
     <button class="btn-sm" id="btnUnlocks" onclick="showUnlocks()">⚜ Desbloqueos</button>
-    <button class="btn-sm" id="btnSettings" onclick="showSettings()" title="Ajustes" style="padding:6px 11px;font-size:15px;">⚙</button>
   `;
   const smRow = tBtns.querySelector('div');
   if(smRow) tBtns.insertBefore(row, smRow);
   else tBtns.appendChild(row);
+
+  // ✏ FIX ⚙: poner el engranaje en #s-title, position:absolute, justo a la derecha del ?
+  if(!document.getElementById('btnSettings')){
+    const sTitle = document.getElementById('s-title');
+    if(sTitle){
+      const settBtn = document.createElement('button');
+      settBtn.id = 'btnSettings';
+      settBtn.title = 'Ajustes';
+      settBtn.textContent = '⚙';
+      settBtn.style.cssText = 'position:absolute;top:8px;left:8px;z-index:200;background:linear-gradient(135deg,#1a1228,#0e0b18);border:1px solid #4a3a5a;border-radius:4px;color:#b8a8c8;font-size:16px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s;font-family:Arial,sans-serif;';
+      settBtn.onmouseenter = ()=>{ settBtn.style.borderColor='#e8b460'; settBtn.style.color='#e8b460'; };
+      settBtn.onmouseleave = ()=>{ settBtn.style.borderColor='#4a3a5a'; settBtn.style.color='#b8a8c8'; };
+      settBtn.onclick = showSettings;
+      sTitle.appendChild(settBtn);
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -2866,3 +3175,4 @@ loadCustom();
 updateTitle();
 injectStatsButton();
 initMobile();
+document.addEventListener('contextmenu', e => e.preventDefault()); document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault(); if(e.ctrlKey && e.key === 'U') e.preventDefault(); });

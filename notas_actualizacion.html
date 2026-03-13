@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noctis Deck — Notas de Actualización v0.0.6 · Ajustes y Recompensas</title>
+<title>Noctis Deck — Notas de Actualización v0.0.7 · Música, Dificultad e Infinito</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
@@ -303,6 +303,132 @@
   </div>
 
 
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- v0.0.7 — MÚSICA, DIFICULTAD Y MODO INFINITO PROCEDURAL   -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div class="version-block">
+    <div class="version-header">
+      <div class="version-num latest">v 0.0.7 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+
+      <!-- MÚSICA -->
+      <div class="section s-ux">
+        <div class="section-header">
+          <div class="section-icon">🎵</div>
+          <div class="section-title">Música de Fondo</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Música de fondo</strong> en bucle durante toda la partida. Coloca tu canción en <code>resources/music/background.mp3</code> (también acepta <code>.ogg</code> y <code>.wav</code>). Se activa automáticamente al primer clic del usuario.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Slider de volumen</strong> en el menú de Ajustes (sección 🎵 Música). El valor se guarda entre sesiones. Rango 0–100%.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIFICULTAD -->
+      <div class="section s-combat">
+        <div class="section-header">
+          <div class="section-icon">⚔</div>
+          <div class="section-title">Escalado de Dificultad por Acto</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                Los enemigos escalan en <strong>HP y daño × 1.5 por cada acto completado</strong>. La progresión queda así:
+                <div class="sub-items">
+                  <div class="sub-item"><strong>Acto 1</strong> — multiplicador ×1.0 (base)</div>
+                  <div class="sub-item"><strong>Acto 2</strong> — multiplicador ×1.5</div>
+                  <div class="sub-item"><strong>Acto 3</strong> — multiplicador ×2.25</div>
+                </div>
+                Se combina correctamente con el multiplicador del Modo Infinito.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODO INFINITO -->
+      <div class="section s-inf">
+        <div class="section-header">
+          <div class="section-icon">🌑</div>
+          <div class="section-title">Modo Infinito — Encuentros Procedurales</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-change">REWORK</span>
+              <div class="item-text"><strong>El jugador ya no elige el tipo de encuentro.</strong> El sistema genera proceduralmente el siguiente nodo y muestra una tarjeta con su símbolo, nombre y descripción antes de entrar. Pulsa la tarjeta para continuar.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Jefe cada 10 encuentros.</strong> Los encuentros 9, 19, 29… siempre son un Jefe. La interfaz muestra un aviso indicando cuántos encuentros faltan para el próximo.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text"><strong>Cofre añadido al Modo Infinito.</strong> El tipo 📦 Cofre ya puede aparecer como encuentro procedural.</div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">BALANCE</span>
+              <div class="item-text"><strong>Probabilidades de encuentros de alivio decrecientes.</strong> Cada 10 encuentros la probabilidad de obtener Descanso, Tienda o Cofre se reduce un 15%, haciendo el avance progresivamente más hostil.
+                <div class="sub-items">
+                  <div class="sub-item">Encuentros 1–9 → probabilidad base completa</div>
+                  <div class="sub-item">Encuentros 10–19 → −15% sobre descanso/tienda/cofre</div>
+                  <div class="sub-item">Encuentros 20–29 → −30% sobre descanso/tienda/cofre</div>
+                  <div class="sub-item">Y así sucesivamente hasta llegar a 0%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCANSO -->
+      <div class="section s-heal">
+        <div class="section-header">
+          <div class="section-icon">🕯</div>
+          <div class="section-title">Santuario — Simplificado</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text"><strong>Eliminada la opción «Purgar»</strong> del Santuario Olvidado. Ahora solo existe la acción <strong>❤ Curar</strong> (recupera 20 HP). La única forma de descartar cartas es a través de la <strong>Tienda</strong>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCARTE -->
+      <div class="section s-deck">
+        <div class="section-header">
+          <div class="section-icon">🗑</div>
+          <div class="section-title">Descarte de Cartas — Solo en Tienda</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text"><strong>Eliminado el editor de mazo al final de acto y en Modo Infinito.</strong> Antes aparecía un overlay tras derrotar al jefe y cada 10 encuentros en infinito permitiendo descartar hasta 5 cartas gratis. Ahora esas pantallas ya no aparecen — el descarte es exclusivo de la Tienda y tiene coste en oro.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v0.0.7 -->
+  </div><!-- /version-block v0.0.7 -->
+
+  <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
   <!-- ══════════════════════════════════
        VERSIÓN 0.0.6 — LA MÁS RECIENTE
        ══════════════════════════════════ -->
@@ -311,7 +437,7 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.6 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num old">v 0.0.6 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
