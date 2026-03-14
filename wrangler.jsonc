@@ -5,10 +5,6 @@
   "observability": {
     "enabled": true
   },
-  "assets": {
-    "directory": ".",
-    "exclude": [".git/**"]
-  },
   "compatibility_flags": [
     "nodejs_compat"
   ]
