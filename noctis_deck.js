@@ -119,6 +119,13 @@ const DEFAULT_IMGS = {
   enemy1:          'resources/enemigos/enemigo2.png',
   enemy2:          'resources/enemigos/enemigo3.png',
   enemy_healer:    'resources/enemigos/healer.png',
+  // ── Enemigos Acto 2 ──
+  // Coloca tus imágenes en resources/enemigos/
+  enemy_vampiro:        'resources/enemigos/vampiro.png',
+  enemy_condesa:        'resources/enemigos/condesa.png',
+  enemy_guardian:       'resources/enemigos/guardian.png',
+  enemy_murcielago:     'resources/enemigos/murcielago.png',
+  enemy_baron_hemlock:  'resources/enemigos/baron_hemlock.png',
   card_strike:     'resources/cartas/golpesombrio.jpg',
   card_slash:      'resources/cartas/tajocruento.jpg',
   card_lance:      'resources/cartas/lanzaniebla.png',
@@ -171,6 +178,12 @@ const ALT_IMGS = {
   enemy1:          'resources/alt/enemigos/enemigo2.png',
   enemy2:          'resources/alt/enemigos/enemigo3.png',
   enemy_healer:    'resources/alt/enemigos/healer.png',
+  // ── Enemigos Acto 2 (imágenes alternativas sin IA) ──
+  enemy_vampiro:        'resources/alt/enemigos/vampiro.png',
+  enemy_condesa:        'resources/alt/enemigos/condesa.png',
+  enemy_guardian:       'resources/alt/enemigos/guardian.png',
+  enemy_murcielago:     'resources/alt/enemigos/murcielago.png',
+  enemy_baron_hemlock:  'resources/alt/enemigos/baron_hemlock.png',
   // ── Cartas ──
   card_strike:     'resources/alt/cartas/strike.png',
   card_slash:      'resources/alt/cartas/slash.png',
@@ -362,20 +375,22 @@ function pickRewardCards(count, tier) {
 // ═══════════════════════════════════════════════
 //  ENEMIES
 // ═══════════════════════════════════════════════
+
+// Acto 1 — enemigos originales
 const ENM_TEMPLATES = {
   normal: [
-    {name:'Rata Espectral',   hp:18,dmg:5, bleed:0,psn:0,rw:6},
-    {name:'Mendigo Maldito',  hp:16,dmg:6, bleed:0,psn:0,rw:6},
-    {name:'Sombra Errante',   hp:20,dmg:4, bleed:1,psn:0,rw:7},
-    {name:'Lacayo Corrupto',  hp:17,dmg:5, bleed:0,psn:1,rw:6},
-    {name:'Espectro Callejero',hp:15,dmg:7,bleed:0,psn:0,rw:7},
+    {name:'Rata Espectral',    hp:18,dmg:5, bleed:0,psn:0,rw:6},
+    {name:'Mendigo Maldito',   hp:16,dmg:6, bleed:0,psn:0,rw:6},
+    {name:'Sombra Errante',    hp:20,dmg:4, bleed:1,psn:0,rw:7},
+    {name:'Lacayo Corrupto',   hp:17,dmg:5, bleed:0,psn:1,rw:6},
+    {name:'Espectro Callejero',hp:15,dmg:7, bleed:0,psn:0,rw:7},
   ],
   elite: [
     {name:'Guardia Corrompido',hp:38,dmg:11,bleed:0,psn:0,rw:18},
     {name:'Heraldo de Niebla', hp:34,dmg:12,bleed:0,psn:2,rw:20},
     {name:'Vampiro Menor',     hp:40,dmg:10,bleed:3,psn:0,rw:18},
   ],
-  // HEALER — aparece en grupos normales y elite, nunca en boss
+  // HEALER — aparece en grupos normales y elite de cualquier acto, nunca en boss
   // Imagen: resources/enemigos/healer.png
   healer: [
     {name:'Sanadora Espectral', hp:22,dmg:3, bleed:0,psn:0,rw:12, isHealer:true,
@@ -391,6 +406,62 @@ const ENM_TEMPLATES = {
   ]
 };
 
+// ── ACTO 2 — Nuevos enemigos ──────────────────────────────────────────────
+// Imagen: resources/enemigos/vampiro.png
+// Al matar a otros enemigos recupera mucha vida. Roba vida al atacar.
+const ACT2_VAMPIRO = {
+  name:'Vampiro Sanguinario', hp:55, dmg:12, bleed:0, psn:0, rw:22,
+  imgKey:'enemy_vampiro', tier:1,
+  isVampiro: true,
+  lifestealOnAttack: 6,   // HP que roba al jugador al atacar
+  reviveHealOnKill: 22,   // HP que recupera cuando muere un aliado
+};
+
+// Imagen: resources/enemigos/condesa.png
+// Cambia de modo cada turno: ataque → defensa → veneno
+const ACT2_CONDESA = {
+  name:'Condesa sin Rostro', hp:50, dmg:13, bleed:0, psn:0, rw:22,
+  imgKey:'enemy_condesa', tier:1,
+  isCondesa: true,
+  condensaTurn: 0,  // 0=ataque, 1=defensa, 2=veneno
+  shieldPerTurn: 10,
+  poisonPerTurn: 3,
+};
+
+// Imagen: resources/enemigos/guardian.png
+// Reduce el daño del jugador y oculta a un aliado el siguiente turno
+const ACT2_GUARDIAN = {
+  name:'Guardián del Candil', hp:58, dmg:10, bleed:0, psn:0, rw:22,
+  imgKey:'enemy_guardian', tier:1,
+  isGuardian: true,
+  damageReductionStacks: 0, // se acumula: cada 2 turnos reduce 2 de daño del jugador
+  hiddenAllyIdx: null,
+};
+
+// Imagen: resources/enemigos/murcielago.png
+// Solo puede atacar al jugador. Tras 5 turnos se convierte en vampiro.
+function makeMurcielago(mult) {
+  return {
+    name:'Murciélago de Hemlock', hp: Math.round(20 * mult), maxHp: Math.round(20 * mult),
+    dmg: Math.round(7 * mult), bleed:0, psn:0, block:0, poison:0,
+    imgKey:'enemy_murcielago', tier:1,
+    dead:false,
+    isMurcielago: true,
+    murcielagoTurns: 0, // se evoluciona a vampiro a los 5 turnos
+    rw: 10,
+  };
+}
+
+// Imagen: resources/enemigos/baron_hemlock.png
+// Boss Acto 2: puede invocar murciélagos (máx 2), curarse y atacar.
+const ACT2_BARON = {
+  name:'Barón Hemlock', hp:130, dmg:16, bleed:0, psn:0, rw:80,
+  imgKey:'enemy_baron_hemlock', tier:2,
+  isBaron: true,
+  baronPhase: 0,       // contador de acciones del barón
+  lastSummonTurn: -99, // turno del último summón (cooldown 5 turnos)
+};
+
 // healer action cycle: heal → shield → debuff → attack → repeat
 function getHealerAction(e, turnInCombat) {
   const cycle = turnInCombat % 4;
@@ -404,6 +475,7 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
   // Multiplicador base: ×1.5 por cada acto completado en modo normal
   const actMult = (!infiniteMultiplier && G.path) ? Math.pow(1.5, G.path.act || 0) : 1;
   const mult = (infiniteMultiplier || 1) * actMult;
+  const currentAct = (G.path && G.path.act) || 0;
   const rnd = t => ENM_TEMPLATES[t][Math.floor(Math.random()*ENM_TEMPLATES[t].length)];
   const mkE = (tpl, ti) => ({
     ...tpl,
@@ -413,12 +485,19 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
     block:0, bleed:0, poison:0, tier:ti, dead:false,
     healAmt: tpl.healAmt ? Math.round(tpl.healAmt * mult) : 0,
     shieldAmt: tpl.shieldAmt ? Math.round(tpl.shieldAmt * mult) : 0,
-    healerTurn: 0
+    healerTurn: 0,
+    imgKey: tpl.imgKey || null,
   });
 
-  // 20% chance to include a healer in normal/elite groups
+  // 20% chance to include a healer in normal/elite groups (any act)
   const includeHealer = (tier < 2) && Math.random() < 0.20;
 
+  // ── ACTO 2 ────────────────────────────────────
+  if(currentAct === 1) {
+    return buildAct2EnemyGroup(tier, mult, includeHealer);
+  }
+
+  // ── ACTO 1 y 3 (modo estándar) ────────────────
   if(tier === 0) {
     const count = Math.random() < 0.4 ? 3 : 2;
     let group = Array.from({length: includeHealer ? count-1 : count}, () => mkE(rnd('normal'), 0));
@@ -437,6 +516,70 @@ function buildEnemyGroup(tier, infiniteMultiplier) {
   } else {
     return [mkE(rnd('boss'), 2)];
   }
+}
+
+// ── Construye grupos de enemigos del Acto 2 ──────────────────────────────
+function buildAct2EnemyGroup(tier, mult, includeHealer) {
+  const mkAct2 = (tpl) => ({
+    ...tpl,
+    hp: Math.round(tpl.hp * mult),
+    maxHp: Math.round(tpl.hp * mult),
+    dmg: Math.round(tpl.dmg * mult),
+    block:0, bleed:0, poison:0, dead:false,
+    isVampiro: tpl.isVampiro || false,
+    isCondesa: tpl.isCondesa || false,
+    isGuardian: tpl.isGuardian || false,
+    lifestealOnAttack: tpl.lifestealOnAttack ? Math.round(tpl.lifestealOnAttack * mult) : 0,
+    reviveHealOnKill: tpl.reviveHealOnKill ? Math.round(tpl.reviveHealOnKill * mult) : 0,
+    condensaTurn: 0,
+    shieldPerTurn: tpl.shieldPerTurn ? Math.round(tpl.shieldPerTurn * mult) : 0,
+    poisonPerTurn: tpl.poisonPerTurn || 0,
+    damageReductionStacks: 0,
+    hiddenAllyIdx: null,
+    baronPhase: 0,
+    lastSummonTurn: -99,
+    _hidden: false,
+  });
+
+  const mkRndHealer = () => {
+    const h = ENM_TEMPLATES.healer[Math.floor(Math.random()*ENM_TEMPLATES.healer.length)];
+    return {
+      ...h,
+      hp: Math.round(h.hp * mult), maxHp: Math.round(h.hp * mult),
+      dmg: Math.round(h.dmg * mult), block:0, bleed:0, poison:0, tier:0, dead:false,
+      healAmt: Math.round(h.healAmt * mult), shieldAmt: Math.round(h.shieldAmt * mult),
+      healerTurn: 0, imgKey: 'enemy_healer', _hidden: false,
+    };
+  };
+
+  if(tier === 2) {
+    return [mkAct2(ACT2_BARON)];
+  }
+
+  // ── Grupos de 3 miembros siempre ────────────────────────────────────────
+  // Los tipos base del Acto 2: V=Vampiro, C=Condesa, G=Guardián
+  // Todas las combinaciones posibles de 3 con repetición:
+  // VVV, CCC, GGG, VVC, VVG, CCG, VCC, GGV, GGC, VCG
+  const TEMPLATES = [ACT2_VAMPIRO, ACT2_CONDESA, ACT2_GUARDIAN];
+  const COMBOS = [
+    [0,0,0], [1,1,1], [2,2,2],          // 3 iguales
+    [0,0,1], [0,0,2], [1,1,0],          // 2+1
+    [1,1,2], [2,2,0], [2,2,1],          // 2+1 variantes
+    [0,1,2],                             // 1 de cada
+  ];
+
+  let group;
+  if(includeHealer) {
+    // Con healer: 2 enemigos Acto 2 + 1 healer
+    const combo = COMBOS[Math.floor(Math.random() * COMBOS.length)];
+    group = [mkAct2(TEMPLATES[combo[0]]), mkAct2(TEMPLATES[combo[1]]), mkRndHealer()];
+  } else {
+    // Sin healer: 3 enemigos Acto 2 de combinación aleatoria
+    const combo = COMBOS[Math.floor(Math.random() * COMBOS.length)];
+    group = combo.map(i => mkAct2(TEMPLATES[i]));
+  }
+
+  return group;
 }
 
 
@@ -1718,7 +1861,7 @@ function showDialogueEvent(event, onComplete) {
       resultEl.style.display = 'block';
       resultEl.innerHTML = `
         <div style="background:#0f0c18;border:1px solid #d4a84322;border-radius:8px;padding:16px 18px;margin-bottom:4px;">
-          ${getResultBadge(chosen.type, applyResult && applyResult.pickedCard)}
+          ${getResultBadge(chosen.type, applyResult && applyResult.pickedCard, chosen.amount)}
           <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c8b89a;line-height:1.75;margin-top:12px;">${chosen.msg}</div>
         </div>
         <div style="text-align:center;margin-top:18px;">
@@ -1734,14 +1877,14 @@ function showDialogueEvent(event, onComplete) {
         ov.style.animation = 'fadeOut .2s ease forwards';
         setTimeout(() => {
           ov.remove();
-          if (chosen.type === 'ambush') { G._ambushPenalty = true; startCombat(0); }
+          if (chosen.type === 'ambush') { G._ambushPenalty = true; startCombat(G.path && G.path.act === 1 ? 1 : 0); }
           else { onComplete(); }
         }, 200);
       });
     });
   });
 }
-function getResultBadge(type, pickedCard) {
+function getResultBadge(type, pickedCard, amount) {
   const rarityColors = { common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44' };
   if (type === 'card' && pickedCard) {
     const rc = rarityColors[pickedCard.rarity] || '#9a5aee';
@@ -1755,10 +1898,12 @@ function getResultBadge(type, pickedCard) {
       </div>
     </div>`;
   }
+  const goldLabel = amount ? `+${amount} 🪙 Oro` : '🪙 Recompensa';
+  const healLabel = amount ? `❤ +${amount} Vitalidad recuperada` : '❤ Curación';
   const b = {
-    heal:          { c:'#4acc70', i:'❤',  t:'Curación' },
-    gold:          { c:'#d4a843', i:'🪙', t:'Recompensa' },
-    gold_loss:     { c:'#c03040', i:'🪙', t:'Pérdida' },
+    heal:          { c:'#4acc70', i:'❤',  t: amount ? `+${amount} Vitalidad recuperada` : 'Curación' },
+    gold:          { c:'#d4a843', i:'🪙', t: amount ? `+${amount} monedas de oro` : 'Recompensa' },
+    gold_loss:     { c:'#c03040', i:'🪙', t: amount ? `-${amount} monedas de oro` : 'Pérdida' },
     card:          { c:'#9a5aee', i:'🃏', t:'Carta obtenida' },
     bleed:         { c:'#c03040', i:'🩸', t:'Sangrado al inicio del próximo combate' },
     debuff_bleed:  { c:'#c03040', i:'🩸', t:'Sangrado al inicio del próximo combate' },
@@ -2051,6 +2196,7 @@ function startCombat(tier, isInfinite){
   G.turn = 1;
   combatTurn = 0;
   G.firstHitUsed = false;
+  G._playerDmgReduction = 0; // Guardián del Candil: se resetea en cada combate
   const p = G.player;
   p.block = 0;
   p.mana = p.maxMana;
@@ -2113,8 +2259,9 @@ function renderEnemies() {
     wrap.dataset.idx = i;
 
     const hpPct = Math.max(0, e.hp / e.maxHp * 100);
-    // Healer uses special image
-    const imgKey = e.isHealer ? 'enemy_healer' : ('enemy'+(e.tier||0));
+
+    // Determine image key: custom imgKey > healer key > tier key
+    const imgKey = e.imgKey ? e.imgKey : (e.isHealer ? 'enemy_healer' : ('enemy'+(e.tier||0)));
     const imgHtml = getImg(imgKey)
       ? `<img src="${getImg(imgKey)}" style="width:100%;height:100%;object-fit:contain">`
       : (e.isHealer ? getHealerSVG() : getESVG(e.name, e.tier||0));
@@ -2124,7 +2271,7 @@ function renderEnemies() {
     if(e.bleed)  statusHtml += `<span class="si si-bl">🩸 ${e.bleed}</span>`;
     if(e.poison) statusHtml += `<span class="si si-ps">☠ ${e.poison}</span>`;
 
-    // Healer intent
+    // Intent text
     let intentText;
     if(e.isHealer) {
       const action = getHealerAction(e, combatTurn);
@@ -2132,25 +2279,67 @@ function renderEnemies() {
       else if(action==='shield') intentText = `🛡 Escudo aliados (${e.shieldAmt||6})`;
       else if(action==='debuff') intentText = `☠ Maldición · Veneno/Sangrado`;
       else                  intentText = `⚔ Ataque: ${e.dmg}`;
+    } else if(e.isCondesa) {
+      const mode = e.condensaTurn % 3;
+      if(mode === 0) intentText = `⚔ Ataque: ${e.dmg}`;
+      else if(mode === 1) intentText = `🛡 Defensa: +${e.shieldPerTurn} escudo`;
+      else intentText = `☠ Veneno: +${e.poisonPerTurn}`;
+    } else if(e.isGuardian) {
+      intentText = combatTurn % 2 === 0 ? `⚔ Ataque + reduce tu daño` : `👁 Oculta a un aliado`;
+    } else if(e.isBaron) {
+      intentText = `⚔ Barón Hemlock actúa...`;
+    } else if(e.isMurcielago) {
+      const turnsLeft = Math.max(0, 5 - (e.murcielagoTurns || 0));
+      intentText = `⚔ Ataque: ${e.dmg} ${turnsLeft > 0 ? `· 🧛 en ${turnsLeft} turnos` : '· ¡Se transforma!'}`;
+    } else if(e.isVampiro) {
+      intentText = `⚔ Ataque: ${e.dmg} (roba ${e.lifestealOnAttack} HP)`;
     } else {
       intentText = `⚔ Ataque: ${e.dmg}`;
     }
 
-    const healerBadge = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
+    // Special badges
+    const healerBadge  = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
+    const hiddenBadge  = e._hidden    ? `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:#b8a8d8;background:#1a1a3a99;border:1px solid #8870cc88;padding:3px 8px;border-radius:3px;margin-bottom:2px">👤 OCULTO</div>` : '';
+
+    // If enemy is hidden: ghost appearance + big OCULTO overlay, no click
+    const hiddenStyle = e._hidden ? 'opacity:.22;filter:grayscale(.9) blur(1px)' : '';
+    const hiddenOverlay = e._hidden ? `
+      <div style="
+        position:absolute;inset:0;z-index:20;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        background:linear-gradient(180deg,#080610cc,#1a103888);
+        border-radius:6px;pointer-events:none;gap:4px;
+      ">
+        <div style="font-size:22px;filter:drop-shadow(0 0 8px #9060cc)">👤</div>
+        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#c8b0f0;text-shadow:0 0 10px #9060cc;text-transform:uppercase">Oculto</div>
+      </div>` : '';
 
     wrap.innerHTML = `
       ${healerBadge}
       <div class="e-name">${e.name}</div>
-      <div class="e-sprite" id="eSprite${i}">${imgHtml}</div>
+      <div class="e-sprite" id="eSprite${i}" style="position:relative;${hiddenStyle}">
+        ${imgHtml}
+        ${hiddenOverlay}
+      </div>
       <div class="e-hp-wrap">
         <div class="e-hp-bar" id="eHpBar${i}" style="width:${hpPct}%"></div>
         <div class="e-hp-txt">${Math.max(0,e.hp)} / ${e.maxHp}</div>
       </div>
-      <div class="e-intent">${intentText}</div>
+      <div class="e-intent">${e._hidden ? '👤 Oculto en la oscuridad' : intentText}</div>
       <div class="si-wrap" style="justify-content:center;margin-top:3px">${statusHtml}</div>
       <div class="target-indicator">${i===G.targetIdx?'▼ OBJETIVO ▼':''}</div>
     `;
-    wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
+    // Bloquear selección de enemigos ocultos
+    if(e._hidden) {
+      wrap.style.cursor = 'not-allowed';
+      wrap.style.opacity = '0.5';
+      wrap.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        addLog('No puedes atacar a un enemigo oculto en la oscuridad.','sta');
+      });
+    } else {
+      wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
+    }
     zone.appendChild(wrap);
   });
 }
@@ -2332,10 +2521,20 @@ function playCard(hi){
   // Amuleto Carmesí: cartas legendarias cuestan 1 menos (mín 0)
   const costReduction = (hasRelic('amuleto_carmesi') && card && card.rarity==='legendary') ? 1 : 0;
   if(!card||(card.cost - costReduction)>p.mana)return;
-  if(!e||e.dead){
-    const alive = G.enemies.findIndex(en=>!en.dead);
-    if(alive>=0) G.targetIdx=alive;
-    else return;
+  if(!e||e.dead||e._hidden){
+    // Si el target está muerto u oculto, busca el primer enemigo válido (vivo y no oculto)
+    const alive = G.enemies.findIndex(en=>!en.dead && !en._hidden);
+    if(alive>=0){ G.targetIdx=alive; }
+    else {
+      // Solo quedan ocultos: no se puede atacar
+      if(card.dmg) { addLog('No hay objetivos atacables — todos están ocultos.','sta'); return; }
+    }
+  }
+  // Verificación final: si el target actual está oculto y la carta hace daño, avisar
+  const currentTarget = G.enemies[G.targetIdx];
+  if(card.dmg && currentTarget && currentTarget._hidden) {
+    addLog('No puedes atacar a un enemigo oculto en la oscuridad.','sta');
+    return;
   }
   const target = G.enemies[G.targetIdx];
 
@@ -2507,6 +2706,9 @@ function endTurn(){
     if(e.hp<=0){ e.dead=true; sfxEnemyDeath(); }
   });
 
+  // Vampiro se cura cuando muere un aliado
+  checkVampiroAllyDeaths();
+
   if(G.enemies.filter(e=>!e.dead).length===0){
     renderEnemies();
     setTimeout(()=>combatWin(),400);
@@ -2514,29 +2716,62 @@ function endTurn(){
   }
 
   // Each alive enemy acts
+  // Primero: limpiar el estado oculto del turno anterior (ya duró todo el turno del jugador)
+  G.enemies.forEach(e => { e._hidden = false; });
+
   aliveEnemies.filter(e=>!e.dead).forEach(e=>{
     if(e.isHealer) {
       doHealerAction(e);
+    } else if(e.isVampiro) {
+      doVampiroAction(e);
+    } else if(e.isCondesa) {
+      doCondesaAction(e);
+    } else if(e.isGuardian) {
+      doGuardianAction(e);
+    } else if(e.isBaron) {
+      doBaronAction(e);
+    } else if(e.isMurcielago) {
+      doMurcielagoAction(e);
     } else {
       // Normal attack
-      let actualDmg=e.dmg;
-      // Espectro firstHit OR Espejo Espectral relic
-      const hasFirstHitEffect = (G.charId==='espectro') || hasRelic('espejo_espectral');
-      if(hasFirstHitEffect && !G.firstHitUsed){
-        G.firstHitUsed=true;actualDmg=0;
-        const relicBonus=hasRelic('espejo_espectral')&&G.charId!=='espectro';
-        if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
-        else addLog('Forma Etérea: golpe evitado!','sta');
+      if(!e._hidden) {
+        let actualDmg=e.dmg;
+        // Espectro firstHit OR Espejo Espectral relic
+        const hasFirstHitEffect = (G.charId==='espectro') || hasRelic('espejo_espectral');
+        if(hasFirstHitEffect && !G.firstHitUsed){
+          G.firstHitUsed=true;actualDmg=0;
+          const relicBonus=hasRelic('espejo_espectral')&&G.charId!=='espectro';
+          if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+          else addLog('Forma Etérea: golpe evitado!','sta');
+        }
+        // Guardián: reduce daño del jugador (accumulated stacks)
+        const dmgReduction = G._playerDmgReduction || 0;
+        actualDmg = Math.max(1, actualDmg - dmgReduction);
+        const ab=Math.min(p.block,actualDmg);
+        p.block=Math.max(0,p.block-actualDmg);
+        const nd=actualDmg-ab;
+        p.hp=Math.max(0,p.hp-nd);
+        if(nd>0){
+          addLog(`${e.name} golpea por ${nd}`,'ene');
+          spawnN(nd,'pl');
+          runDmgTanked += nd;
+          animatePlayerHit();
+        }
       }
-      const ab=Math.min(p.block,actualDmg);
-      p.block=Math.max(0,p.block-actualDmg);
-      const nd=actualDmg-ab;
-      p.hp=Math.max(0,p.hp-nd);
-      if(nd>0){
-        addLog(`${e.name} golpea por ${nd}`,'ene');
-        spawnN(nd,'pl');
-        runDmgTanked += nd;
-        animatePlayerHit();
+    }
+  });
+
+  // Aplicar ocultaciones pendientes del Guardián (durarán el turno del jugador)
+  G.enemies.forEach(e => {
+    if(e._hiddenNextTurn) { e._hidden = true; e._hiddenNextTurn = false; }
+  });
+
+  // Evolucionar murciélagos a vampiros si llegan a 5 turnos
+  G.enemies.forEach((e, idx) => {
+    if(e.isMurcielago && !e.dead) {
+      e.murcielagoTurns = (e.murcielagoTurns || 0) + 1;
+      if(e.murcielagoTurns >= 5) {
+        evolveToVampiro(idx);
       }
     }
   });
@@ -2631,6 +2866,279 @@ function doHealerAction(healer) {
     }
   }
   healer.healerTurn = (healer.healerTurn||0) + 1;
+}
+
+// ─── ACTO 2: VAMPIRO ─────────────────────────────
+// Roba vida al atacar. Recupera mucha vida cuando muere un aliado.
+function doVampiroAction(e) {
+  const p = G.player;
+  if(e._hidden) return;
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){
+    addLog(`${e.name} golpea por ${nd}`,'ene');
+    spawnN(nd,'pl');
+    runDmgTanked += nd;
+    animatePlayerHit();
+    // Vampiro roba vida
+    const steal = e.lifestealOnAttack || 6;
+    const healed = Math.min(e.maxHp - e.hp, steal);
+    if(healed > 0){
+      e.hp += healed;
+      addLog(`${e.name} roba ${healed} HP 🧛`,'ene');
+      animateEnemyHeal(e);
+    }
+  }
+}
+
+// Vampiro se cura al morir un aliado — llamado desde checkEnemyDeaths
+function vampiroAllyDeathHeal(vampiro) {
+  const heal = vampiro.reviveHealOnKill || 22;
+  const gained = Math.min(vampiro.maxHp - vampiro.hp, heal);
+  if(gained > 0){
+    vampiro.hp += gained;
+    addLog(`${vampiro.name} absorbe la muerte de su aliado · +${gained} HP 🧛`,'ene');
+    animateEnemyHeal(vampiro);
+  }
+}
+
+// ─── ACTO 2: CONDESA SIN ROSTRO ──────────────────
+// Cada turno alterna: ataque → defensa → veneno → repite
+function doCondesaAction(e) {
+  const p = G.player;
+  const mode = e.condensaTurn % 3;
+  e.condensaTurn = (e.condensaTurn || 0) + 1;
+
+  if(mode === 1) {
+    // Turno de defensa: se escuda
+    const shield = e.shieldPerTurn || 10;
+    e.block += shield;
+    addLog(`${e.name} cambia de forma · +${shield} escudo 🛡`,'sta');
+    return;
+  }
+  if(mode === 2) {
+    // Turno de veneno
+    const psn = e.poisonPerTurn || 3;
+    p.poison = (p.poison || 0) + psn;
+    addLog(`${e.name} cambia de forma · te envenena (☠ +${psn})`,'ene');
+    spawnN(psn, 'pl');
+    return;
+  }
+  // mode === 0: ataque normal
+  if(e._hidden) return;
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){
+    addLog(`${e.name} cambia de forma · ataca por ${nd}`,'ene');
+    spawnN(nd,'pl'); runDmgTanked += nd; animatePlayerHit();
+  }
+}
+
+// ─── ACTO 2: GUARDIÁN DEL CANDIL ─────────────────
+// Turno par: ataca y aplica reducción de daño al jugador.
+// Turno impar: oculta a un aliado (o a sí mismo si está solo) hasta su siguiente turno.
+// El oculto NO puede ser atacado pero SÍ actúa normalmente.
+function doGuardianAction(e) {
+  const p = G.player;
+  const phase = (combatTurn || 0) % 2;
+
+  if(phase === 1) {
+    // Turno de ocultación: usar _hiddenNextTurn para que dure el turno del jugador
+    const aliveOthers = G.enemies.filter(en => !en.dead && en !== e);
+    const target = aliveOthers.length > 0
+      ? aliveOthers[Math.floor(Math.random() * aliveOthers.length)]
+      : e; // Solo: se oculta a sí mismo
+    target._hiddenNextTurn = true;
+    addLog(`${e.name} apaga el candil · ${target === e ? 'desaparece en la oscuridad' : target.name + ' queda oculto'} hasta el próximo turno 👤`, 'sta');
+
+    // El guardián también ataca en este turno
+    let actualDmg = e.dmg;
+    const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+    if(hasFirstHit && !G.firstHitUsed){
+      G.firstHitUsed = true; actualDmg = 0;
+      const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
+      if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+      else addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const dmgRed0 = G._playerDmgReduction || 0;
+    actualDmg = Math.max(1, actualDmg - dmgRed0);
+    const ab0 = Math.min(p.block, actualDmg);
+    p.block = Math.max(0, p.block - actualDmg);
+    const nd0 = actualDmg - ab0;
+    p.hp = Math.max(0, p.hp - nd0);
+    if(nd0 > 0){ addLog(`${e.name} ataca desde las sombras por ${nd0}`,'ene'); spawnN(nd0,'pl'); runDmgTanked+=nd0; animatePlayerHit(); }
+    return;
+  }
+
+  // phase === 0: ataque normal + aplica debuff de daño
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){ addLog(`${e.name} ataca por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  G._playerDmgReduction = Math.min((G._playerDmgReduction || 0) + 2, 6);
+  addLog(`${e.name} reduce tu daño en 2 (total -${G._playerDmgReduction}) 🕯`,'ene');
+}
+
+// ─── ACTO 2: MURCIÉLAGO ──────────────────────────
+// Solo ataca. Evoluciona a Vampiro a los 5 turnos (gestionado en endTurn).
+function doMurcielagoAction(e) {
+  const p = G.player;
+  if(e._hidden || e.dead) return;
+  let actualDmg = e.dmg;
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){ addLog(`${e.name} ataca por ${nd} 🦇`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+}
+
+// Evoluciona un murciélago a vampiro
+function evolveToVampiro(idx) {
+  const e = G.enemies[idx];
+  if(!e || e.dead) return;
+  const mult = (G.infiniteMode ? getInfiniteMultiplier() : 1) * (G.path ? Math.pow(1.5, G.path.act || 0) : 1);
+  const newVampiro = {
+    ...ACT2_VAMPIRO,
+    hp: Math.round(ACT2_VAMPIRO.hp * mult * 0.8), // llega con el 80% de vida
+    maxHp: Math.round(ACT2_VAMPIRO.hp * mult),
+    dmg: Math.round(ACT2_VAMPIRO.dmg * mult),
+    block: 0, bleed: 0, poison: 0, dead: false,
+    lifestealOnAttack: Math.round((ACT2_VAMPIRO.lifestealOnAttack || 6) * mult),
+    reviveHealOnKill: Math.round((ACT2_VAMPIRO.reviveHealOnKill || 22) * mult),
+    isVampiro: true, isMurcielago: false, tier: 1, rw: 20,
+  };
+  G.enemies[idx] = newVampiro;
+  addLog(`¡${e.name} se ha transformado en Vampiro Sanguinario! 🧛`,'ene');
+  renderEnemies();
+}
+
+// ─── ACTO 2: BARÓN HEMLOCK (BOSS) ────────────────
+// Acciones posibles: invocar murciélagos, curarse, atacar.
+// Puede invocar si hay menos de 2 murciélagos/vampiros y pasaron ≥5 turnos desde el último summón.
+function doBaronAction(e) {
+  const p = G.player;
+  e.baronPhase = (e.baronPhase || 0) + 1;
+  const turn = e.baronPhase;
+
+  // Contar murciélagos y vampiros vivos invocados
+  const summonedAlive = G.enemies.filter(en => !en.dead && (en.isMurcielago || en.isVampiro) && en !== e).length;
+  const turnsSinceLastSummon = turn - (e.lastSummonTurn || -99);
+  const canSummon = summonedAlive < 2 && turnsSinceLastSummon >= 5;
+
+  // Decidir acción (pesos): invocar > curar (si hp < 60%) > atacar
+  const hpPct = e.hp / e.maxHp;
+  let action;
+
+  if(canSummon && Math.random() < 0.45) {
+    action = 'summon';
+  } else if(hpPct < 0.60 && Math.random() < 0.40) {
+    action = 'heal';
+  } else {
+    action = 'attack';
+  }
+
+  if(action === 'summon') {
+    // Cuántos invocar: si hay 0 invoca 2; si hay 1 invoca 1
+    const toSummon = summonedAlive === 0 ? 2 : 1;
+    const mult = (G.infiniteMode ? getInfiniteMultiplier() : 1) * (G.path ? Math.pow(1.5, G.path.act || 0) : 1);
+    for(let i = 0; i < toSummon; i++){
+      G.enemies.push(makeMurcielago(mult));
+    }
+    e.lastSummonTurn = turn;
+    addLog(`${e.name} extiende las alas · ¡invoca ${toSummon} Murciélago(s) de Hemlock! 🦇`,'ene');
+    // Seleccionar al barón como target si se añaden enemigos
+    renderEnemies();
+    return;
+  }
+
+  if(action === 'heal') {
+    const healAmt = Math.round(e.maxHp * 0.18); // cura 18% de su HP máx
+    const gained = Math.min(e.maxHp - e.hp, healAmt);
+    e.hp += gained;
+    addLog(`${e.name} absorbe las sombras · +${gained} HP 💀`,'ene');
+    animateEnemyHeal(e);
+    return;
+  }
+
+  // attack
+  if(e._hidden) return;
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){ addLog(`${e.name} golpea por ${nd} 💀`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+}
+
+// ─── HELPER: animación de curación en enemigo ────
+function animateEnemyHeal(e) {
+  const idx = G.enemies.indexOf(e);
+  const el = document.getElementById('eSprite'+idx);
+  if(el){
+    const pulse = document.createElement('div');
+    pulse.style.cssText = 'position:absolute;inset:-4px;border-radius:4px;background:radial-gradient(circle,#cc304055,transparent 70%);border:2px solid #cc304099;pointer-events:none;z-index:5;animation:healPulseAnim .8s forwards';
+    el.style.position = 'relative';
+    el.appendChild(pulse);
+    setTimeout(()=>pulse.remove(), 800);
+  }
+}
+
+// ─── Vampiro se cura cuando muere un aliado ───────
+// Esta función se llama desde el bloque DoTs en endTurn,
+// después de marcar un enemigo como muerto.
+function checkVampiroAllyDeaths() {
+  const deadThisTurn = G.enemies.filter(e => e.dead && !e._deathProcessed);
+  deadThisTurn.forEach(dead => {
+    dead._deathProcessed = true;
+    // Buscar vampiros vivos y curarlos
+    G.enemies.filter(en => !en.dead && en.isVampiro).forEach(v => vampiroAllyDeathHeal(v));
+  });
 }
 
 function animateHit(e) {
@@ -3210,7 +3718,12 @@ function buildCustom(){
     {key:'enemy0',  id:'dz-e0', ico:'🐀', lbl:'Normal',  cap:'Tier 1'},
     {key:'enemy1',  id:'dz-e1', ico:'⚔',  lbl:'Élite',   cap:'Tier 2'},
     {key:'enemy2',  id:'dz-e2', ico:'👁',  lbl:'Jefe',    cap:'Tier 3'},
-    {key:'enemy_healer', id:'dz-eh', ico:'✚', lbl:'Sanadora', cap:'Healer'},
+    {key:'enemy_healer',      id:'dz-eh',  ico:'✚', lbl:'Sanadora',  cap:'Healer'},
+    {key:'enemy_vampiro',     id:'dz-ev',  ico:'🧛', lbl:'Vampiro',   cap:'Acto 2'},
+    {key:'enemy_condesa',     id:'dz-ec',  ico:'👁', lbl:'Condesa',   cap:'Acto 2'},
+    {key:'enemy_guardian',    id:'dz-eg',  ico:'🕯', lbl:'Guardián',  cap:'Acto 2'},
+    {key:'enemy_murcielago',  id:'dz-em',  ico:'🦇', lbl:'Murciélago',cap:'Acto 2'},
+    {key:'enemy_baron_hemlock',id:'dz-eb', ico:'💀', lbl:'Barón',     cap:'Boss A2'},
   ];
   enemySlots.forEach(slot => {
     const dz = document.getElementById(slot.id);
@@ -3224,23 +3737,34 @@ function buildCustom(){
 }
 
 function ensureHealerDz() {
-  if(document.getElementById('dz-eh')) return;
-  // Find the enemies section and inject healer dz
   const e2Container = document.getElementById('dz-e2');
   if(!e2Container) return;
   const parentFlex = e2Container.parentElement?.parentElement;
   if(!parentFlex) return;
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px';
-  wrap.innerHTML = `
-    <div class="dz" id="dz-eh" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'enemy_healer',this)">
-      <div class="dz-ico">✚</div><div class="dz-lbl">Sanadora</div>
-      <input type="file" accept="image/*" onchange="dzFile(event,'enemy_healer',this.parentNode)">
-      <button class="dz-clr" onclick="dzClr('enemy_healer',document.getElementById('dz-eh'),event)">✕</button>
-    </div>
-    <div class="dz-cap">Healer</div>
-  `;
-  parentFlex.appendChild(wrap);
+
+  const extraSlots = [
+    {id:'dz-eh', key:'enemy_healer',      ico:'✚', lbl:'Sanadora',   cap:'Healer'},
+    {id:'dz-ev', key:'enemy_vampiro',     ico:'🧛', lbl:'Vampiro',    cap:'Acto 2'},
+    {id:'dz-ec', key:'enemy_condesa',     ico:'👁', lbl:'Condesa',    cap:'Acto 2'},
+    {id:'dz-eg', key:'enemy_guardian',    ico:'🕯', lbl:'Guardián',   cap:'Acto 2'},
+    {id:'dz-em', key:'enemy_murcielago',  ico:'🦇', lbl:'Murciélago', cap:'Acto 2'},
+    {id:'dz-eb', key:'enemy_baron_hemlock',ico:'💀',lbl:'Barón',      cap:'Boss A2'},
+  ];
+
+  extraSlots.forEach(slot => {
+    if(document.getElementById(slot.id)) return;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px';
+    wrap.innerHTML = `
+      <div class="dz" id="${slot.id}" style="width:100px;height:132px" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,'${slot.key}',this)">
+        <div class="dz-ico">${slot.ico}</div><div class="dz-lbl">${slot.lbl}</div>
+        <input type="file" accept="image/*" onchange="dzFile(event,'${slot.key}',this.parentNode)">
+        <button class="dz-clr" onclick="dzClr('${slot.key}',document.getElementById('${slot.id}'),event)">✕</button>
+      </div>
+      <div class="dz-cap">${slot.cap}</div>
+    `;
+    parentFlex.appendChild(wrap);
+  });
 }
 
 function buildCharDz(){
@@ -3988,4 +4512,3 @@ loadCustom();
 updateTitle();
 injectStatsButton();
 initMobile();
-document.addEventListener('contextmenu', e => e.preventDefault()); document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault(); if(e.ctrlKey && e.key === 'U') e.preventDefault(); });
