@@ -25,6 +25,12 @@ function getSfxVolume() {
 function setSfxVolume(v) {
   try { localStorage.setItem('noctis_sfx_vol', v); } catch(e){}
 }
+function getDoubleConfirm() {
+  try { const cfg = loadSettings(); return cfg.doubleConfirm === true; } catch(e){ return false; }
+}
+function setDoubleConfirm(v) {
+  const cfg = loadSettings(); cfg.doubleConfirm = v; saveSettings(cfg);
+}
 // Arrancar música al primer gesto del usuario
 document.addEventListener('click', ()=>{ initMusic(); }, { once:true });
 
@@ -44,12 +50,16 @@ const SFX_PLAYER_TURN    = 'resources/music/sfx_player_turn.mp3';
 const SFX_CHEST_OPEN     = 'resources/music/sfx_chest_open.mp3';
 //  Cuando entras en la tienda:
 const SFX_SHOP_ENTER     = 'resources/music/sfx_shop_enter.mp3';
+//  Cuando el jugador obtiene escudo:
+const SFX_BLOCK          = 'resources/music/sfx_block.mp3';
 //  Cuando el jugador golpea a un enemigo:
 const SFX_PLAYER_ATTACK  = 'resources/music/sfx_player_attack.mp3';
 //  Cuando el jugador muere:
 const SFX_PLAYER_DEATH   = 'resources/music/sfx_player_death.mp3';
 //  Cuando recibes un golpe:
 const SFX_PLAYER_HIT     = 'resources/music/sfx_player_hit.mp3';
+//  Cuando una carta cura al jugador:
+const SFX_HEAL           = 'resources/music/sfx_heal.mp3';
 //
 // ════════════════════════════════════════════════
 function _playSfx(src) {
@@ -68,6 +78,8 @@ function sfxShopEnter()    { _playSfx(SFX_SHOP_ENTER); }
 function sfxPlayerHit()    { _playSfx(SFX_PLAYER_HIT); }
 function sfxPlayerAttack() { _playSfx(SFX_PLAYER_ATTACK); }
 function sfxPlayerDeath()  { _playSfx(SFX_PLAYER_DEATH); }
+function sfxBlock()        { _playSfx(SFX_BLOCK); }
+function sfxHeal()         { _playSfx(SFX_HEAL); }
 
 // Deseleccionar carta al pulsar fuera de la mano
 document.addEventListener('click', e => {
@@ -124,6 +136,22 @@ const DEFAULT_IMGS = {
   card_headshot:   'resources/cartas/headshot.jpg',
   card_fanfire:    'resources/cartas/fanfire.jpg',
   card_smokebomb:  'resources/cartas/smokebomb.jpg',
+  // ── NPCs / Eventos de diálogo ──
+  npc_mendigo:       'resources/npc/mendigo.jpg',
+  npc_comerciante:   'resources/npc/comerciante.jpg',
+  npc_sacerdote:     'resources/npc/sacerdote.jpg',
+  npc_noble:         'resources/npc/noble.jpg',
+  npc_viuda:         'resources/npc/viuda.jpg',
+  npc_soldado:       'resources/npc/soldado.jpg',
+  npc_nino:          'resources/npc/nino.jpg',
+  npc_alquimista:    'resources/npc/alquimista.jpg',
+  npc_medico:        'resources/npc/medico.jpg',
+  npc_ladron:        'resources/npc/ladron.jpg',
+  npc_profeta:       'resources/npc/profeta.jpg',
+  npc_herrero:       'resources/npc/herrero.jpg',
+  npc_investigador:  'resources/npc/investigador.jpg',
+  npc_superviviente: 'resources/npc/superviviente.jpg',
+  npc_figura:        'resources/npc/figura.jpg',
   
 
 };
@@ -160,6 +188,22 @@ const ALT_IMGS = {
   card_headshot:   'resources/alt/cartas/headshot.png',
   card_fanfire:    'resources/alt/cartas/fanfire.png',
   card_smokebomb:  'resources/alt/cartas/smokebomb.png',
+  // ── NPCs / Eventos de diálogo ──
+  npc_mendigo:       'resources/alt/npc/mendigo.png',
+  npc_comerciante:   'resources/alt/npc/comerciante.png',
+  npc_sacerdote:     'resources/alt/npc/sacerdote.png',
+  npc_noble:         'resources/alt/npc/noble.png',
+  npc_viuda:         'resources/alt/npc/viuda.png',
+  npc_soldado:       'resources/alt/npc/soldado.png',
+  npc_nino:          'resources/alt/npc/nino.png',
+  npc_alquimista:    'resources/alt/npc/alquimista.png',
+  npc_medico:        'resources/alt/npc/medico.png',
+  npc_ladron:        'resources/alt/npc/ladron.png',
+  npc_profeta:       'resources/alt/npc/profeta.png',
+  npc_herrero:       'resources/alt/npc/herrero.png',
+  npc_investigador:  'resources/alt/npc/investigador.png',
+  npc_superviviente: 'resources/alt/npc/superviviente.png',
+  npc_figura:        'resources/alt/npc/figura.png',
   card_nightmare: 'resources/alt/cartas/nightmare.png',
   card_bloodpact: 'resources/alt/cartas/blood.png',
 };
@@ -953,13 +997,27 @@ function pickType(row, actNum){
 }
 
 function genMap(){
-  return Array.from({length:3},(_,ai)=>({
+  const raw = Array.from({length:3},(_,ai)=>({
     rows: Array.from({length:6},(_,ri)=>[
       {type:pickType(ri,ai),visited:false},
       {type:pickType(ri,ai),visited:false}
     ]),
-    boss:{type:'boss',visited:false}
+    boss:{type:'boss',visited:false},
+    dialoguePool:[],
+    dialogueUsed:[],
+    dialogueTriggers:[]
   }));
+  // Asignar triggers de diálogo: filas del mapa tras las que aparecerá el evento
+  // Son entre 2 y 4 por acto, en filas aleatorias (no la última antes del boss)
+  raw.forEach((act, ai) => {
+    act.dialoguePool = pickDialogueEvents(ai); // 2-4 eventos
+    act.dialogueUsed = [];
+    // Elegir en qué filas (0-5) se disparará el diálogo al completarlas
+    const eligibleRows = [0,1,2,3,4,5];
+    const shuffled = [...eligibleRows].sort(()=>Math.random()-0.5);
+    act.dialogueTriggers = shuffled.slice(0, act.dialoguePool.length).sort((a,b)=>a-b);
+  });
+  return raw;
 }
 
 function cById(id){return CARDS.find(c=>c.id===id)}
@@ -1107,6 +1165,613 @@ function renderMap(){
   });
 }
 
+
+// ═══════════════════════════════════════════════
+//  SISTEMA DE EVENTOS DE DIÁLOGO — NOCTIS DECK
+// ═══════════════════════════════════════════════
+
+const DIALOGUE_EVENTS = [
+
+  // ══════════════════════════════
+  //  ACTO 1 — Barrios exteriores
+  // ══════════════════════════════
+
+  {
+    id: 'mendigo_moneda',
+    acts: [0],
+    npc: 'npc_mendigo',
+    npcName: 'Un mendigo bajo el farol',
+    intro: 'Un hombre cubierto de harapos yace contra la pared húmeda. La luz del farol tiembla sobre su rostro. Extiende la mano sin mirarte, murmurando algo sobre "la noche que no acaba".',
+    options: [
+      { text: 'Dejarle una moneda y seguir tu camino', outcomes: [
+        { w:40, type:'gold_loss', amount:8,  gold_gain:20, msg:'Le das unas monedas. Él las aprieta con fuerza y sin mirarte señala un callejón. "Por allí es más corto. Que la oscuridad no te alcance." En el callejón, entre escombros, encuentras una pequeña bolsa olvidada.' },
+        { w:35, type:'gold_loss', amount:8,  msg:'Le das las monedas. Él las cuenta lentamente, luego te mira por primera vez. Sus ojos son completamente negros. "Gracias", dice, y desaparece como si la niebla se lo tragara.' },
+        { w:25, type:'heal',      amount:12, msg:'Mientras depositas las monedas en su mano, él te agarra la muñeca. "La oscuridad te ha visto ya." Te suelta y saca un pequeño frasco. "Toma esto. Antes de que sea demasiado tarde." El líquido sabe a cobre y a algo más.' }
+      ]},
+      { text: 'Ignorarle y continuar', outcomes: [
+        { w:50, type:'none',   msg:'Pasas de largo. A tu espalda, su murmullo se vuelve más alto: "La ciudad recuerda a quienes la ignoran..." No te detienes.' },
+        { w:30, type:'ambush', msg:'Cuando doblas la esquina, tres figuras encapuchadas te cierran el paso. "Debiste haberle escuchado", dice una voz desde atrás. El mendigo ya no está, pero sus palabras sí.' },
+        { w:20, type:'card',   msg:'Al pasar junto a él, notas que sujeta en la mano algo que no son monedas. Un papel doblado con tu nombre escrito. No entiendes cómo es posible. Dentro hay una carta entre los pliegues.' }
+      ]},
+      { text: 'Preguntarle qué ha visto esta noche', outcomes: [
+        { w:45, type:'lore',   msg:'"Las luces del Palacio Cendral llevan cuatro noches sin apagarse", murmura. "Los nobles encendieron algo que no saben cómo apagar. Los que entran no salen. Los que salen... ya no son los mismos."' },
+        { w:35, type:'bleed',  amount:2, msg:'Al agacharte para escucharle, sientes un pinchazo en el cuello. Sus dedos retraídos. "Perdona, reflejo... Lo hacemos cuando alguien se acerca demasiado ahora." Retrocedes. La herida escuece con una extraña frialdad.' },
+        { w:20, type:'gold',   amount:15, msg:'Te mira sorprendido. Nadie le había preguntado nada en semanas. Con manos temblorosas saca una moneda de un escondite en su bota. "De la última persona que me ayudó. Guárdala tú."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'comerciante_caja',
+    acts: [0],
+    npc: 'npc_comerciante',
+    npcName: 'Comerciante de medianoche',
+    intro: 'Un hombre de edad indefinida empuja un carrito desvencijado entre la niebla. Sobre él, cajas cerradas con candados oxidados. Al verte, se detiene y sonríe demasiado ampliamente para ser natural.',
+    options: [
+      { text: 'Comprarle la caja más pequeña por diez monedas', outcomes: [
+        { w:40, type:'card',        msg:'Dentro hay una carta envuelta en tela encerada. "Una reliquia de un Cazador anterior", dice él. "O eso me contaron." Se aleja empujando el carrito sin esperar respuesta.' },
+        { w:35, type:'gold_loss',   amount:10, msg:'La caja está vacía. El comerciante encoge los hombros. "A veces la suerte no está dentro." Desaparece entre la niebla antes de que puedas decir nada.' },
+        { w:25, type:'debuff_poison', amount:2, msg:'Dentro hay un frasco roto que rezuma un líquido verdoso. El olor es suficiente para marcarte. "Ah, esa era la especial", dice él, ya alejándose.' }
+      ]},
+      { text: 'Preguntarle por la caja más grande', outcomes: [
+        { w:50, type:'gold_loss',   amount:20, msg:'"Esa no está en venta." Pero si insistes... veinte monedas. Dentro hay ropa vieja y una nota: "Si estás leyendo esto, la ciudad ya te tiene." No hay firma.' },
+        { w:30, type:'heal',        amount:18, msg:'"Esa no está en venta." Pero antes de que te vayas, la abre él mismo. Dentro, entre telas viejas, hay un frasco de tintura médica antigua. "Para ti, sin coste."' },
+        { w:20, type:'gold',        amount:30, msg:'La caja tiene doble fondo. "Vaya", dice el comerciante, genuinamente sorprendido. "Yo tampoco sabía eso." Os repartís lo encontrado a partes iguales.' }
+      ]},
+      { text: 'Seguir de largo sin comprar nada', outcomes: [
+        { w:55, type:'none',   msg:'Al alejarte, escuchas cómo el carrito se detiene. "Volverás", dice su voz desde la niebla. No te vuelves.' },
+        { w:25, type:'gold',   amount:12, msg:'A los pocos pasos escuchas un silbido. Cuando te giras, el carrito está vacío y el comerciante te hace señas desde un portal. "Dejé algo para ti en el suelo."' },
+        { w:20, type:'ambush', msg:'La niebla se espesa de golpe. El carrito está volcado. El comerciante ha desaparecido. En su lugar, dos figuras con capas oscuras. "El señor pedía sus monedas de vuelta."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'sacerdote_plegaria',
+    acts: [0],
+    npc: 'npc_sacerdote',
+    npcName: 'Sacerdote de la Orden Pálida',
+    intro: 'Un sacerdote con hábito blanco manchado de ceniza recita plegarias frente a una pared cubierta de marcas grabadas. Al escuchar tus pasos se interrumpe y te mira con ojos cansados que han visto demasiado.',
+    options: [
+      { text: 'Pedirle que rece por ti', outcomes: [
+        { w:45, type:'heal',      amount:15, msg:'"La oración no cura el cuerpo, dice la iglesia. La iglesia miente." Posa sus manos en tus hombros y musita algo en un idioma que no reconoces. Sientes calor donde había frío.' },
+        { w:35, type:'debuff_bleed', amount:3, msg:'Cierra los ojos y comienza a rezar. Cuando los abre, su expresión ha cambiado. "La oscuridad ya te ha tocado. Lo que rezo no alcanza para limpiar eso." Sus palabras quedan en ti como espinas.' },
+        { w:20, type:'lore',      msg:'"Antes del Ritual de los Cien Faroles, esta ciudad tenía día", dice en voz baja. "Los nobles creyeron que podían capturar la noche. Capturaron algo que usa la noche como ropa." Se vuelve hacia la pared y no dice más.' }
+      ]},
+      { text: 'Ayudarle a grabar más marcas en la pared', outcomes: [
+        { w:40, type:'gold',  amount:18, msg:'"Cada marca es una barrera." Lo dice mientras grabáis juntos. Al terminar saca una bolsa. "De la colecta. Para quien tenga el valor de continuar."' },
+        { w:35, type:'card',  msg:'Entre las marcas, él te guía para trazar una diferente. "Esta no es de protección. Es de acceso." Cuando termina, arranca el trozo de piedra con la marca. En tus manos se convierte en algo más útil.' },
+        { w:25, type:'none',  msg:'Grabáis en silencio durante un rato. Cuando termina, el sacerdote contempla la pared. "No sirve de nada", admite. "Pero hacer algo es mejor que no hacer nada."' }
+      ]},
+      { text: 'Preguntarle qué significan las marcas', outcomes: [
+        { w:50, type:'lore',       msg:'"Son el lenguaje de antes del Tiempo de la Noche. La aristocracia lo estudió para invocarlo. Nosotros lo estudiamos para sellarlo." Señala hacia el centro. "Allí ya no funcionan. Algo muy potente las borra."' },
+        { w:30, type:'gold',       amount:10, msg:'"Son contratos. Esta calle pertenece a los que aún resisten." Te da unas monedas de su propio bolsillo. "Para que puedas llegar más lejos que yo."' },
+        { w:20, type:'debuff_mana', msg:'"No debería explicarlo a alguien que no ha sido consagrado." Pero lo hace. Y mientras habla, algo en el aire cambia. Como si el conocimiento tuviera un precio que no se paga con monedas.' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'nino_perdido',
+    acts: [0],
+    npc: 'npc_nino',
+    npcName: 'Una figura pequeña entre la niebla',
+    intro: 'Entre la niebla distingues lo que parece ser un niño parado en mitad de la calle vacía. Demasiado quieto para ser normal. Demasiado solo para esta hora.',
+    options: [
+      { text: 'Acercarte a ver si está bien', outcomes: [
+        { w:35, type:'heal',      amount:20, msg:'Es una niña, no mayor de diez años, con una cesta cubierta. "Mi madre me dijo que si encontraba a un Cazador le diera esto." Dentro hay vendas y ungüento. No entiendes cómo supo lo que eres.' },
+        { w:35, type:'ambush',    msg:'Cuando te acercas lo suficiente, la figura levanta la cabeza. No es un niño. O ya no lo es. Sus ojos son el color de la tinta. "Gracias por venir", dice con una voz que no encaja con ese cuerpo.' },
+        { w:30, type:'gold_loss', amount:15, msg:'Es un niño de verdad, asustado. Cuando intentas ayudarle, se pierde entre la niebla. En el suelo donde estaba, tus monedas han desaparecido. No recuerdas haberlas sacado.' }
+      ]},
+      { text: 'Llamarle desde donde estás sin moverte', outcomes: [
+        { w:45, type:'lore',  msg:'"Mi padre decía que el centro de la ciudad latía como un corazón. Antes de que se lo llevaran." Señala hacia las torres más altas. "Aún puedo escucharlo de noche." Se aleja entre la niebla.' },
+        { w:30, type:'card',  msg:'Al llamarle, se vuelve y camina hacia ti. Deja caer algo al suelo antes de desaparecer en la niebla. Una carta de combate envuelta en una cinta negra con un nudo que no reconoces.' },
+        { w:25, type:'none',  msg:'No responde. Se queda quieto un momento más y luego la niebla se lo traga. Ni siquiera pisadas en el suelo húmedo.' }
+      ]},
+      { text: 'Rodearle y continuar tu camino', outcomes: [
+        { w:50, type:'none',  msg:'Le rodeas con distancia. La figura no se mueve. Cuando miras atrás desde el final de la calle, ya no está.' },
+        { w:30, type:'bleed', amount:2, msg:'Mientras le rodeas, escuchas su voz a tu espalda: "Te sangra la mano." Y es verdad. Una herida que no recuerdas haberte hecho.' },
+        { w:20, type:'gold',  amount:25, msg:'Al pasar junto a él, deja caer algunas monedas al suelo sin mirarte. "Para el Cazador." No sabes si debería preocuparte que te reconozca.' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'soldado_herido',
+    acts: [0],
+    npc: 'npc_soldado',
+    npcName: 'Guardia de la Ciudad',
+    intro: 'Un soldado con el uniforme desgarrado está apoyado contra una farola, apretando una herida en el costado. La insignia en su pecho es la de la Guardia de Noctis, aunque el emblema tiene algo rayado encima.',
+    options: [
+      { text: 'Ayudarle a curar la herida', outcomes: [
+        { w:40, type:'gold',  amount:20, msg:'"No tengo monedas. Pero sé dónde hay un alijo de la Guardia Vieja. Antes de que todo cambiara." Te da instrucciones precisas. El alijo estaba donde dijo.' },
+        { w:35, type:'heal',  amount:10, msg:'"Llevamos tres semanas sin recibir órdenes del Palacio Central. Los que fueron a preguntar no volvieron." Termina de curarte las propias heridas con lo que sobra.' },
+        { w:25, type:'bleed', amount:3, msg:'La herida es más rara de lo que parece. Algo en ella reacciona al contacto. No es veneno exactamente. Es otra cosa. Y ahora está en ti también.' }
+      ]},
+      { text: 'Preguntarle qué le pasó', outcomes: [
+        { w:50, type:'lore',       msg:'"Una de esas... cosas. No sé cómo llamarlas. Tenía forma de persona hasta que se acercó demasiado al farol." Escupe. "En el Cuarto Distrito ya no hay humanos. Sólo formas que recuerdan haber sido humanos."' },
+        { w:30, type:'debuff_bleed', amount:2, msg:'"Pronto lo verás tú mismo." Cuando te acercas, nota algo. "Ya te han tocado también, ¿verdad? Uno siempre reconoce a otro marcado."' },
+        { w:20, type:'card',       msg:'Saca un papel del bolsillo interior. "Encontré esto en la guarida de lo que me atacó. No sé qué es, pero no debería quedarse allí." En tus manos cobra forma de carta de combate.' }
+      ]},
+      { text: 'Dejarle y seguir adelante', outcomes: [
+        { w:55, type:'none',   msg:'A tu espalda escuchas su voz apagarse: "Correcto. No pares. Nunca pares." No sabes si era consejo o amenaza.' },
+        { w:25, type:'ambush', msg:'A diez pasos de allí, el sonido de botas en los tejados. No suenan del todo humanas.' },
+        { w:20, type:'gold',   amount:12, msg:'Cuando llevas unos pasos algo rueda por el suelo. Una bolsa pequeña. "Para el siguiente que pase. Tú eres el siguiente."' }
+      ]}
+    ]
+  },
+
+  // ══════════════════════════════
+  //  ACTO 2 — Corazón de la ciudad
+  // ══════════════════════════════
+
+  {
+    id: 'noble_refugio',
+    acts: [1],
+    npc: 'npc_noble',
+    npcName: 'Noble en las ruinas de su mansión',
+    intro: 'Entre las columnas caídas de lo que fue una mansión aristocrática, un hombre vestido con ropas que fueron lujosas contempla retratos familiares esparcidos por el suelo. No parece sorprendido de verte.',
+    options: [
+      { text: 'Ofrecerle protección a cambio de información', outcomes: [
+        { w:40, type:'lore',  msg:'"¿Protección?" Ríe sin humor. "Fui uno de los que organizó el Ritual de los Cien Faroles. Mi familia lo inició. Yo intenté detenerlo. Llegué tarde." Te cuenta todo lo que sabe sobre el Palacio Central.' },
+        { w:35, type:'gold',  amount:35, msg:'"Información a cambio de monedas ya no tiene sentido aquí." Abre un panel oculto. "Toma lo que hay. A mí no me sirve para nada donde voy." No explica adónde va.' },
+        { w:25, type:'debuff_poison', amount:2, msg:'"La información tiene precio. El precio es entender lo que significan las palabras." Mientras habla, el aire de la habitación cambia. No fue intencional. O eso dice.' }
+      ]},
+      { text: 'Preguntarle por qué no ha huido de la ciudad', outcomes: [
+        { w:45, type:'lore', msg:'"La ciudad no deja ir a quienes le pertenecen. Noctis no es un lugar, es un acuerdo. Mi familia firmó ese acuerdo hace tres generaciones. No se puede romper huyendo." Pausa. "Sólo puede romperse desde dentro."' },
+        { w:30, type:'card', msg:'Abre un baúl sin responder. "Mi abuelo decía que el conocimiento debería caber en la mano." Te da varias cartas antiguas, una de las cuales aún tiene poder.' },
+        { w:25, type:'heal', amount:22, msg:'"Porque la respuesta está aquí." Saca una botella de la chimenea. "Del último médico de la familia. Guardaba esto para mí. Pero yo ya no voy a necesitarlo."' }
+      ]},
+      { text: 'Registrar la mansión mientras él mira', outcomes: [
+        { w:40, type:'gold',   amount:28, msg:'Observa en silencio. "En el tercer cajón del escritorio", dice por fin. "Siempre se olvidan del tercero." Tiene razón.' },
+        { w:35, type:'ambush', msg:'Detrás de uno de los paneles hay algo que no debería estar dentro de una mansión. El noble suspira. "Lo sé. Por eso no la he abandonado. Alguien tiene que vigilarlo."' },
+        { w:25, type:'card',   msg:'Bajo las tablas del suelo, una caja lacada. "La robé hace años para que no pudieran usarla. Úsala tú."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'alquimista_laboratorio',
+    acts: [1],
+    npc: 'npc_alquimista',
+    npcName: 'Alquimista entre sus frascos rotos',
+    intro: 'Un laboratorio improvisado en un sótano, con frascos chispeantes y anotaciones en las paredes. La alquimista no levanta la vista cuando entras, aunque claramente sabe que estás ahí.',
+    options: [
+      { text: 'Pedirle una poción', outcomes: [
+        { w:40, type:'heal',          amount:25, msg:'"Esta estabiliza el flujo vital. Temporal, pero suficiente para llegar más lejos." Lo dice con la frialdad de quien ha catalogado demasiados experimentos.' },
+        { w:35, type:'bleed',         amount:3,  msg:'"Esto purifica el sistema." No miente exactamente. El proceso de purificación tiene efectos secundarios que no mencionó. "Todo lo que limpia, también corta."' },
+        { w:25, type:'debuff_poison', amount:2,  msg:'"Esta neutraliza venenos." Dicho y hecho. Lo que no dice es que la neutralización crea su propio compuesto. "Conocimiento necesario para la siguiente fase."' }
+      ]},
+      { text: 'Ofrecerte a ayudar en su experimento actual', outcomes: [
+        { w:45, type:'card',  msg:'El experimento requiere un elemento que sólo se obtiene en combate. Cuando lo consigues y vuelves, ella transforma el resultado. "El conocimiento siempre tiene forma de herramienta, si sabes verlo."' },
+        { w:30, type:'gold',  amount:22, msg:'El experimento resulta en un descubrimiento que ella ya sabía pero necesitaba verificar. "Para los datos de campo necesitaba a alguien de fuera." Te paga con naturalidad.' },
+        { w:25, type:'debuff_bleed', amount:2, msg:'El experimento requería contacto directo con el compuesto. "Debería haber avisado del tiempo de exposición máximo." No parece arrepentida, sólo precisa.' }
+      ]},
+      { text: 'Preguntarle qué está investigando exactamente', outcomes: [
+        { w:50, type:'lore', msg:'"El núcleo de la noche permanente tiene una frecuencia. Como un corazón. No es metáfora: tiene ritmo real, medible. Lo que lo mantiene activo está en el Palacio Central, en la sala más profunda, latiendo desde hace años." Se vuelve hacia ti. "¿Vas hacia allí?"' },
+        { w:30, type:'card', msg:'Saca un cuaderno y arranca una página con un esquema. "Esto es una anomalía que no sé cómo clasificar." En tus manos, el esquema se convierte en algo funcional.' },
+        { w:20, type:'gold', amount:15, msg:'"Lo que me pagaba la Orden que quedó. Ya no vienen a pagar." Saca una bolsa. "Supongo que esto es tuyo ahora."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'viuda_puerta',
+    acts: [1],
+    npc: 'npc_viuda',
+    npcName: 'Mujer frente a una puerta sellada',
+    intro: 'Frente a una puerta cubierta de símbolos grabados, una mujer de negro contempla un retrato. No llora. Sus ojos están secos de tanto llorar que ya no puede.',
+    options: [
+      { text: 'Preguntarle a quién espera', outcomes: [
+        { w:40, type:'lore',  msg:'"A nadie. Mi marido entró por esa puerta hace seis noches. Los que entran en las puertas selladas no salen, pero tampoco mueren. Permanecen. La ciudad los conserva." Mira el retrato. "Puedo escucharle respirar al otro lado."' },
+        { w:35, type:'heal',  amount:18, msg:'"Ya no espero a nadie." Pero se vuelve hacia ti. "Esperaba a alguien que supiera leer esos símbolos." Saca un frasco. "Esto lo preparó él antes de entrar. Para quien llegara después."' },
+        { w:25, type:'debuff_bleed', amount:2, msg:'Al hablar, sus manos aprietan tanto el retrato que sus uñas se clavan en sus palmas. La sangre cae de un modo que no parece accidental. No te das cuenta hasta después de que algo de eso te tocó.' }
+      ]},
+      { text: 'Intentar abrir la puerta sellada', outcomes: [
+        { w:35, type:'gold',   amount:30, msg:'Los símbolos no responden a la fuerza. Responden al reconocimiento. Al tocarlos, algo al otro lado reacciona. Una ranura se abre. Dentro, una caja que alguien dejó para quien tuviera la curiosidad de intentarlo.' },
+        { w:35, type:'ambush', msg:'Los símbolos reaccionan de una forma que no esperabas. No es la puerta lo que se abre.' },
+        { w:30, type:'debuff_mana', msg:'La puerta absorbe algo al contacto. No duele. Simplemente, cuando te retiras, algo que antes estaba disponible en ti ahora está al otro lado de esa puerta.' }
+      ]},
+      { text: 'Dejarle una moneda sin decir nada', outcomes: [
+        { w:50, type:'none', msg:'La acepta sin mirar. "Gracias." Esa sola palabra contiene demasiadas cosas. Continúas.' },
+        { w:30, type:'gold', amount:18, msg:'Al marcharte, algo rueda por el suelo. Varias monedas. "Las de él. Decía que el dinero debía seguir moviéndose." No quieres saber cómo llegaron a sus manos.' },
+        { w:20, type:'card', msg:'La moneda cae de canto. Ambos la miráis. Ella recoge algo del suelo junto a la moneda. "Era suya. Supongo que ahora es tuya."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'medico_vacio',
+    acts: [1],
+    npc: 'npc_medico',
+    npcName: 'Médico en una clínica vacía',
+    intro: 'Una clínica con instrumentos ordenados y camas sin usar. El médico limpia bisturís con una meticulosidad que lleva demasiado tiempo practicando. Al entrar, señala una silla sin hablar.',
+    options: [
+      { text: 'Sentarte y dejar que te examine', outcomes: [
+        { w:45, type:'heal', amount:30, msg:'"Sin heridas externas graves. Exposición moderada a la oscuridad concentrada. Tratable." La cura es metódica, eficaz, y no incluye preguntas personales.' },
+        { w:35, type:'lore', msg:'"Llevas marca de la niebla en los pulmones. No es enfermedad. Es registro. La ciudad anota en los cuerpos de quienes la atraviesan." Sigue examinando. "¿Cuánto tiempo llevas dentro?"' },
+        { w:20, type:'bleed', amount:2, msg:'La revisión encuentra algo que no esperaba. "Esto complica el diagnóstico estándar." El tratamiento experimental funciona a medias. La otra mitad tiene sus propias consecuencias.' }
+      ]},
+      { text: 'Preguntarle dónde están todos sus pacientes', outcomes: [
+        { w:50, type:'lore', msg:'"Los del Primer Distrito evacuaron en la segunda semana. Los del Tercero... dejaron de necesitar médico en la cuarta. Los del Quinto no sé si siguen siendo pacientes en el sentido estricto." Pausa larga. "Tú eres el primero humano no marcado que veo en doce días."' },
+        { w:30, type:'gold', amount:20, msg:'"Se fueron o cambiaron." Saca una caja de debajo de la mesa. "Esto es de las familias que pagaron por adelantado y no volvieron a recoger. A mí ya no me sirve de moneda aquí."' },
+        { w:20, type:'card', msg:'Abre un armario de fichas médicas. "Caso 1247: síntomas, conocimiento involuntario de cosas que no deberían saberse. Tratamiento: ninguno conocido. Resultado: útil en combate, según el propio paciente." Te da la ficha.' }
+      ]},
+      { text: 'Pedirle suministros para el camino', outcomes: [
+        { w:40, type:'heal',     amount:15, msg:'Sin preguntar, llena una pequeña bolsa con vendas y frascos. "Suficiente para tres usos. Cuatro si eres cuidadoso." No cobra.' },
+        { w:35, type:'gold_loss', amount:12, msg:'"Los suministros tienen precio incluso aquí. Especialmente aquí." No es codicia. Es principio. La mejora es real.' },
+        { w:25, type:'debuff_mana', msg:'Te da lo que pides. Luego añade algo que no pediste: "Para el dolor que viene." No especifica qué dolor. Tiene efectos secundarios que no incluyó.' }
+      ]}
+    ]
+  },
+
+  // ══════════════════════════════
+  //  ACTO 3 — El núcleo oscuro
+  // ══════════════════════════════
+
+  {
+    id: 'investigador_notas',
+    acts: [2],
+    npc: 'npc_investigador',
+    npcName: 'Investigador de la Torre Obscura',
+    intro: 'Una habitación cuyas paredes están cubiertas de notas, mapas y esquemas conectados con hilos de colores. Un hombre teclea en una máquina de escribir sin papel. Escribe en el aire, o en algo que tú no puedes ver.',
+    options: [
+      { text: 'Preguntarle qué está escribiendo', outcomes: [
+        { w:45, type:'lore', msg:'"El informe final. La aristocracia creía que el Tiempo de la Noche era un estado que podía mantenerse indefinidamente. Tenían razón en la mecánica. Se equivocaron en la fuente. No usa energía ritual. Nos usa a nosotros. A todos los que seguimos dentro." Para de teclear. "Incluyéndote a ti, ahora."' },
+        { w:30, type:'card', msg:'Sin dejar de escribir, empuja hacia ti una carpeta. "Toma el anexo B. Tiene aplicaciones prácticas." Dentro hay algo que en tus manos se convierte en una herramienta de combate.' },
+        { w:25, type:'debuff_mana', msg:'"Las conclusiones del Experimento 7." Se detiene. "No debería habértelo dicho. Algunas conclusiones modifican a quien las conoce." Tiene razón. Algo cambia en la forma en que percibes el espacio.' }
+      ]},
+      { text: 'Leer sus notas en la pared', outcomes: [
+        { w:40, type:'lore',   msg:'Líneas de fuerza convergiendo en el Palacio Central. Fechas, nombres de familias nobles, rituales detallados. "Tres generaciones de investigación", dice él. "Y la conclusión siempre es la misma: hay que llegar al centro y romper el nudo."' },
+        { w:35, type:'gold',   amount:25, msg:'"Observas bien." Se levanta y señala una parte del mapa. "Eso es un fallo en el patrón. Un punto ciego. Úsalo." Te da también una bolsa.' },
+        { w:25, type:'ambush', msg:'Mientras lees, una de las notas reacciona a tu presencia. "Ah. Parece que el sistema te ha registrado ya. Sabrán exactamente dónde estás."' }
+      ]},
+      { text: 'Ofrecerle salir contigo', outcomes: [
+        { w:50, type:'lore',  msg:'"No puedo salir. Soy parte del sistema de observación ahora. Si salgo, el registro se interrumpe." Señala las notas. "Pero tú puedes llevar lo que he documentado."' },
+        { w:30, type:'gold',  amount:30, msg:'"No." Sin matices. "Pero toma esto. Es lo que me sobra y a ti te falta."' },
+        { w:20, type:'heal',  amount:28, msg:'Por primera vez deja de escribir y te mira. "Nadie me lo había propuesto." Abre un cajón. "Lo preparé para mí. Pero si alguien va a llegar al centro, que sea en buenas condiciones."' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'superviviente_portal',
+    acts: [2],
+    npc: 'npc_superviviente',
+    npcName: 'Figura en las sombras del portal',
+    intro: 'No te habla. Está de espaldas a ti, pegado a la pared del portal como si intentara fundirse con la piedra. Cuando presientes su presencia y te detienes, se vuelve lentamente. Sus ojos no reflejan la luz de los faroles de la forma correcta.',
+    options: [
+      { text: 'Hablarle en voz baja', outcomes: [
+        { w:40, type:'lore',   msg:'Tarda en responder. "En el Palacio Central hay una sala que no aparece en los planos. Es donde todo empezó. Es donde todo termina. Cuando llegues allí..." Se detiene. "No toques el suelo con las manos desnudas."' },
+        { w:35, type:'heal',   amount:20, msg:'Se queda mirándote. Luego rebusca en su ropa. "Tenía esto desde el inicio. Esperaba al momento correcto." No explica cómo sabe que eres tú ese momento.' },
+        { w:25, type:'bleed',  amount:3, msg:'"No deberías haber venido aquí." No como amenaza. Como advertencia genuina. "Este portal cambia a quienes se detienen demasiado tiempo." Te has detenido demasiado tiempo.' }
+      ]},
+      { text: 'Ofrecerle comida o agua', outcomes: [
+        { w:45, type:'gold', amount:22, msg:'Rechaza con un gesto. "Ya no necesito eso." Pero deja caer algo al suelo. "De los que vinieron antes. No llegaron hasta donde vas tú."' },
+        { w:30, type:'card', msg:'"Ya no funciona en mí." Acepta el gesto. Te devuelve algo marcado con un símbolo del sacerdote del primer distrito. "Para el momento en que lo necesites."' },
+        { w:25, type:'none', msg:'Niega con la cabeza. Señala hacia el interior del portal. "Por ahí es más directo. Aunque más peligroso." Cuando te vuelves para darle las gracias, ya no está.' }
+      ]},
+      { text: 'Pedirle que te guíe por esta zona', outcomes: [
+        { w:35, type:'lore',   msg:'Te guía por callejones que no aparecen en ningún mapa. En silencio señala marcas, patrones en las sombras, puntos donde la niebla es más densa. "La ciudad te habla si sabes escucharla. Dice que llegas tarde."' },
+        { w:35, type:'ambush', msg:'Asiente y empieza a caminar. A mitad del trayecto se detiene. "Aquí es hasta donde puedo acompañarte." Cuando te vuelves a mirarle, entiendes por qué no puede ir más lejos.' },
+        { w:30, type:'gold',   amount:18, msg:'La guía es silenciosa y eficaz. Al terminar, señala un punto en el suelo de un callejón. "El anterior dejó esto. Dijo que sería para el siguiente." Hay una bolsa bajo una piedra suelta.' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'figura_encapuchada',
+    acts: [2],
+    npc: 'npc_figura',
+    npcName: 'Una figura que te esperaba',
+    intro: 'Está de pie en mitad de la calle, mirando exactamente hacia donde ibas a aparecer tú. La capa oscura no tiene insignia de ninguna facción que reconozcas. Cuando llegas a su altura, habla primero.',
+    options: [
+      { text: 'Escuchar lo que tiene que decir', outcomes: [
+        { w:40, type:'lore',   msg:'"El ritual que mantiene la noche no está en el Palacio Central. Está bajo él. En la cámara que construyeron antes de que hubiera Palacio, antes de que hubiera ciudad. Y lo que lo activa no es un mecanismo. Es una decisión que alguien tomó y que tiene que ser revocada por alguien con la misma capacidad." Se va antes de que preguntes qué significa.' },
+        { w:35, type:'card',   msg:'"Toma esto." Un objeto que en sus manos era opaco, en las tuyas adquiere forma y uso. "Lo encontrarás útil en la última sala." No especifica cuál es la última sala.' },
+        { w:25, type:'ambush', msg:'"Llevo tiempo siguiéndote. No soy el único." Cuando te preparas, levanta una mano. "Yo no soy el problema inmediato." Tiene razón.' }
+      ]},
+      { text: 'Preguntarle quién le envió', outcomes: [
+        { w:50, type:'lore', msg:'"Nadie me envía. Me muevo por las mismas razones que tú. O razones parecidas." Pausa. "Lo que hay en el centro tiene que acabarse. En eso coincidimos, al menos."' },
+        { w:30, type:'gold', amount:35, msg:'"Una pregunta justa." Saca una bolsa. "Lo que sobra de los que ya no necesitan monedas aquí. Tú eres el primero que ha llegado haciendo las preguntas correctas."' },
+        { w:20, type:'debuff_bleed', amount:2, msg:'"Prefiero no responder a eso." Antes de irse, roza tu brazo. "Un registro. Para saber que estuviste aquí. Por si alguien pregunta después."' }
+      ]},
+      { text: 'Intentar ver su rostro', outcomes: [
+        { w:45, type:'none', msg:'No lo evita activamente. Pero cuando consigues el ángulo correcto, la capucha está vacía. Se aleja como si nada de eso fuera relevante.' },
+        { w:30, type:'heal', amount:25, msg:'Bajo la capucha hay un rostro que podría ser cualquiera. Lo que reconoces son sus manos: llevan los mismos símbolos del sacerdote del primer distrito. "Para que llegues", dice, y te cura sin pedírselo.' },
+        { w:25, type:'card', msg:'Lo que ves te resulta familiar de una forma que no puedes precisar. La figura deja algo en el suelo y se marcha. Una carta. Con tu nombre escrito en el reverso.' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'herrero_fragua_fria',
+    acts: [2],
+    npc: 'npc_herrero',
+    npcName: 'Herrero en una fragua que no quema',
+    intro: 'La fragua arde con un fuego que no da calor. El herrero trabaja metal que no debería ser maleable, con la concentración de quien lleva tiempo adaptándose a reglas nuevas.',
+    options: [
+      { text: 'Pedirle que refuerce tu equipo', outcomes: [
+        { w:40, type:'card',      msg:'"No trabajo el metal que traen los Cazadores. Trabajo lo que queda en sus manos después de los combates. El rastro." Hace algo con gestos que no entiendes. El resultado es funcional.' },
+        { w:35, type:'gold_loss', amount:15, msg:'"El trabajo tiene precio." Lo cobra sin negociar. La mejora es real pero no lo que esperabas. "El metal de este distrito no obedece las mismas reglas."' },
+        { w:25, type:'heal',      amount:15, msg:'"No es lo que pediste, pero es lo que necesitas." Trabaja algo que lleva en la fragua desde hace tiempo. El resultado te cura de formas que el metal no debería poder hacer.' }
+      ]},
+      { text: 'Preguntarle qué es ese fuego que no calienta', outcomes: [
+        { w:50, type:'lore',       msg:'"Fuego de Noctis. Del núcleo. Cuando la noche se volvió permanente, el calor fue lo primero que cambió. La ciudad mantiene la temperatura que necesita para sus propósitos, no los nuestros."' },
+        { w:30, type:'gold',       amount:20, msg:'"No me lo explico yo mismo después de meses." Te da algo forjado con ese fuego. "Vende esto fuera si llegas. Vale más de lo que pesa."' },
+        { w:20, type:'debuff_mana', msg:'"Eso pregunto yo cada día." Te deja tocar las llamas. No quema. Pero toma algo. "El fuego de la ciudad siempre toma algo. No sé qué tomó de ti."' }
+      ]},
+      { text: 'Ayudarle a mover el metal pesado', outcomes: [
+        { w:45, type:'gold', amount:25, msg:'Trabaja en silencio a tu lado. Al terminar, divide lo producido equitativamente. "Primera vez en semanas que hay dos pares de manos."' },
+        { w:30, type:'card', msg:'El trabajo conjunto produce algo inesperado. "El metal reacciona diferente con energía de dos personas." Te da el resultado. "No sé usarlo. Puede que tú sí."' },
+        { w:25, type:'bleed', amount:2, msg:'El metal de la ciudad tiene filo propio. "Debería haberte advertido." Lo trata con eficiencia profesional. "No siempre se corta de la misma forma."' }
+      ]}
+    ]
+  },
+
+  // ══════════════════════════════
+  //  TODOS LOS ACTOS
+  // ══════════════════════════════
+
+  {
+    id: 'profeta_callejon',
+    acts: [0, 1, 2],
+    npc: 'npc_profeta',
+    npcName: 'Voz desde un callejón oscuro',
+    intro: 'Desde un callejón lateral, una voz recita nombres en voz alta. Nombres que no reconoces. Salvo uno, que podría ser el tuyo, aunque no puedas explicar cómo lo sabe.',
+    options: [
+      { text: 'Entrar al callejón', outcomes: [
+        { w:35, type:'lore',   msg:'Una figura anciana con ojos completamente blancos. "Los que llegan al centro tienen siempre el mismo problema: no entienden que llegar no es suficiente. El acto de romper algo requiere entender qué es lo que lo sostiene."' },
+        { w:35, type:'gold',   amount:20, msg:'El callejón está vacío cuando entras. Sólo una bolsa en el suelo con tu nombre escrito. La voz ya no se escucha.' },
+        { w:30, type:'ambush', msg:'La voz calla cuando entras. El callejón huele a niebla concentrada. "Curiosidad excesiva", dice alguien en la oscuridad.' }
+      ]},
+      { text: 'Llamar a la voz sin entrar', outcomes: [
+        { w:40, type:'lore', msg:'"Los nombres que recito son los que la ciudad ha registrado como amenazas a su continuidad. Llevo tu nombre en la lista desde que cruzaste el primer portal." Pausa. "Eso es bueno. Significa que te tiene miedo."' },
+        { w:35, type:'heal', amount:12, msg:'"Bien. No entres donde no puedes ver." Algo rueda desde el callejón hasta tus pies. Un frasco. "Para los que tienen la prudencia de no entrar en todos los callejones oscuros."' },
+        { w:25, type:'none', msg:'La voz se interrumpe al escucharte. Larga pausa. "Pasas de largo. Interesante." No dice nada más.' }
+      ]},
+      { text: 'Ignorarlo y seguir', outcomes: [
+        { w:50, type:'none',        msg:'La voz sigue recitando. Tu nombre aparece una vez más en la lista mientras te alejas. Hace frío de una forma que no tiene que ver con la temperatura.' },
+        { w:30, type:'card',        msg:'Cuando has dado cinco pasos, algo cae a tus pies desde arriba. "Para los que saben cuándo no detenerse."' },
+        { w:20, type:'debuff_bleed', amount:1, msg:'La lista continúa. Sientes algo al alejarte, como si una parte muy pequeña de ti se quedara escuchando aunque no quieras.' }
+      ]}
+    ]
+  },
+
+  {
+    id: 'ladron_tejado',
+    acts: [0, 1],
+    npc: 'npc_ladron',
+    npcName: 'Figura ágil en el tejado',
+    intro: 'Percibes movimiento en un tejado cercano antes de que la voz llegue desde arriba. "No te mueves mal para alguien que va por la calle principal." No es una amenaza. Suena casi a cumplido.',
+    options: [
+      { text: 'Invitarle a bajar', outcomes: [
+        { w:40, type:'gold',   amount:18, msg:'Baja con facilidad. "Llevo aquí desde antes de que todo cambiara. Conozco cada tejado, cada portal, cada guarida." Te da información específica y una bolsa que "ya no necesitaba el anterior propietario".' },
+        { w:35, type:'ambush', msg:'Baja. Pero no está solo. "Los tejados tienen sus propias reglas. Y sus propios impuestos."' },
+        { w:25, type:'card',   msg:'Baja, evalúa, y saca algo de su bolsa. "Encontré esto en el último nido que vacié. No es para vender. Es para usar." Te lo da sin negociar.' }
+      ]},
+      { text: 'Preguntarle qué ha visto desde los tejados', outcomes: [
+        { w:50, type:'lore', msg:'"El patrón de movimiento del Quinto Distrito. Los puntos donde la niebla es artificial. Los tres portales que llevan al nivel inferior sin pasar por el Palacio Central." Sonríe. "Eso último no lo sabe casi nadie."' },
+        { w:30, type:'gold', amount:22, msg:'"Información cara." Pero no pide pago. "Estás yendo al centro. Los que van al centro hacen las cosas más interesantes." Tira algo desde el tejado.' },
+        { w:20, type:'gold_loss', amount:12, msg:'"Desde los tejados se ve cuando alguien no presta atención a sus bolsillos." Sonríe. "La lección es gratis. Las monedas ya las cobré."' }
+      ]},
+      { text: 'Seguir sin prestarle atención', outcomes: [
+        { w:45, type:'gold_loss', amount:10, msg:'La lección de prestar atención a voces en tejados se aprende tarde. Las monedas ya no están donde estaban.' },
+        { w:35, type:'none',      msg:'"Bien jugado", dice la voz alejándose. "Los que ignoran lo que está encima suelen llegar más lejos." Podría ser verdad.' },
+        { w:20, type:'card',      msg:'Tres pasos después, algo cae del tejado. Una carta. "Para el siguiente que pase. Tú eres el siguiente."' }
+      ]}
+    ]
+  }
+
+];
+
+// ═══════════════════════════════════════════════
+//  GESTIÓN DE EVENTOS EN EL MAPA
+// ═══════════════════════════════════════════════
+
+function pickDialogueEvents(actNum) {
+  const pool = DIALOGUE_EVENTS.filter(e => e.acts.includes(actNum));
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const count = 2 + Math.floor(Math.random() * 3); // 2, 3 o 4 por acto
+  return shuffled.slice(0, count).map(e => e.id);
+}
+
+function assignDialogueEvents(mapData) {
+  return mapData.map((act, ai) => ({
+    ...act,
+    dialoguePool: pickDialogueEvents(ai),
+    dialogueUsed: []
+  }));
+}
+
+function getNextDialogueEvent(actNum) {
+  const act = G.map[actNum];
+  if (!act || !act.dialoguePool) return null;
+  const remaining = act.dialoguePool.filter(id => !(act.dialogueUsed || []).includes(id));
+  if (remaining.length === 0) return null;
+  const id = remaining[Math.floor(Math.random() * remaining.length)];
+  if (!act.dialogueUsed) act.dialogueUsed = [];
+  act.dialogueUsed.push(id);
+  return DIALOGUE_EVENTS.find(e => e.id === id) || null;
+}
+
+// ═══════════════════════════════════════════════
+//  APLICAR RESULTADO DE EVENTO
+// ═══════════════════════════════════════════════
+
+function applyEventOutcome(outcome) {
+  const p = G.player;
+  switch(outcome.type) {
+    case 'heal': {
+      const healed = Math.min(p.maxHp - p.hp, outcome.amount || 0);
+      p.hp += healed;
+      break;
+    }
+    case 'gold':
+      G.gold += (outcome.amount || 0);
+      break;
+    case 'gold_loss':
+      G.gold = Math.max(0, G.gold - (outcome.amount || 0));
+      if (outcome.gold_gain) G.gold += outcome.gold_gain;
+      break;
+    case 'card': {
+      const cardPool = CARDS.filter(c =>
+        !['strike','shield','bullet'].includes(c.id) &&
+        ['uncommon','rare'].includes(c.rarity)
+      );
+      if (cardPool.length > 0) {
+        const picked = cardPool[Math.floor(Math.random() * cardPool.length)];
+        p.deck.push(picked.id);
+        saveG();
+        return { pickedCard: picked }; // ← devuelve la carta para mostrarla
+      }
+      break;
+    }
+    case 'bleed':
+    case 'debuff_bleed':
+      G._pendingBleed = (G._pendingBleed || 0) + (outcome.amount || 1);
+      break;
+    case 'poison':
+    case 'debuff_poison':
+      G._pendingPoison = (G._pendingPoison || 0) + (outcome.amount || 1);
+      break;
+    case 'debuff_mana':
+      G._pendingManaMinus = (G._pendingManaMinus || 0) + 1;
+      break;
+    case 'ambush':
+      G._ambushPenalty = true;
+      break;
+    case 'lore':
+    case 'none':
+    default:
+      break;
+  }
+  saveG();
+  return {};
+}
+
+function applyPendingDebuffs() {
+  const p = G.player;
+  if (G._pendingBleed)    { p.bleed  = (p.bleed  || 0) + G._pendingBleed;  delete G._pendingBleed; }
+  if (G._pendingPoison)   { p.poison = (p.poison || 0) + G._pendingPoison; delete G._pendingPoison; }
+  if (G._pendingManaMinus){ p.mana   = Math.max(0, p.mana - G._pendingManaMinus); delete G._pendingManaMinus; }
+}
+
+// ═══════════════════════════════════════════════
+//  PANTALLA DE EVENTO DE DIÁLOGO
+// ═══════════════════════════════════════════════
+
+function showDialogueEvent(event, onComplete) {
+  playUI();
+  const existing = document.getElementById('dialogueOverlay');
+  if (existing) existing.remove();
+
+  const npcImg = getImg(event.npc);
+  const imgHtml = npcImg
+    ? `<img src="${npcImg}" style="width:100px;height:136px;object-fit:cover;border-radius:6px;border:1px solid #d4a84344;box-shadow:0 0 20px #00000088;flex-shrink:0;">`
+    : `<div style="width:100px;height:136px;border-radius:6px;border:1px solid #d4a84344;background:#1a1030;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0;">👤</div>`;
+
+  const optionsHtml = event.options.map((opt, i) => `
+    <button class="dialogue-opt" data-idx="${i}" style="
+      width:100%;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;
+      padding:13px 16px;cursor:pointer;text-align:left;transition:border-color .2s,background .2s;
+      font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#e8d8ba;line-height:1.6;
+      margin-bottom:9px;box-sizing:border-box;
+    " onmouseover="this.style.borderColor='#d4a84366';this.style.background='#1e1430'"
+       onmouseout="this.style.borderColor='#2a1e3a';this.style.background='#160e26'">
+      <span style="color:#d4a843;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:5px">${String.fromCharCode(65+i)}</span>
+      ${opt.text}
+    </button>
+  `).join('');
+
+  const ov = document.createElement('div');
+  ov.id = 'dialogueOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:8500;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;background:rgba(5,3,12,.95);backdrop-filter:blur(8px);animation:fadeIn .3s ease;padding:16px 0 40px;';
+  ov.innerHTML = `
+    <div style="background:linear-gradient(160deg,#1a1030,#110c20);border:1px solid #d4a84333;border-radius:12px;padding:22px 20px 24px;width:min(540px,96vw);box-shadow:0 0 60px #00000099,0 0 30px #d4a84311;box-sizing:border-box;">
+      <div style="font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:14px;font-family:'Cinzel',serif;text-align:center;">✦ &nbsp; Encuentro &nbsp; ✦</div>
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;flex-wrap:nowrap;">
+        ${imgHtml}
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Cinzel',serif;font-size:13px;color:#d4a843;letter-spacing:.08em;margin-bottom:8px;">${event.npcName}</div>
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c8b89a;line-height:1.7;">${event.intro}</div>
+        </div>
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#d4a84333,transparent);margin-bottom:16px;"></div>
+      <div id="dialogueOptions">${optionsHtml}</div>
+      <div id="dialogueResult" style="display:none;"></div>
+    </div>`;
+
+  document.body.appendChild(ov);
+
+  ov.querySelectorAll('.dialogue-opt').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const opt = event.options[parseInt(this.dataset.idx)];
+      let r = Math.random() * opt.outcomes.reduce((s,o)=>s+o.w,0);
+      let chosen = opt.outcomes[opt.outcomes.length-1];
+      for (const o of opt.outcomes) { r -= o.w; if (r <= 0) { chosen = o; break; } }
+
+      const applyResult = applyEventOutcome(chosen);
+
+      document.getElementById('dialogueOptions').style.display = 'none';
+      const resultEl = document.getElementById('dialogueResult');
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = `
+        <div style="background:#0f0c18;border:1px solid #d4a84322;border-radius:8px;padding:16px 18px;margin-bottom:4px;">
+          ${getResultBadge(chosen.type, applyResult && applyResult.pickedCard)}
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c8b89a;line-height:1.75;margin-top:12px;">${chosen.msg}</div>
+        </div>
+        <div style="text-align:center;margin-top:18px;">
+          <button id="dialogueContinue" style="font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#d4a843;background:linear-gradient(135deg,#2a1a3a,#1a0a28);border:1px solid #d4a84344;border-radius:4px;padding:12px 28px;cursor:pointer;transition:all .25s;"
+            onmouseover="this.style.borderColor='#d4a843';this.style.background='linear-gradient(135deg,#3a2a4a,#2a1a3a)'"
+            onmouseout="this.style.borderColor='#d4a84344';this.style.background='linear-gradient(135deg,#2a1a3a,#1a0a28)'">
+            Continuar →
+          </button>
+        </div>`;
+
+      document.getElementById('dialogueContinue').addEventListener('click', () => {
+        playUI();
+        ov.style.animation = 'fadeOut .2s ease forwards';
+        setTimeout(() => {
+          ov.remove();
+          if (chosen.type === 'ambush') { G._ambushPenalty = true; startCombat(0); }
+          else { onComplete(); }
+        }, 200);
+      });
+    });
+  });
+}
+function getResultBadge(type, pickedCard) {
+  const rarityColors = { common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44' };
+  if (type === 'card' && pickedCard) {
+    const rc = rarityColors[pickedCard.rarity] || '#9a5aee';
+    const rarityLabel = {common:'Común',uncommon:'Infrecuente',rare:'Rara',legendary:'Legendaria'}[pickedCard.rarity] || '';
+    return `<div style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:inline-flex;align-items:center;gap:8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;text-transform:uppercase;color:#9a5aee;border:1px solid #9a5aee33;border-radius:4px;padding:5px 12px;background:#9a5aee0f;">🃏&nbsp;Carta obtenida</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Cinzel',serif;font-size:13px;color:${rc};border:1px solid ${rc}44;border-radius:4px;padding:6px 14px;background:${rc}11;margin-top:2px;">
+        <span style="font-size:16px;">✦</span>
+        <span style="font-weight:600;letter-spacing:.05em;">${pickedCard.name}</span>
+        <span style="font-size:10px;opacity:.7;letter-spacing:.1em;text-transform:uppercase;">${rarityLabel}</span>
+      </div>
+    </div>`;
+  }
+  const b = {
+    heal:          { c:'#4acc70', i:'❤',  t:'Curación' },
+    gold:          { c:'#d4a843', i:'🪙', t:'Recompensa' },
+    gold_loss:     { c:'#c03040', i:'🪙', t:'Pérdida' },
+    card:          { c:'#9a5aee', i:'🃏', t:'Carta obtenida' },
+    bleed:         { c:'#c03040', i:'🩸', t:'Sangrado al inicio del próximo combate' },
+    debuff_bleed:  { c:'#c03040', i:'🩸', t:'Sangrado al inicio del próximo combate' },
+    debuff_poison: { c:'#4a8a30', i:'☠',  t:'Veneno al inicio del próximo combate' },
+    debuff_mana:   { c:'#3a6acc', i:'✦',  t:'Maná reducido en el próximo combate' },
+    ambush:        { c:'#c03040', i:'⚔',  t:'¡Emboscada!' },
+    lore:          { c:'#7a6888', i:'📜', t:'Conocimiento' },
+  }[type];
+  if (!b) return '';
+  return `<div style="display:inline-flex;align-items:center;gap:8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:${b.c};border:1px solid ${b.c}33;border-radius:4px;padding:5px 12px;background:${b.c}0f;">${b.i}&nbsp;${b.t}</div>`;
+}
+
+
 function enterNode(ai,ri,ci){
   G.path={act:ai,row:ri,col:ci};
   saveG();
@@ -1127,22 +1792,39 @@ function enterNode(ai,ri,ci){
 
 function advance(){
   const {act,row,col}=G.path;
-  if(row===6){G.map[act].boss.visited=true;}
-  else if(col!==null){G.map[act].rows[row][col].visited=true;}
-  const nextRow=row+1;
+  // Marcar nodo actual como visitado
+  if(row===6){ G.map[act].boss.visited=true; }
+  else if(col!==null){ G.map[act].rows[row][col].visited=true; }
+
+  // ── Cambio de acto (tras boss) ──
   if(row===6){
     const nextAct=act+1;
     if(nextAct>=G.map.length){
-      // Completed act 3 — ask about infinite mode
       localStorage.removeItem(SK);
       showPostAct3();
       return;
     }
-    G.path={act:nextAct,row:0,col:null};
-  } else {
-    G.path={act,row:nextRow,col:null};
+    // Arrancar el acto siguiente siempre desde fila 0, sin columna elegida
+    G.path={act:nextAct, row:0, col:null};
+    saveG();
+    showMap();
+    return;
   }
+
+  // ── Avance normal dentro del mismo acto ──
+  const nextRow = row + 1;
+  G.path = {act, row:nextRow, col:null};
   saveG();
+
+  // ¿Toca evento de diálogo tras completar esta fila?
+  const actData = G.map[act];
+  if(actData && Array.isArray(actData.dialogueTriggers) && actData.dialogueTriggers.includes(row)){
+    const evt = getNextDialogueEvent(act);
+    if(evt){
+      showDialogueEvent(evt, ()=>showMap());
+      return;
+    }
+  }
   showMap();
 }
 
@@ -1187,20 +1869,8 @@ function startInfiniteMode() {
   const ov = document.getElementById('postAct3Overlay');
   if(ov) { ov.style.opacity='0'; setTimeout(()=>ov.style.display='none',350); }
   // Guardar stats de la run normal antes de entrar al infinito
-  // (reliquias de personaje ya se dieron en showPostAct3)
-  if(!runFinalized){
-    runFinalized = true;
-    const stats = loadStats();
-    stats.totalRuns++;
-    const rt = getRunTime();
-    stats.totalPlaytime += rt;
-    if(runEncounters > stats.bestRunEncounters){ stats.bestRunEncounters=runEncounters; stats.bestRunTime=rt; stats.bestRunTotalDmg=runTotalDmg; }
-    if(runHighDmg > stats.highestSingleDmg) stats.highestSingleDmg=runHighDmg;
-    if(runDmgTanked > stats.mostDmgTanked)  stats.mostDmgTanked=runDmgTanked;
-    if(runDmgHealed > stats.mostDmgHealed)  stats.mostDmgHealed=runDmgHealed;
-    saveStats(stats);
-  }
-  runFinalized = false; // reset para el modo infinito
+  finalizeRunStats(true); // usa el guard runFinalized, no duplica
+  runFinalized = false;   // reset para que el infinito pueda registrarse al morir
   G.infiniteMode = true;
   G.infiniteEncounters = 0;
   saveG();
@@ -1373,6 +2043,7 @@ function getMaxHand() {
 //  COMBAT
 // ═══════════════════════════════════════════════
 function startCombat(tier, isInfinite){
+  applyPendingDebuffs();
   const infiniteMult = (G.infiniteMode || isInfinite) ? getInfiniteMultiplier() : 1;
   G.enemies = buildEnemyGroup(tier, infiniteMult);
   G._combatTier = tier; // 0=normal, 1=elite, 2=boss
@@ -1587,14 +2258,15 @@ function addStatusTooltips(wrapEl, card){
 function renderHand(){
   const zone=document.getElementById('handZone');zone.innerHTML='';
   const p=G.player,n=p.hand.length;
-  p.hand.map(id=>cById(id)).forEach((card,i)=>{
-    if(!card)return;
+  for(let hi=0;hi<n;hi++){
+    const card=cById(p.hand[hi]);
+    if(!card)continue;
     const wrap=document.createElement('div');wrap.className='c-slot';
-    const sp=Math.min(26,13*n),angle=n>1?-sp/2+(sp/(n-1))*i:0;
-    wrap.style.cssText=`transform:rotate(${angle}deg) translateY(${Math.abs(angle)*.5}px);z-index:${i+1};margin-left:${i===0?0:-16}px`;
+    const sp=Math.min(26,13*n),angle=n>1?-sp/2+(sp/(n-1))*hi:0;
+    wrap.style.cssText=`transform:rotate(${angle}deg) translateY(${Math.abs(angle)*.5}px);z-index:${hi+1};margin-left:${hi===0?0:-16}px`;
     const can=card.cost<=p.mana;
     const g=document.createElement('div');g.className=`gcard ${card.type} ${can?'playable':'unplayable'}`;
-    const ds=card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg; // ✏ CAMBIO 4: fanfire muestra dmg total (6×3=18)
+    const ds=card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg;
     let fx='';
     if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;
     if(card.blk)fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
@@ -1603,27 +2275,37 @@ function renderHand(){
     if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
     g.innerHTML=`<div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div>`;
     wrap.appendChild(g);
-    if(can) wrap.addEventListener('click', ()=>{
-      // Si esta carta ya está seleccionada → ejecutar
-      if(wrap.classList.contains('card-selected')){
-        playCard(i);
-        return;
-      }
-      // Deseleccionar cualquier otra carta previamente destacada
-      document.querySelectorAll('.c-slot.card-selected').forEach(el=>{
-        el.classList.remove('card-selected');
-        el.style.transform = el._baseTransform || '';
-      });
-      // Guardar transform base y destacar esta
-      wrap._baseTransform = wrap.style.transform;
-      wrap.classList.add('card-selected');
-      wrap.style.transform = (wrap._baseTransform||'') + ' translateY(-48px) scale(1.12)';
-    });
-    addStatusTooltips(wrap, card); // ✏ CAMBIO 9b: activar tooltips de estado en cada carta
+    if(can){
+      // Capturar el ID de la carta — buscar posición en tiempo de click para evitar índices obsoletos
+      (function(cardId,w){
+        w.addEventListener('click',function(ev){
+          ev.stopPropagation();
+          const currentIdx = G.player.hand.indexOf(cardId);
+          if(currentIdx === -1) return; // carta ya jugada
+          if(!getDoubleConfirm()){
+            playCard(currentIdx);
+            return;
+          }
+          if(w.classList.contains('card-selected')){
+            const idx2 = G.player.hand.indexOf(cardId);
+            if(idx2 === -1) return;
+            playCard(idx2);
+            return;
+          }
+          document.querySelectorAll('.c-slot.card-selected').forEach(function(el){
+            el.classList.remove('card-selected');
+            el.style.transform=el._baseTransform||'';
+          });
+          w._baseTransform=w.style.transform;
+          w.classList.add('card-selected');
+          w.style.transform=(w._baseTransform||'')+' translateY(-48px) scale(1.12)';
+        });
+      })(p.hand[hi],wrap);
+    }
+    addStatusTooltips(wrap,card);
     zone.appendChild(wrap);
-  });
+  }
 }
-
 function getCArt(card){
   const img=getImg('card_'+card.id);
   if(img)return`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:2px">`;
@@ -1707,7 +2389,7 @@ function playCard(hi){
       }
     }
   }
-  if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');}
+  if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');sfxBlock();}
   if(card.bleed){target.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`;}
   if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;if(hasRelic('tomo_envenenado'))ps+=1;target.poison+=ps;msg+=` · ${ps} veneno`;}
   if(card.heal){
@@ -1716,6 +2398,7 @@ function playCard(hi){
     msg+=` · +${h} vida`;
     runDmgHealed += h;
     animateHeal(h);
+    if(h>0) sfxHeal();
   }
   addLog(msg,'sta');
 
@@ -3149,6 +3832,15 @@ function showSettings() {
           <span style="position:absolute;top:3px;left:${aiOn?'24px':'3px'};width:20px;height:20px;border-radius:50%;background:${aiOn?'#fff':'#5a4870'};transition:left .25s;display:block;"></span>
         </button>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#160e26;border:1px solid #2a1e3a;border-radius:8px;padding:14px 16px;margin-top:8px">
+        <div>
+          <div style="font-size:13px;color:#e8d8ba;letter-spacing:.05em;margin-bottom:3px">Confirmar carta con doble clic</div>
+          <div style="font-size:11px;color:#5a4870;font-family:'IM Fell English',serif;font-style:italic">Primer clic selecciona · segundo clic ejecuta</div>
+        </div>
+        <button id="dcToggleBtn" onclick="toggleDoubleConfirm()" style="width:48px;height:26px;border-radius:13px;border:none;cursor:pointer;background:${getDoubleConfirm()?'#d4a843':'#2a1e3a'};position:relative;transition:background .25s;flex-shrink:0;margin-left:16px;box-shadow:${getDoubleConfirm()?'0 0 10px #d4a84355':'none'};">
+          <span style="position:absolute;top:3px;left:${getDoubleConfirm()?'24px':'3px'};width:20px;height:20px;border-radius:50%;background:${getDoubleConfirm()?'#fff':'#5a4870'};transition:left .25s;display:block;"></span>
+        </button>
+      </div>
     </div>
     <div style="margin-bottom:8px">
       <div style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:#7a6888;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a1e3a">🗑 &nbsp; Borrar Datos</div>
@@ -3198,6 +3890,17 @@ function toggleAiImages() {
   const knob = btn.querySelector('span');
   if(knob) { knob.style.left = on ? '24px' : '3px'; knob.style.background = on ? '#fff' : '#5a4870'; }
   try { renderRelicsPanel(); } catch(e) {}
+}
+
+function toggleDoubleConfirm() {
+  const on = !getDoubleConfirm();
+  setDoubleConfirm(on);
+  const btn = document.getElementById('dcToggleBtn');
+  if(!btn) return;
+  btn.style.background = on ? '#d4a843' : '#2a1e3a';
+  btn.style.boxShadow = on ? '0 0 10px #d4a84355' : 'none';
+  const knob = btn.querySelector('span');
+  if(knob) { knob.style.left = on ? '24px' : '3px'; knob.style.background = on ? '#fff' : '#5a4870'; }
 }
 
 function settingsDeleteSave() {
