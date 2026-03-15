@@ -1878,7 +1878,11 @@ function showDialogueEvent(event, onComplete) {
         setTimeout(() => {
           ov.remove();
           if (chosen.type === 'ambush') { G._ambushPenalty = true; startCombat(G.path && G.path.act === 1 ? 1 : 0); }
-          else { onComplete(); }
+          else {
+            onComplete();
+            // Re-inyectar botón ver mazo si el mapa sigue activo
+            setTimeout(injectDeckViewBtn, 80);
+          }
         }, 200);
       });
     });
@@ -2229,6 +2233,7 @@ function startCombat(tier, isInfinite){
   document.getElementById('clog').innerHTML = '';
   addLog(`¡Combate! ${G.enemies.map(e=>e.name).join(', ')}`, 'ene');
   show('game');
+  injectCombatDeckBtn();
   // Móvil: asegurar que los bloques HP/MANA tienen la clase correcta
   if(isMobile()) {
     markMobileStatBlocks();
@@ -2246,8 +2251,63 @@ function applyPort(){
 }
 
 // ═══════════════════════════════════════════════
-//  RENDER ENEMIES
+//  INTENT SYSTEM — icono de intención del enemigo
 // ═══════════════════════════════════════════════
+function getEnemyIntent(e) {
+  // Devuelve ARRAY de { icon, text } — uno por acción prevista
+  if(e._hidden) return [{ icon:'👤', text:'Oculto en la oscuridad — no puede ser atacado' }];
+
+  if(e.isHealer) {
+    const action = getHealerAction(e, combatTurn);
+    if(action==='heal')   return [{ icon:'❤', text:`Curará al aliado con menos vida (+${e.healAmt||8} HP)` }];
+    if(action==='shield') return [{ icon:'🛡', text:`Escudará a todos los aliados (+${e.shieldAmt||6} de bloqueo cada uno)` }];
+    if(action==='debuff') return [{ icon:'☠', text:`Lanzará una maldición: veneno o sangrado al jugador` }];
+    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+  }
+  if(e.isVampiro) {
+    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }, { icon:'🧛', text:`Robará ${e.lifestealOnAttack} HP para sí mismo al golpear` }];
+  }
+  if(e.isCondesa) {
+    const mode = (e.condensaTurn||0) % 3;
+    if(mode === 0) return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    if(mode === 1) return [{ icon:'🛡', text:`Se defenderá: ganará +${e.shieldPerTurn} de bloqueo` }];
+    return [{ icon:'☠', text:`Envenenará al jugador (+${e.poisonPerTurn} veneno)` }];
+  }
+  if(e.isGuardian) {
+    const phase = (combatTurn||0) % 2;
+    if(phase === 1) return [
+      { icon:'⚔', text:`Atacará desde las sombras por ${e.dmg} de daño` },
+      { icon:'👁', text:`Ocultará a un aliado aleatorio hasta el próximo turno (no puede ser atacado)` }
+    ];
+    return [
+      { icon:'⚔', text:`Atacará por ${e.dmg} de daño` },
+      { icon:'🕯', text:`Reducirá tu daño en 2 (acumulable hasta −6)` }
+    ];
+  }
+  if(e.isBaron) {
+    const summonedAlive = G.enemies.filter(en=>!en.dead&&(en.isMurcielago||en.isVampiro)&&en!==e).length;
+    const turnsSince = (e.baronPhase||0) - (e.lastSummonTurn||(-99));
+    const isFirstTurn = (e.baronPhase||0) === 0; // antes de que actúe
+    const canSummon = summonedAlive < 2 && (turnsSince >= 5 || isFirstTurn);
+    if(canSummon) return [{ icon:'🦇', text:`Invocará ${summonedAlive===0?2:1} Murciélago(s) de Hemlock al campo` }];
+    if(e.hp/e.maxHp < 0.60) return [
+      { icon:'💀', text:`Puede curarse (~${Math.round(e.maxHp*0.18)} HP)` },
+      { icon:'⚔', text:`O atacará por ${e.dmg} de daño` }
+    ];
+    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+  }
+  if(e.isMurcielago) {
+    const turnsLeft = Math.max(0, 5 - (e.murcielagoTurns||0));
+    if(turnsLeft === 0) return [{ icon:'🧛', text:`¡Se transformará en Vampiro Sanguinario este turno!` }];
+    return [
+      { icon:'⚔', text:`Atacará por ${e.dmg} de daño` },
+      { icon:'🧛', text:`Se transforma en vampiro en ${turnsLeft} turno(s)` }
+    ];
+  }
+  // Enemigo estándar
+  return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+}
+
 function renderEnemies() {
   const zone = document.getElementById('eZone');
   if(!zone) return;
@@ -2259,8 +2319,6 @@ function renderEnemies() {
     wrap.dataset.idx = i;
 
     const hpPct = Math.max(0, e.hp / e.maxHp * 100);
-
-    // Determine image key: custom imgKey > healer key > tier key
     const imgKey = e.imgKey ? e.imgKey : (e.isHealer ? 'enemy_healer' : ('enemy'+(e.tier||0)));
     const imgHtml = getImg(imgKey)
       ? `<img src="${getImg(imgKey)}" style="width:100%;height:100%;object-fit:contain">`
@@ -2271,45 +2329,15 @@ function renderEnemies() {
     if(e.bleed)  statusHtml += `<span class="si si-bl">🩸 ${e.bleed}</span>`;
     if(e.poison) statusHtml += `<span class="si si-ps">☠ ${e.poison}</span>`;
 
-    // Intent text
-    let intentText;
-    if(e.isHealer) {
-      const action = getHealerAction(e, combatTurn);
-      if(action==='heal')   intentText = `❤ Cura aliados (${e.healAmt||8})`;
-      else if(action==='shield') intentText = `🛡 Escudo aliados (${e.shieldAmt||6})`;
-      else if(action==='debuff') intentText = `☠ Maldición · Veneno/Sangrado`;
-      else                  intentText = `⚔ Ataque: ${e.dmg}`;
-    } else if(e.isCondesa) {
-      const mode = e.condensaTurn % 3;
-      if(mode === 0) intentText = `⚔ Ataque: ${e.dmg}`;
-      else if(mode === 1) intentText = `🛡 Defensa: +${e.shieldPerTurn} escudo`;
-      else intentText = `☠ Veneno: +${e.poisonPerTurn}`;
-    } else if(e.isGuardian) {
-      intentText = combatTurn % 2 === 0 ? `⚔ Ataque + reduce tu daño` : `👁 Oculta a un aliado`;
-    } else if(e.isBaron) {
-      intentText = `⚔ Barón Hemlock actúa...`;
-    } else if(e.isMurcielago) {
-      const turnsLeft = Math.max(0, 5 - (e.murcielagoTurns || 0));
-      intentText = `⚔ Ataque: ${e.dmg} ${turnsLeft > 0 ? `· 🧛 en ${turnsLeft} turnos` : '· ¡Se transforma!'}`;
-    } else if(e.isVampiro) {
-      intentText = `⚔ Ataque: ${e.dmg} (roba ${e.lifestealOnAttack} HP)`;
-    } else {
-      intentText = `⚔ Ataque: ${e.dmg}`;
-    }
+    const intents = getEnemyIntent(e);
+    const intentIconsHtml = intents.map((it, ii) =>
+      `<span class="e-intent-icon" data-tip="${it.text.replace(/"/g,'&quot;')}" data-idx="${i}">${it.icon}</span>`
+    ).join('');
+    const healerBadge = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
 
-    // Special badges
-    const healerBadge  = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
-    const hiddenBadge  = e._hidden    ? `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:#b8a8d8;background:#1a1a3a99;border:1px solid #8870cc88;padding:3px 8px;border-radius:3px;margin-bottom:2px">👤 OCULTO</div>` : '';
-
-    // If enemy is hidden: ghost appearance + big OCULTO overlay, no click
     const hiddenStyle = e._hidden ? 'opacity:.22;filter:grayscale(.9) blur(1px)' : '';
     const hiddenOverlay = e._hidden ? `
-      <div style="
-        position:absolute;inset:0;z-index:20;
-        display:flex;flex-direction:column;align-items:center;justify-content:center;
-        background:linear-gradient(180deg,#080610cc,#1a103888);
-        border-radius:6px;pointer-events:none;gap:4px;
-      ">
+      <div style="position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#080610cc,#1a103888);border-radius:6px;pointer-events:none;gap:4px;">
         <div style="font-size:22px;filter:drop-shadow(0 0 8px #9060cc)">👤</div>
         <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#c8b0f0;text-shadow:0 0 10px #9060cc;text-transform:uppercase">Oculto</div>
       </div>` : '';
@@ -2325,22 +2353,56 @@ function renderEnemies() {
         <div class="e-hp-bar" id="eHpBar${i}" style="width:${hpPct}%"></div>
         <div class="e-hp-txt">${Math.max(0,e.hp)} / ${e.maxHp}</div>
       </div>
-      <div class="e-intent">${e._hidden ? '👤 Oculto en la oscuridad' : intentText}</div>
       <div class="si-wrap" style="justify-content:center;margin-top:3px">${statusHtml}</div>
+      <div class="e-intent-row">
+        ${intentIconsHtml}
+      </div>
       <div class="target-indicator">${i===G.targetIdx?'▼ OBJETIVO ▼':''}</div>
     `;
-    // Bloquear selección de enemigos ocultos
+
     if(e._hidden) {
       wrap.style.cursor = 'not-allowed';
       wrap.style.opacity = '0.5';
-      wrap.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        addLog('No puedes atacar a un enemigo oculto en la oscuridad.','sta');
-      });
+      wrap.addEventListener('click', ev => { ev.stopPropagation(); addLog('No puedes atacar a un enemigo oculto en la oscuridad.','sta'); });
     } else {
       wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
     }
     zone.appendChild(wrap);
+  });
+
+  // Añadir tooltips a los iconos de intención
+  zone.querySelectorAll('.e-intent-icon').forEach(icon => {
+    const tipText = icon.dataset.tip;
+    const idx = parseInt(icon.dataset.idx);
+
+    function showIntentTip() {
+      _removeTip();
+      const rect = icon.getBoundingClientRect();
+      const tip = document.createElement('div');
+      tip.className = 'status-tooltip';
+      tip.innerHTML = `<b style="color:#f0c060;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;display:block;margin-bottom:4px">Intención</b>${tipText}`;
+      const portal = _getTipPortal();
+      tip.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
+      portal.appendChild(tip);
+      _activeTip = tip;
+      const tw = tip.offsetWidth || 220;
+      const th = tip.offsetHeight || 60;
+      let lx = rect.left + rect.width/2 - tw/2;
+      lx = Math.max(8, Math.min(window.innerWidth - tw - 8, lx));
+      let ty = rect.top - th - 10;
+      if(ty < 8) ty = rect.bottom + 8;
+      if(ty + th > window.innerHeight - 8) ty = Math.max(8, (window.innerHeight - th)/2);
+      tip.style.cssText = `position:fixed;left:${lx}px;top:${ty}px;pointer-events:none;visibility:visible`;
+    }
+
+    icon.addEventListener('mouseenter', e => { e.stopPropagation(); showIntentTip(); });
+    icon.addEventListener('mouseleave', () => _removeTip());
+    icon.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      if(_activeTip){ _removeTip(); return; }
+      showIntentTip();
+      setTimeout(_removeTip, 3500);
+    }, {passive:true});
   });
 }
 
@@ -2629,8 +2691,8 @@ function updateGunslingerHUD(){
   if(G.charId!=='pistolero'){el.style.display='none';return;}
   el.style.display='flex';
   el.innerHTML=_gunslingerReady
-    ? `<span style="color:#ffcc44;font-size:10px;letter-spacing:1px;font-family:'Cinzel',serif">🔥 ¡CARGADO!</span>`
-    : `<span style="font-size:9px;letter-spacing:1px;color:var(--dim)">🔫 ${_gunslingerAttacks}/${_gunslingerThreshold}</span>`;
+    ? `<span style="color:#ffcc44;font-size:17px;letter-spacing:1px;font-family:Arial,sans-serif;font-weight:bold">🔥 ¡CARGADO!</span>`
+    : `<span style="font-size:15px;letter-spacing:1px;color:var(--dim);font-family:Arial,sans-serif">🔫 ${_gunslingerAttacks}/${_gunslingerThreshold}</span>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -3062,11 +3124,14 @@ function doBaronAction(e) {
   const turnsSinceLastSummon = turn - (e.lastSummonTurn || -99);
   const canSummon = summonedAlive < 2 && turnsSinceLastSummon >= 5;
 
-  // Decidir acción (pesos): invocar > curar (si hp < 60%) > atacar
+  // TURNO 1: siempre invocar
+  const forceFirstSummon = (turn === 1);
+
+  // Decidir acción
   const hpPct = e.hp / e.maxHp;
   let action;
 
-  if(canSummon && Math.random() < 0.45) {
+  if(forceFirstSummon || (canSummon && Math.random() < 0.45)) {
     action = 'summon';
   } else if(hpPct < 0.60 && Math.random() < 0.40) {
     action = 'heal';
@@ -4152,6 +4217,23 @@ window.show = function(id) {
     if(sheet) sheet.style.transform = 'translateY(100%)';
     if(bd)    bd.style.display = 'none';
   }
+  // Close deck viewer overlay on any screen change
+  const dvo = document.getElementById('deckViewOverlay');
+  if(dvo) dvo.remove();
+  // Remove combat deck btn when leaving combat
+  if(id !== 'game') {
+    const cdb = document.getElementById('combatDeckBtn');
+    if(cdb) cdb.remove();
+  }
+  // Remove old deck view button
+  const dvb = document.getElementById('deckViewBtn');
+  if(dvb) dvb.remove();
+  // Inject deck view button on relevant screens
+  const showOn = ['reward','shop','chest','map','rest'];
+  if(showOn.includes(id)) {
+    // Small delay so the screen is active
+    setTimeout(injectDeckViewBtn, 50);
+  }
 };
 
 // ─── PREVENT DOUBLE-TAP ZOOM ON BUTTONS ────────
@@ -4501,6 +4583,267 @@ function injectStatsButton() {
       settBtn.onmouseleave = ()=>{ settBtn.style.borderColor='#4a3a5a'; settBtn.style.color='#b8a8c8'; };
       settBtn.onclick = showSettings;
       sTitle.appendChild(settBtn);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INTENT ICON CSS + DECK VIEWER + GUNSLINGER FIX
+// ═══════════════════════════════════════════════
+(function injectGameStyles(){
+  const s = document.createElement('style');
+  s.textContent = `
+    /* ── Intención del enemigo ── */
+    .e-intent-row {
+      display:flex; justify-content:flex-start; align-items:center;
+      padding:2px 4px 0; min-height:22px;
+    }
+    .e-intent-icon {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:50%;
+      background:linear-gradient(135deg,#1a1228,#2a1238);
+      border:1px solid #d4a84355;
+      font-size:15px; cursor:pointer; user-select:none;
+      transition:transform .15s, box-shadow .15s;
+      box-shadow:0 0 6px #d4a84322;
+      flex-shrink:0;
+    }
+    .e-intent-icon:hover, .e-intent-icon:active {
+      transform:scale(1.2);
+      box-shadow:0 0 12px #d4a84366;
+      border-color:#d4a84388;
+    }
+
+    /* ── Botón Ver Mazo en combate ── */
+    #combatDeckBtn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:6px;
+      background:linear-gradient(135deg,#1a1228,#2a1a3a);
+      border:1px solid #d4a84355; cursor:pointer;
+      font-size:16px; transition:all .2s;
+      box-shadow:0 0 6px #d4a84322;
+      flex-shrink:0; vertical-align:middle;
+    }
+    #combatDeckBtn:hover, #combatDeckBtn:active {
+      border-color:#d4a843;
+      box-shadow:0 0 14px #d4a84466;
+      transform:scale(1.15);
+    }
+    /* En móvil el botón de mazo va fixed a la IZQUIERDA, encima del portBtn */
+    @media (max-width:640px){
+      #combatDeckBtn {
+        position:fixed !important;
+        bottom:64px !important;
+        left:8px !important;
+        right:auto !important;
+        width:38px !important; height:38px !important;
+        font-size:20px !important;
+        border-radius:50% !important;
+        z-index:500 !important;
+        box-shadow:0 0 14px #d4a84355 !important;
+      }
+      /* Botón ver mazo en pantallas fuera de combate — izquierda para no solapar log btn (derecha) */
+      .deck-view-btn {
+        bottom:68px !important;
+        left:8px !important;
+        right:auto !important;
+        font-size:10px !important;
+        padding:6px 10px !important;
+      }
+    }
+    .deck-view-btn {
+      position:fixed; z-index:800;
+      bottom:18px; right:16px;
+      background:linear-gradient(135deg,#1a1228,#2a1a3a);
+      border:1px solid #d4a84366; border-radius:8px;
+      padding:8px 14px;
+      font-family:'Cinzel',serif; font-size:11px; letter-spacing:.12em;
+      color:#d4a843; cursor:pointer;
+      display:flex; align-items:center; gap:7px;
+      box-shadow:0 0 16px #d4a84322;
+      transition:all .2s;
+      text-transform:uppercase;
+    }
+    .deck-view-btn:hover { border-color:#d4a843; box-shadow:0 0 24px #d4a84455; background:linear-gradient(135deg,#2a1a3a,#3a2a4a); }
+    .deck-view-btn .dvb-icon { font-size:16px; }
+    .deck-view-btn .dvb-count { font-size:9px; color:#a090c8; margin-left:2px; }
+
+    /* ── Overlay Ver Mazo ── */
+    #deckViewOverlay {
+      position:fixed; inset:0; z-index:8800;
+      background:#080610ee; backdrop-filter:blur(6px);
+      display:flex; align-items:flex-start; justify-content:center;
+      overflow-y:auto; padding:20px 12px 80px;
+      animation:fadeIn .2s ease;
+    }
+    #deckViewOverlay .dvo-inner {
+      background:linear-gradient(160deg,#1a1228,#0e0b18);
+      border:1px solid #d4a84333; border-radius:12px;
+      padding:22px 18px; width:100%; max-width:860px;
+      display:flex; flex-direction:column; gap:14px;
+      box-shadow:0 0 60px #d4a84322;
+    }
+    #deckViewOverlay .dvo-header {
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid #d4a84322; padding-bottom:12px;
+    }
+    #deckViewOverlay .dvo-title {
+      font-family:'Cinzel Decorative',cursive; font-size:16px;
+      color:#f0c060; letter-spacing:2px;
+    }
+    #deckViewOverlay .dvo-close {
+      background:none; border:none; color:#7a6888; font-size:22px;
+      cursor:pointer; line-height:1; padding:0; transition:color .2s;
+    }
+    #deckViewOverlay .dvo-close:hover { color:#d4a843; }
+    #deckViewOverlay .dvo-section-label {
+      font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+      text-transform:uppercase; color:#7a6888;
+      border-bottom:1px solid #2a1a3a; padding-bottom:5px; margin-bottom:6px;
+    }
+    #deckViewOverlay .dvo-cards {
+      display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    }
+
+    /* ── Gunslinger HUD más grande ── */
+    #gunslingerHUD {
+      font-family:Arial,sans-serif !important;
+      font-size:16px !important;
+    }
+    #gunslingerHUD span {
+      font-family:Arial,sans-serif !important;
+      font-size:16px !important;
+    }
+
+    /* ── Pasiva más grande en combate ── */
+    #passiveInfo {
+      font-family:Arial,sans-serif !important;
+      font-size:13px !important;
+      line-height:1.55 !important;
+    }
+  `;
+  document.head.appendChild(s);
+})();
+
+// ═══════════════════════════════════════════════
+//  VER MAZO — overlay reutilizable
+// ═══════════════════════════════════════════════
+function showDeckViewer() {
+  playUI();
+  // Eliminar si ya existe
+  const existing = document.getElementById('deckViewOverlay');
+  if(existing){ existing.remove(); return; }
+
+  const p = G.player;
+  const allCards = [...p.deck, ...p.hand, ...p.discard];
+  const counts = {};
+  allCards.forEach(id => { counts[id] = (counts[id]||0)+1; });
+  const unique = [...new Set(allCards)];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'deckViewOverlay';
+
+  // Construir cards HTML en tamaño pequeño
+  let cardsHtml = '';
+  unique.forEach(id => {
+    const card = cById(id);
+    if(!card) return;
+    const n = counts[id];
+    const rc = RARITY_COLORS[card.rarity]||'#a0a0b0';
+    const ds = card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg;
+    let fx='';
+    if(card.dmg)  fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;
+    if(card.blk)  fx+=`<span class="fx fx-b">🛡 ${card.blk}</span>`;
+    if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;
+    if(card.psn)  fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
+    if(card.heal) fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
+    const countBadge = n>1 ? `<div style="position:absolute;top:3px;left:3px;background:#d4a843;color:#0a0810;font-family:'Cinzel',serif;font-size:9px;font-weight:bold;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:5">×${n}</div>` : '';
+    cardsHtml += `
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px">
+        ${countBadge}
+        <div class="gcard ${card.type} playable" style="width:86px;height:130px;border-top:2px solid ${rc};cursor:default;pointer-events:none">
+          <div class="c-bar"></div>
+          <div class="c-cost">${card.cost}</div>
+          <div class="c-art" style="padding:7px 4px 2px">${getCArt(card)}</div>
+          <div class="c-name" style="font-size:8px">${card.name}</div>
+          <div class="c-fx" style="font-size:7px">${fx}</div>
+        </div>
+      </div>`;
+  });
+
+  const totalCards = allCards.length;
+
+  overlay.innerHTML = `
+    <div class="dvo-inner">
+      <div class="dvo-header">
+        <div class="dvo-title">✦ Tu Mazo ✦</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-family:'Cinzel',serif;font-size:10px;color:#7a6888;letter-spacing:2px">${totalCards} carta${totalCards!==1?'s':''}</div>
+          <button class="dvo-close" onclick="document.getElementById('deckViewOverlay')?.remove()">✕</button>
+        </div>
+      </div>
+      <div class="dvo-section-label">🃏 Cartas en el mazo (Mazo: ${p.deck.length} · Mano: ${p.hand.length} · Descarte: ${p.discard.length})</div>
+      <div class="dvo-cards">${cardsHtml || '<div style="color:#5a4a68;font-style:italic;padding:20px">El mazo está vacío.</div>'}</div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ─── Inyectar botón "Ver Mazo" en las pantallas de recompensa, tienda, cofre y mapa ───
+function injectDeckViewBtn() {
+  // Eliminar el anterior si existe
+  const old = document.getElementById('deckViewBtn');
+  if(old) old.remove();
+
+  const currentScreen = document.querySelector('.screen.active');
+  if(!currentScreen) return;
+  const sid = currentScreen.id;
+  const showOn = ['s-reward','s-shop','s-chest','s-map','s-rest'];
+  if(!showOn.includes(sid)) return;
+  if(!G.player) return;
+
+  const totalCards = G.player.deck.length + G.player.hand.length + G.player.discard.length;
+  const btn = document.createElement('button');
+  btn.id = 'deckViewBtn';
+  btn.className = 'deck-view-btn';
+  btn.innerHTML = `<span class="dvb-icon">🃏</span> Ver Mazo <span class="dvb-count">(${totalCards})</span>`;
+  btn.addEventListener('click', showDeckViewer);
+  document.body.appendChild(btn);
+}
+
+// ─── Botón Ver Mazo en combate (solo emoji) ───
+function injectCombatDeckBtn() {
+  const old = document.getElementById('combatDeckBtn');
+  if(old) old.remove();
+
+  const btn = document.createElement('button');
+  btn.id = 'combatDeckBtn';
+  btn.title = 'Ver tu mazo';
+  btn.textContent = '🃏';
+  btn.addEventListener('click', e => { e.stopPropagation(); showDeckViewer(); });
+
+  if(isMobile()) {
+    // Móvil: fixed por CSS, añadimos al body
+    document.body.appendChild(btn);
+  } else {
+    // Escritorio: junto al label "Mazo" en el panel izquierdo
+    let targetLabel = null;
+    document.querySelectorAll('.p-label').forEach(el => {
+      if(el.textContent.trim() === 'Mazo') targetLabel = el;
+    });
+    if(targetLabel && !targetLabel.querySelector('#combatDeckBtn')) {
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:0;';
+      const labelClone = document.createElement('span');
+      labelClone.textContent = targetLabel.textContent;
+      labelClone.style.cssText = 'font-family:Arial,sans-serif;font-size:14px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;';
+      wrapper.appendChild(labelClone);
+      wrapper.appendChild(btn);
+      targetLabel.replaceWith(wrapper);
+    } else {
+      // Fallback
+      document.body.appendChild(btn);
     }
   }
 }

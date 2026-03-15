@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noctis Deck — Notas de Actualización v0.0.9 · Acto II y Diálogos</title>
+<title>Noctis Deck — Notas de Actualización v0.0.10 · Intenciones, Mazo y Móvil</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
@@ -304,16 +304,150 @@
 
 
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.9 — LA MÁS RECIENTE
+       VERSIÓN 0.0.10 — LA MÁS RECIENTE
        ══════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.9 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num latest">v 0.0.10 <span class="version-tag vtag-new">ÚLTIMA</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
 
-      <!-- ENEMIGOS ACTO II -->
+      <!-- INTENCIONES ENEMIGOS -->
+      <div class="section s-combat">
+        <div class="section-header">
+          <div class="section-icon">👁</div>
+          <div class="section-title">Intenciones de Enemigos — Al Estilo Slay the Spire</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                Cada enemigo muestra uno o varios <strong>iconos circulares</strong> en la esquina inferior de su carta, uno por cada acción que realizará. El texto de intención plano debajo del enemigo ha sido eliminado.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>PC:</strong> al pasar el ratón sobre un icono aparece un tooltip que describe la acción con valores dinámicos reales (el daño exacto de ese enemigo concreto, la curación, el veneno…). <strong>Móvil:</strong> al tocar el icono aparece el mismo tooltip durante 3,5 segundos.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                Iconos por tipo de acción: <strong>⚔</strong> ataque · <strong>🛡</strong> defensa · <strong>❤</strong> curación · <strong>☠</strong> veneno/maldición · <strong>🧛</strong> robo de vida · <strong>🦇</strong> invocar murciélagos · <strong>👁</strong> ocultar aliado · <strong>🕯</strong> reducir daño · <strong>💀</strong> curación de jefe · <strong>👤</strong> oculto.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                <strong>Un icono por acción.</strong> Los enemigos con dos acciones simultáneas (Vampiro, Guardián, Murciélago, Barón en duda) muestran <strong>dos iconos separados</strong>, cada uno con su propio tooltip independiente.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">
+                <strong>Barón Hemlock</strong> — ahora <strong>siempre invoca en el turno 1</strong> sin excepción. Antes podía no invocar por el random del 45%.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VER MAZO -->
+      <div class="section s-deck">
+        <div class="section-header">
+          <div class="section-icon">🃏</div>
+          <div class="section-title">Ver Mazo — Disponible en Todo Momento</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                Botón <strong>🃏 Ver Mazo</strong> flotante en las pantallas de Recompensa, Tienda, Cofre, Mapa y Descanso. Muestra todas las cartas del mazo (deck + mano + descarte) en un overlay con badge <strong>×N</strong> para los duplicados.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">NUEVO</span>
+              <div class="item-text">
+                En <strong>combate</strong>: botón <strong>🃏</strong> (solo emoji, sin texto) integrado junto al label «Mazo» en el panel izquierdo en escritorio, y como botón circular fijo en la esquina inferior <strong>izquierda</strong> en móvil.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">
+                El botón de mazo <strong>reaparece correctamente</strong> tras cerrar un diálogo de evento en el mapa, en móvil y escritorio.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HUD PISTOLERO -->
+      <div class="section s-char">
+        <div class="section-header">
+          <div class="section-icon">🔫</div>
+          <div class="section-title">HUD del Pistolero — Texto Más Legible</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">MEJORA</span>
+              <div class="item-text">
+                El contador del cargador (<strong>🔫 1/3</strong>, <strong>🔫 2/3</strong>) y el aviso de <strong>🔥 ¡CARGADO!</strong> ahora usan fuente <strong>Arial 15–17px</strong> en lugar de la fuente Cinzel diminuta anterior. También la pasiva del personaje sube a 13px en Arial para mayor legibilidad.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓVIL -->
+      <div class="section s-mob">
+        <div class="section-header">
+          <div class="section-icon">📱</div>
+          <div class="section-title">Móvil — Correcciones de Interfaz en Combate</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">
+                Corregida una regresión que ocultaba la <strong>barra de maná, los popups del jugador y el botón de registro</strong> en combate móvil. El CSS inyectado por JS entraba en conflicto con <code>style_scale.css</code>; el bloque conflictivo ha sido eliminado y el layout queda íntegramente gestionado por la hoja de estilos original.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">
+                El botón <strong>🃏 Ver Mazo</strong> en combate móvil se ha movido a la esquina inferior <strong>izquierda</strong>, separándolo del botón de registro 📜 que ocupa la esquina inferior derecha. Ya no se solapan.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">FIX</span>
+              <div class="item-text">
+                El botón de mazo se elimina correctamente al salir del combate y no persiste en otras pantallas.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /version-body v0.0.10 -->
+  </div><!-- /version-block v0.0.10 -->
+
+  <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       VERSIÓN 0.0.9 — ANTERIOR
+       ══════════════════════════════════ -->
+  <div class="version-block" style="opacity:.95">
+    <div class="version-header">
+      <div class="version-num old">v 0.0.9 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+
       <div class="section s-combat">
         <div class="section-header">
           <div class="section-icon">🧛</div>
@@ -321,143 +455,25 @@
         </div>
         <div class="card">
           <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                El Acto II cuenta ahora con un bestiario completamente propio. Los enemigos de Acto I ya no aparecen en el segundo acto. Los cinco nuevos enemigos tienen mecánicas únicas que no existen en ningún otro acto.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Vampiro Sanguinario</strong> — al golpear al jugador roba una cantidad de HP para sí mismo. Cuando muere un aliado en el mismo combate, el Vampiro se cura una cantidad elevada instantáneamente, absorbiendo la energía del caído.
-                <br><span style="color:var(--dim);font-size:12px">Imagen: <code>resources/enemigos/vampiro.png</code> · Alt: <code>resources/alt/enemigos/vampiro.png</code></span>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Condesa sin Rostro</strong> — su forma cambia cada turno en un ciclo de tres fases: ataque directo → defensa (se escuda a sí misma) → veneno al jugador. La intención mostrada revela siempre la fase actual.
-                <br><span style="color:var(--dim);font-size:12px">Imagen: <code>resources/enemigos/condesa.png</code> · Alt: <code>resources/alt/enemigos/condesa.png</code></span>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Guardián del Candil</strong> — en turnos pares ataca y aplica una reducción acumulable al daño del jugador (–2 por activación, máximo –6). En turnos impares <strong>oculta</strong> a un aliado aleatorio durante el turno del jugador; si está solo, se oculta a sí mismo. El oculto no puede ser atacado pero sí ataca.
-                <br><span style="color:var(--dim);font-size:12px">Imagen: <code>resources/enemigos/guardian.png</code> · Alt: <code>resources/alt/enemigos/guardian.png</code></span>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Murciélago de Hemlock</strong> — invocado exclusivamente por el Barón Hemlock. Solo ataca al jugador. Tras sobrevivir 5 turnos se transforma en un Vampiro Sanguinario completo.
-                <br><span style="color:var(--dim);font-size:12px">Imagen: <code>resources/enemigos/murcielago.png</code> · Alt: <code>resources/alt/enemigos/murcielago.png</code></span>
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-boss">BOSS</span>
-              <div class="item-text">
-                <strong>Barón Hemlock</strong> — jefe exclusivo del Acto II. Tiene tres acciones posibles: atacar directamente, curarse a sí mismo (18% de su HP máximo) e <em>invocar</em>. Al invocar, llama hasta 2 Murciélagos de Hemlock al campo. Si ya hay 2 criaturas invocadas vivas no puede invocar más; si hay 1 puede llamar a otra para completar el par. El cooldown de invocación es de 5 turnos mínimo.
-                <br><span style="color:var(--dim);font-size:12px">Imagen: <code>resources/enemigos/baron_hemlock.png</code> · Alt: <code>resources/alt/enemigos/baron_hemlock.png</code></span>
-              </div>
-            </div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Vampiro Sanguinario</strong> — roba HP al atacar, se cura al morir un aliado.</div></div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Condesa sin Rostro</strong> — ciclo de 3 fases: ataque → escudo → veneno.</div></div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Guardián del Candil</strong> — reduce el daño del jugador y oculta aliados.</div></div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Murciélago de Hemlock</strong> — invocado por el Barón; se transforma en vampiro a los 5 turnos.</div></div>
+            <div class="item"><span class="item-tag tag-boss">BOSS</span><div class="item-text"><strong>Barón Hemlock</strong> — invoca murciélagos, se cura y ataca. Siempre invoca en el turno 1.</div></div>
           </div>
         </div>
       </div>
 
-      <!-- MECÁNICA OCULTO -->
       <div class="section s-ux">
         <div class="section-header">
           <div class="section-icon">👤</div>
-          <div class="section-title">Mecánica de Ocultación</div>
+          <div class="section-title">Mecánica de Ocultación · Grupos de 3 · Diálogos Mejorados</div>
         </div>
         <div class="card">
           <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Cuando el Guardián del Candil oculta a un enemigo, ese enemigo aparece con una <strong>overlay oscura</strong> con el icono 👤 y el texto «Oculto» en color violeta. El sprite se desvanece al 22% de opacidad con efecto de desenfoque.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Los enemigos ocultos <strong>no pueden ser seleccionados ni atacados</strong>. Al intentarlo el juego muestra un mensaje en el registro: «No puedes atacar a un enemigo oculto en la oscuridad». Si todos los enemigos están ocultos y juegas una carta de daño, la acción se bloquea.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                El estado de ocultación dura <strong>exactamente un turno del jugador</strong>. Al inicio del siguiente turno enemigo el estado se limpia y el enemigo vuelve a ser visible y atacable. Durante ese turno el oculto sí puede atacar al jugador con normalidad.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- GRUPOS ACTO II -->
-      <div class="section s-map">
-        <div class="section-header">
-          <div class="section-icon">⚔</div>
-          <div class="section-title">Grupos de Combate del Acto II</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Todos los grupos de combate del Acto II (normal y élite) son <strong>siempre de 3 miembros</strong>. Las combinaciones posibles incluyen todas las variantes con repetición: 3 iguales (VVV, CCC, GGG), 2+1 (VVC, VVG, CCG, VCC, GGV, GGC) y 1 de cada tipo (VCG). La Sanadora puede aparecer en lugar de uno de los tres slots con un 20% de probabilidad como en actos anteriores.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- IMÁGENES PERSONALIZABLES -->
-      <div class="section s-ui">
-        <div class="section-header">
-          <div class="section-icon">🎨</div>
-          <div class="section-title">Personalización — Nuevos Slots de Imagen</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Los 5 nuevos enemigos del Acto II tienen sus propios slots en la pantalla de <strong>Personalización</strong>: Vampiro, Condesa, Guardián, Murciélago y Barón Hemlock. Se pueden arrastrar imágenes o usar el selector de archivo exactamente igual que con los enemigos anteriores.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Cada nuevo enemigo tiene también su ruta de imagen alternativa (no-IA) en <code>ALT_IMGS</code>, compatible con el toggle «Imágenes IA» de Ajustes.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DIÁLOGOS MEJORADOS -->
-      <div class="section s-feat">
-        <div class="section-header">
-          <div class="section-icon">📜</div>
-          <div class="section-title">Diálogos — Badges de Resultado Mejorados</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-fix">MEJORA</span>
-              <div class="item-text">
-                El badge de resultado en los eventos de diálogo ahora muestra la <strong>cantidad exacta</strong> de lo obtenido o perdido. En lugar de «🪙 Recompensa» aparece «🪙 +28 monedas de oro»; en lugar de «❤ Curación» aparece «❤ +22 Vitalidad recuperada»; las pérdidas de oro también muestran la cifra exacta con signo negativo.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-fix">MEJORA</span>
-              <div class="item-text">
-                Las <strong>emboscadas que ocurren en el Acto II</strong> ahora generan grupos de enemigos del Acto II en lugar de enemigos del Acto I, manteniendo la coherencia temática y de dificultad.
-              </div>
-            </div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Enemigos ocultos no atacables — overlay visual 👤, bloqueo de carta de daño, duración de 1 turno.</div></div>
+            <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Grupos del Acto II siempre de 3 miembros con todas las combinaciones posibles (VVV, CCC, GGG, VCG…).</div></div>
+            <div class="item"><span class="item-tag tag-fix">MEJORA</span><div class="item-text">Badges de diálogo muestran la cantidad exacta de oro y vitalidad. Emboscadas en Acto II usan enemigos del Acto II.</div></div>
           </div>
         </div>
       </div>
