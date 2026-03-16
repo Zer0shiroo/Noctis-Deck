@@ -36,39 +36,83 @@
 </div>
 
 <div id="app">
+
+<!-- Botón ? siempre visible, fuera de cualquier screen -->
 <div class="screen active" id="s-title">
-  <div id="tutorialBtn" onclick="showTutorial()" title="Tutorial — ¿Cómo jugar?" style="
-      position:absolute;top:10px;left:10px;z-index:100;
-      width:28px;height:28px;border-radius:6px;
-      background:linear-gradient(135deg,#1a1228,#2a1a3a);
-      border:1px solid #d4a84366;
-      display:flex;align-items:center;justify-content:center;
-      font-family:'Cinzel',serif;font-size:15px;font-weight:bold;
-      color:#d4a843;cursor:pointer;
-      transition:all .2s;box-shadow:0 0 8px #d4a84322;
-      user-select:none;
-    " onmouseover="this.style.borderColor='#d4a843';this.style.boxShadow='0 0 14px #d4a84444';document.getElementById('tutorialHoverTip').style.opacity='1'" onmouseout="this.style.borderColor='#d4a84366';this.style.boxShadow='0 0 8px #d4a84322';document.getElementById('tutorialHoverTip').style.opacity='0'">?</div>
-    <div id="tutorialHoverTip" style="
-      position:absolute;top:10px;left:46px;z-index:101;
-      background:#1a1228;border:1px solid #d4a84366;border-radius:5px;
-      padding:5px 10px;font-family:'Cinzel',serif;font-size:10px;
-      color:#d4a843;letter-spacing:1.5px;white-space:nowrap;
-      opacity:0;transition:opacity .2s;pointer-events:none;
-    ">Tutorial · ¿Cómo jugar?</div>
-  <img src="resources/logo/logo.png" alt="">
-  <div class="t-main">Noctis Deck</div>
-  <div class="t-sub">✦ &nbsp; Roguelike de Cartas &nbsp; ✦</div>
-  <div class="t-quote">"En la ciudad que nunca amanece, solo el Cazador<br>marcado por el pacto antiguo puede sobrevivir."</div>
-  <div class="t-btns">
-    <button class="btn" onclick="goCharSelect()">▶ &nbsp;Nueva Partida</button>
-    <button class="btn" id="btnContinue" onclick="continueGame()" style="display:none">↩ &nbsp;Continuar Partida</button>
-    <div class="save-badge" id="saveBadge" style="display:none"></div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-sm" onclick="show('custom')">🎨 Personalizar</button>
-      <button class="btn-sm" id="btnDel" onclick="deleteSave()" style="display:none;color:var(--wine2);border-color:var(--wine)">🗑 Borrar guardado</button>
+
+<div id="tutorialBtn" onclick="showTutorial()" title="Tutorial — ¿Cómo jugar?" style="
+    position:fixed;top:10px;left:4px;z-index:9999;
+    width:30px;height:30px;border-radius:6px;
+    background:linear-gradient(135deg,#1a1228,#2a1a3a);
+    border:1px solid #d4a84366;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Cinzel',serif;font-size:15px;font-weight:bold;
+    color:#d4a843;cursor:pointer;
+    transition:all .2s;box-shadow:0 0 8px #d4a84322;
+    user-select:none;
+  " onmouseover="this.style.borderColor='#d4a843';this.style.boxShadow='0 0 14px #d4a84444'" onmouseout="this.style.borderColor='#d4a84366';this.style.boxShadow='0 0 8px #d4a84322'">?</div>
+
+  <!-- Logo + título en el tercio superior -->
+  <div id="titleTop" style="position:relative;display:flex;flex-direction:column;align-items:center;margin-top:-30vh;">
+    <img src="resources/logo/logo.png" alt="" style="width:130px;height:130px;object-fit:contain;margin-bottom:6px;margin-top:-24px">
+    <div style="position:relative;display:inline-block">
+      <div class="t-main" id="titleMain">Noctis Deck</div>
     </div>
+  </div>
+
+  <!-- Splash posicionado por JS -->
+  <div id="splashWrap" style="position:fixed;transform-origin:left bottom;pointer-events:none;z-index:10;display:none;">
+    <div id="splashText" style="
+      font-family:Arial,sans-serif;
+      font-size:13px;
+      font-weight:700;
+      color:#e8f0a0;
+      
+      opacity:0.80;
+        text-shadow: 1px  0px 0px black,
+               0px  1px 0px black,
+              -1px  0px 0px black,
+               0px -1px 0px black;
+      white-space:nowrap;
+      letter-spacing:.3px;
+      animation:splashPulse 2s ease-in-out infinite;
+      user-select:none;
+      display:inline-block;
+    "></div>
+  </div>
+
+  <!-- Menú: SIN guardado — botones muy abajo -->
+  <div class="t-btns" id="menuNoSave" style="position:absolute;bottom:80px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:14px">
+    <button class="btn" onclick="goCharSelect()">▶ &nbsp;Nueva Partida</button>
+    <button class="btn-sm" id="btnUnlocks"  onclick="showUnlocks()"  style="border:none;background:transparent"> &nbsp;Desbloqueos</button>
+    <button class="btn-sm" id="btnBestiary" onclick="showBestiary()" style="border:none;background:transparent"> &nbsp;Bestiario</button>
+    <button class="btn-sm" id="btnStats"    onclick="showStats()"    style="border:none;background:transparent"> &nbsp;Estadísticas</button>
+    <button class="btn-sm" id="btnSettings" onclick="showSettings()" style="border:none;background:transparent"> &nbsp;Ajustes</button>
     <div class="diff-badge" id="diffBadge"></div>
   </div>
+
+  <!-- Menú: CON guardado — botones muy abajo -->
+  <div id="menuWithSave" style="display:none;position:absolute;bottom:80px;left:0;right:0;flex-direction:column;align-items:center;gap:14px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn" onclick="continueGame()">↩ &nbsp;Continuar Partida</button>
+      <button id="btnDel" onclick="deleteSave()" title="Finalizar Run"
+        style="width:34px;height:34px;border-radius:4px;border:1px solid var(--wine);background:transparent;
+               color:var(--wine2);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;
+               justify-content:center;flex-shrink:0;"
+        onmouseover="this.style.background='#7a1f3533';this.style.borderColor='var(--wine2)'"
+        onmouseout="this.style.background='transparent';this.style.borderColor='var(--wine)'">🗑</button>
+    </div>
+    <div class="save-badge" id="saveBadge"></div>
+    <button class="btn" onclick="goCharSelect()">▶ &nbsp;Nueva Partida</button>
+    <div style="display:flex;gap:18px">
+      <button class="btn-sm" onclick="showUnlocks()"  style="border:none;background:transparent"> &nbsp;Desbloqueos</button>
+      <button class="btn-sm" onclick="showBestiary()" style="border:none;background:transparent"> &nbsp;Bestiario</button>
+      <button class="btn-sm" onclick="showStats()"    style="border:none;background:transparent"> &nbsp;Estadísticas</button>
+      <button class="btn-sm" onclick="showSettings()" style="border:none;background:transparent"> &nbsp;Ajustes</button>
+    </div>
+    <div class="diff-badge" id="diffBadge2"></div>
+  </div>
+
   <a href="notas_actualizacion.html"
      style="position:fixed;bottom:22px;left:24px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9984a;text-decoration:none;opacity:.75;transition:opacity .2s,text-shadow .2s;text-shadow:0 0 8px #c9984a44;z-index:100;"
      onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
@@ -172,7 +216,7 @@
   <!-- id="rewSub" → el JS lo actualiza ("Elige 1 carta", "Elige 2 cartas", etc.) -->
   <div id="rewSub" style="font-size:12px;color:#6a5a7a;text-align:center;font-style:italic;margin-bottom:8px">Elige 1 carta (o sáltate)</div>
   <div class="rew-cards" id="rewCards"></div>
-  <button class="btn-sm" onclick="skipRew()">Continuar sin carta</button>
+  
 </div>
 
 <div class="screen" id="s-rest">
@@ -259,6 +303,12 @@
 </div>
 </div>
 
+<style>
+@keyframes splashPulse {
+  0%,100% { transform: scale(1);    opacity: .80; }
+  50%      { transform: scale(1.07); opacity: 1;   }
+}
+</style>
 <script src="noctis_deck.js"></script>
 </body>
 </html>

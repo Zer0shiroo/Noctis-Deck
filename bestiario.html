@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noctis Deck — Bestiario & Grimorio</title>
+<link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0a0810; --parchment:#1a1428; --gold:#d4a843; --gold2:#f0c060;
+    --crimson:#8a1a2a; --wine:#6a1020; --dim:#7a6888; --text:#c8b89a;
+    --text-bright:#e8d8ba; --fog:#2a1e3a; --green:#4acc70; --green2:#80ee90;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--text);font-family:'IM Fell English',Georgia,serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,#3a1a5a22 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 80%,#6a102022 0%,transparent 60%);pointer-events:none;z-index:0}
+  #fog-layer{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+  .fog-p{position:absolute;border-radius:50%;background:radial-gradient(circle,#3a1a5a18 0%,transparent 70%);animation:fogDrift linear infinite;filter:blur(40px)}
+  @keyframes fogDrift{from{transform:translateX(-120%) scaleY(0.6)}to{transform:translateX(110vw) scaleY(1.2)}}
+
+  .page{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:60px 32px 120px}
+
+  /* HEADER */
+  .header{text-align:center;margin-bottom:56px}
+  .header-eye{font-size:52px;display:block;margin-bottom:10px;animation:eyePulse 4s ease-in-out infinite;filter:drop-shadow(0 0 20px #8a1a2a88)}
+  @keyframes eyePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);filter:drop-shadow(0 0 40px #c03040bb)}}
+  .game-title{font-family:'Cinzel Decorative',serif;font-size:clamp(18px,4vw,36px);font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 30px #d4a84366;margin-bottom:6px}
+  .page-sub{font-family:'Cinzel',serif;font-size:clamp(10px,1.5vw,13px);letter-spacing:.35em;text-transform:uppercase;color:var(--crimson);margin-bottom:6px}
+  .page-note{font-style:italic;font-size:12px;color:var(--dim);letter-spacing:.08em}
+
+  /* TABS */
+  .tab-row{display:flex;gap:8px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
+  .tab{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    padding:10px 22px;border-radius:4px;border:1px solid #d4a84344;background:transparent;
+    color:var(--dim);cursor:pointer;transition:all .2s;user-select:none}
+  .tab:hover{border-color:#d4a84388;color:var(--text-bright);background:#d4a84310}
+  .tab.active{background:linear-gradient(135deg,#2a1a3a,#1a0a28);border-color:#d4a843;color:var(--gold2);box-shadow:0 0 16px #d4a84322}
+
+  /* SECTION */
+  .section{display:none}
+  .section.visible{display:block}
+
+  .section-title-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+  .section-icon{font-size:22px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a3a,#1a0a28);border:1px solid #d4a84344;box-shadow:0 0 12px #d4a84322;flex-shrink:0}
+  .section-label{font-family:'Cinzel',serif;font-size:clamp(13px,2vw,19px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 12px #d4a84344}
+  .section-desc{font-size:13px;color:var(--dim);font-style:italic;margin-bottom:20px;line-height:1.7;max-width:700px}
+
+  /* ENEMY GRID */
+  .enemy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;margin-bottom:48px}
+
+  .enemy-card{
+    background:linear-gradient(160deg,#1e1430 0%,#130d20 100%);
+    border:1px solid #d4a84322;border-radius:8px;overflow:hidden;
+    transition:transform .2s,box-shadow .2s,border-color .2s;cursor:default;position:relative;
+  }
+  .enemy-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px #00000066,0 0 20px #d4a84318;border-color:#d4a84355}
+  .enemy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,linear-gradient(90deg,transparent,#d4a84355,transparent))}
+
+  .enemy-img{width:100%;height:150px;object-fit:cover;object-position:top;display:block;background:#0e0b18;cursor:zoom-in;transition:opacity .15s}
+  .enemy-img:hover{opacity:.88}
+  .enemy-img-placeholder{width:100%;height:150px;background:linear-gradient(160deg,#1a1030,#0e0b18);display:flex;align-items:center;justify-content:center;font-size:48px}
+
+  .enemy-body{padding:14px 14px 16px}
+  .enemy-tier-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 7px;border-radius:2px;margin-bottom:8px;display:inline-block}
+  .badge-normal  {background:#c0304011;color:#e87070;border:1px solid #c0304033}
+  .badge-elite   {background:#8a1a2a22;color:#cc6080;border:1px solid #8a1a2a44}
+  .badge-healer  {background:#4acc7011;color:var(--green2);border:1px solid #4acc7033}
+  .badge-boss    {background:#c0304033;color:#ff8080;border:1px solid #c0304066}
+  .badge-special {background:#7a3acc22;color:#cc80ff;border:1px solid #7a3acc44}
+
+  .enemy-name{font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--text-bright);margin-bottom:10px;line-height:1.3}
+
+  .enemy-stats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+  .stat-pill{font-size:10px;font-family:'Cinzel',serif;padding:3px 7px;border-radius:3px;letter-spacing:.05em;white-space:nowrap}
+  .stat-hp   {background:#c0304011;color:#e87070;border:1px solid #c0304033}
+  .stat-dmg  {background:#c9984a11;color:#e8b870;border:1px solid #c9984a33}
+  .stat-bleed{background:#aa203011;color:#e06070;border:1px solid #aa203033}
+  .stat-psn  {background:#3a7a2011;color:#80cc50;border:1px solid #3a7a2033}
+  .stat-heal {background:#4acc7011;color:var(--green2);border:1px solid #4acc7033}
+  .stat-shld {background:#3a8acc11;color:#70b8e8;border:1px solid #3a8acc33}
+
+  .enemy-behaviors{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+  .behavior{font-size:11px;color:var(--dim);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+  .behavior-icon{flex-shrink:0;font-size:12px;margin-top:1px}
+
+  /* COMING SOON */
+  .coming-soon{
+    border:1px dashed #d4a84333;border-radius:10px;
+    padding:60px 32px;text-align:center;margin-top:8px;
+    background:radial-gradient(ellipse 70% 60% at 50% 50%,#1a1030 0%,#0a0810 100%);
+  }
+  .cs-eye{font-size:48px;display:block;margin-bottom:16px;opacity:.4;animation:csFloat 3s ease-in-out infinite}
+  @keyframes csFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .cs-title{font-family:'Cinzel Decorative',serif;font-size:clamp(14px,3vw,22px);color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+  .cs-sub{font-size:13px;color:#4a3a5a;font-style:italic}
+
+  /* DIVIDER */
+  .divider{display:flex;align-items:center;gap:14px;margin:32px 0}
+  .divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,#d4a84333,transparent)}
+  .divider-glyph{color:var(--gold);font-size:14px;text-shadow:0 0 10px #d4a84388;flex-shrink:0}
+
+  /* CARD GRIMOIRE GRID */
+  .grimoire-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:40px}
+
+  .grim-card{
+    background:linear-gradient(160deg,#1e1430 0%,#130d20 100%);
+    border-radius:7px;overflow:hidden;
+    border:1px solid #d4a84322;
+    transition:transform .2s,box-shadow .2s,border-color .2s;cursor:default;
+    position:relative;
+  }
+  .grim-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px #00000055,0 0 16px #d4a84318;border-color:#d4a84455}
+  .grim-card-top{height:3px;background:var(--rc,#a0a0b0)}
+  .grim-card-art{width:100%;height:100px;object-fit:cover;display:block;background:#0e0b18;cursor:zoom-in;transition:opacity .15s}
+  .grim-card-art:hover{opacity:.88}
+  .grim-card-art-placeholder{width:100%;height:100px;background:linear-gradient(160deg,#1a1030,#0e0b18);display:flex;align-items:center;justify-content:center;font-size:32px}
+  .grim-card-body{padding:10px 10px 12px}
+  .grim-rarity{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px;display:inline-block;padding:2px 5px;border-radius:2px}
+  .grim-name{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-bright);margin-bottom:6px;line-height:1.3}
+  .grim-type{font-size:9px;font-family:'Cinzel',serif;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+  .grim-stats{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+  .grim-stat{font-size:9px;font-family:'Cinzel',serif;padding:2px 5px;border-radius:2px;white-space:nowrap}
+  .grim-cost{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2a1a3a,#1a0a28);border:1px solid #d4a84366;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--gold2);box-shadow:0 0 8px #d4a84333}
+  .grim-desc{font-size:10px;color:var(--dim);font-style:italic;line-height:1.5}
+
+  .rarity-section-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;padding:5px 10px;border-radius:3px;margin-bottom:16px;display:inline-block}
+
+  /* BACK */
+  .back-bar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,#0a0810 60%,transparent);padding:18px 40px;display:flex;justify-content:center;z-index:10}
+  .back-btn{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--gold2);text-decoration:none;padding:10px 28px;border:1px solid #d4a84344;border-radius:4px;background:linear-gradient(135deg,#2a1a3a88,#1a0a2888);backdrop-filter:blur(8px);transition:all .25s;text-shadow:0 0 10px #d4a84366}
+  .back-btn:hover{background:linear-gradient(135deg,#3a2a4a,#2a1a3a);border-color:#d4a84388;box-shadow:0 0 30px #d4a84333}
+
+  /* LIGHTBOX */
+  [data-lb]{cursor:zoom-in!important}
+  #lightbox{position:fixed;inset:0;z-index:9999;background:#000000cc;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;cursor:zoom-out}
+  #lightbox.open{opacity:1;pointer-events:all}
+  #lightbox img{max-width:min(88vw,600px);max-height:82vh;object-fit:contain;border-radius:6px;border:1px solid #d4a84344;box-shadow:0 0 80px #00000099,0 0 30px #d4a84322;transform:scale(.92);transition:transform .22s;cursor:default}
+  #lightbox.open img{transform:scale(1)}
+  #lightbox-close{position:absolute;top:18px;right:22px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;color:#d4a843;background:transparent;border:1px solid #d4a84344;border-radius:4px;padding:6px 14px;cursor:pointer;transition:all .2s}
+  #lightbox-close:hover{border-color:#d4a843;background:#d4a84318}
+
+  @media(max-width:600px){
+    .page{padding:40px 16px 100px}
+    .enemy-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+    .grimoire-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+  }
+</style>
+</head>
+<body>
+<div id="fog-layer"></div>
+<div id="lightbox"><button id="lightbox-close" onclick="closeLightbox()">✕ Cerrar</button><img id="lightbox-img" src="" alt=""></div>
+<div class="page">
+
+  <div class="header">
+    <span class="header-eye">📖</span>
+    <div class="game-title">Bestiario & Grimorio</div>
+    <div class="page-sub">Registros de la Torre Obscura</div>
+    <div class="page-note">Las criaturas que acechan en la ciudad que nunca amanece · Las artes que el Cazador domina</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-row">
+    <div class="tab active" onclick="switchTab('acto1')">⚔ Acto I — Las Calles</div>
+    <div class="tab" onclick="switchTab('acto2')">🧛 Acto II — El Corazón</div>
+    <div class="tab" onclick="switchTab('acto3')">👁 Acto III — Coming Soon</div>
+    <div class="tab" onclick="switchTab('grimoire')">🃏 Grimorio de Cartas</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       ACTO I
+       ═══════════════════════════════════ -->
+  <div class="section visible" id="tab-acto1">
+
+    <!-- NORMALES -->
+    <div class="section-title-row">
+      <div class="section-icon">🐀</div>
+      <div class="section-label">Enemigos Normales</div>
+    </div>
+    <p class="section-desc">Criaturas que merodean en grupo por las calles más oscuras. Su comportamiento es impredecible: a veces cargan con furia y otras se detienen a cargarla.</p>
+    <div class="enemy-grid" id="grid-normal"></div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+    <!-- SANADORAS -->
+    <div class="section-title-row">
+      <div class="section-icon">✚</div>
+      <div class="section-label">Sanadoras</div>
+    </div>
+    <p class="section-desc">Aparecen con un 20% de probabilidad en grupos normales y élite de cualquier acto. Ciclan entre curar al aliado más débil, escudar a todos, lanzar maldiciones y atacar débilmente.</p>
+    <div class="enemy-grid" id="grid-healer"></div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+    <!-- ÉLITES -->
+    <div class="section-title-row">
+      <div class="section-icon">💀</div>
+      <div class="section-label">Élites</div>
+    </div>
+    <p class="section-desc">Más resistentes y peligrosos. Pueden escudarse, enfurecerse para atacar con un 25% adicional de daño, o bufar a sus aliados goblins con el mismo bono.</p>
+    <div class="enemy-grid" id="grid-elite"></div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+    <!-- JEFES -->
+    <div class="section-title-row">
+      <div class="section-icon">👁</div>
+      <div class="section-label">Jefes de Acto</div>
+    </div>
+    <p class="section-desc">Los señores del Acto I. Aparecen al final del camino y ponen a prueba todo lo que el Cazador ha aprendido.</p>
+    <div class="enemy-grid" id="grid-boss"></div>
+
+  </div><!-- /acto1 -->
+
+  <!-- ═══════════════════════════════════
+       ACTO II
+       ═══════════════════════════════════ -->
+  <div class="section" id="tab-acto2">
+
+    <div class="section-title-row">
+      <div class="section-icon">🧛</div>
+      <div class="section-label">Criaturas del Corazón</div>
+    </div>
+    <p class="section-desc">Dentro de las murallas, las criaturas son más antiguas y más peligrosas. Cada una posee mecánicas únicas que el Cazador debe aprender a leer.</p>
+    <div class="enemy-grid" id="grid-act2"></div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+    <div class="section-title-row">
+      <div class="section-icon">👁</div>
+      <div class="section-label">Jefe del Acto II</div>
+    </div>
+    <p class="section-desc">El señor de la noche que habita en el corazón de la ciudad. Invoca aliados, se cura y golpea sin misericordia.</p>
+    <div class="enemy-grid" id="grid-act2boss"></div>
+
+  </div><!-- /acto2 -->
+
+  <!-- ═══════════════════════════════════
+       ACTO III — COMING SOON
+       ═══════════════════════════════════ -->
+  <div class="section" id="tab-acto3">
+    <div class="coming-soon">
+      <span class="cs-eye">👁</span>
+      <div class="cs-title">La Cámara Bajo la Catedral</div>
+      <div class="cs-sub" style="margin-bottom:20px">"Donde el pacto fue sellado, el pacto debe romperse."</div>
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#4a3a5a;padding:8px 20px;border:1px dashed #3a2a4a;border-radius:4px;display:inline-block">En desarrollo · Próximamente</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       GRIMORIO DE CARTAS
+       ═══════════════════════════════════ -->
+  <div class="section" id="tab-grimoire">
+
+    <div class="section-title-row">
+      <div class="section-icon">🃏</div>
+      <div class="section-label">Grimorio de Cartas</div>
+    </div>
+    <p class="section-desc">Todas las artes que el Cazador puede dominar. Las cartas base (Golpe Sombrío, Escudo Arcano, Bala de Plomo) no aparecen en recompensas — el resto sí, con probabilidad según su rareza.</p>
+
+    <!-- COMUNES -->
+    <div id="sec-common"></div>
+    <!-- INFRECUENTES -->
+    <div id="sec-uncommon"></div>
+    <!-- RARAS -->
+    <div id="sec-rare"></div>
+    <!-- LEGENDARIAS -->
+    <div id="sec-legendary"></div>
+
+  </div><!-- /grimoire -->
+
+</div><!-- /page -->
+
+<div class="back-bar">
+  <a href="index.html" class="back-btn" onclick="playUI()">← Volver al Juego</a>
+</div>
+
+<script>
+// ─── SETTINGS: leer ajuste de imágenes IA ───────────────────────────────────
+function isAiImages() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem('noctis_cfg_v1') || 'null') || {};
+    return cfg.aiImages !== false;
+  } catch(e) { return true; }
+}
+
+const USE_AI = isAiImages();
+
+// ─── RUTAS DE IMAGEN ─────────────────────────────────────────────────────────
+const IMG = {
+  enemy0:         USE_AI ? 'resources/enemigos/enemigo1.png'       : 'resources/alt/enemigos/enemigo1.png',
+  enemy1:         USE_AI ? 'resources/enemigos/enemigo2.png'       : 'resources/alt/enemigos/enemigo2.png',
+  enemy2:         USE_AI ? 'resources/enemigos/enemigo3.png'       : 'resources/alt/enemigos/enemigo3.png',
+  enemy_healer:   USE_AI ? 'resources/enemigos/healer.png'         : 'resources/alt/enemigos/healer.png',
+  enemy_vampiro:  USE_AI ? 'resources/enemigos/vampiro.png'        : 'resources/alt/enemigos/vampiro.png',
+  enemy_condesa:  USE_AI ? 'resources/enemigos/condesa.png'        : 'resources/alt/enemigos/condesa.png',
+  enemy_guardian: USE_AI ? 'resources/enemigos/guardian.png'       : 'resources/alt/enemigos/guardian.png',
+  enemy_murcielago:USE_AI? 'resources/enemigos/murcielago.png'     : 'resources/alt/enemigos/murcielago.png',
+  enemy_baron:    USE_AI ? 'resources/enemigos/baron_hemlock.png'  : 'resources/alt/enemigos/baron_hemlock.png',
+  card_strike:    USE_AI ? 'resources/cartas/golpesombrio.jpg'     : 'resources/alt/cartas/strike.png',
+  card_shield:    USE_AI ? 'resources/cartas/escudoarcano.jpg'     : 'resources/alt/cartas/shield.png',
+  card_lance:     USE_AI ? 'resources/cartas/lanzaniebla.png'      : 'resources/alt/cartas/lance.png',
+  card_retaliate: USE_AI ? 'resources/cartas/cartarepresalia.jpg'  : 'resources/alt/cartas/retaliate.png',
+  card_mend:      USE_AI ? 'resources/cartas/susurro vital.jpg'    : 'resources/alt/cartas/mend.png',
+  card_bullet:    USE_AI ? 'resources/cartas/bullet.jpg'           : 'resources/alt/cartas/bullet.png',
+  card_slash:     USE_AI ? 'resources/cartas/tajocruento.jpg'      : 'resources/alt/cartas/slash.png',
+  card_double:    USE_AI ? 'resources/cartas/Golpe doble.png'      : 'resources/alt/cartas/double.png',
+  card_mantle:    USE_AI ? 'resources/cartas/manto de sombras.jpg' : 'resources/alt/cartas/mantle.png',
+  card_cloud:     USE_AI ? 'resources/cartas/nube venenosa.jpg'    : 'resources/alt/cartas/cloud.png',
+  card_quickdraw: USE_AI ? 'resources/cartas/quickdraw.jpg'        : 'resources/alt/cartas/quickdraw.png',
+  card_smokebomb: USE_AI ? 'resources/cartas/smokebomb.jpg'        : 'resources/alt/cartas/smokebomb.png',
+  card_smite:     USE_AI ? 'resources/cartas/golpe sagrado.jpg'    : 'resources/alt/cartas/smite.png',
+  card_ritual:    USE_AI ? 'resources/cartas/ritual of blood.jpg'  : 'resources/alt/cartas/ritual.png',
+  card_fanfire:   USE_AI ? 'resources/cartas/fanfire.jpg'          : 'resources/alt/cartas/fanfire.png',
+  card_headshot:  USE_AI ? 'resources/cartas/headshot.jpg'         : 'resources/alt/cartas/headshot.png',
+  card_bloodpact: USE_AI ? 'resources/cartas/ritual of blood.jpg'  : 'resources/alt/cartas/blood.png',
+  card_nightmare: USE_AI ? 'resources/cartas/nube venenosa.jpg'    : 'resources/alt/cartas/nightmare.png',
+};
+
+function imgTag(key, cls, alt) {
+  const src = IMG[key];
+  if(!src) return `<div class="${cls}-placeholder"><span>👁</span></div>`;
+  return `<img class="${cls}" data-lb src="${src}" alt="${alt||''}" onerror="this.parentNode.innerHTML='<div class=\\'${cls}-placeholder\\'><span>👁</span></div>'">`;
+}
+
+// ─── ENEMY DATA ───────────────────────────────────────────────────────────────
+const ENEMIES = {
+  normal: [
+    { name:'Goblin de Niebla',  hp:18, dmg:5,  bleed:0, psn:0, imgKey:'enemy0',
+      behaviors:['⚔ Ataca por 5 de dano','😡 25%: se enfurece — ataca normal + carga furia (no ataca el siguiente turno)','⚡ Turno tras furia: golpea con +50% de dano'] },
+  ],
+  healer: [
+    { name:'Sanadora Espectral', hp:22, dmg:3, bleed:0, psn:0, imgKey:'enemy_healer', heal:8, shld:6,
+      behaviors:['❤ Cura al aliado con menos vida (+8 HP)','🛡 Escuda a todos los aliados (+6 bloqueo)','☠ Maldicion: aplica veneno o sangrado al jugador','⚔ Ataque debil por 3 de dano'] },
+  ],
+  elite: [
+    { name:'Goblin Guardia',  hp:38, dmg:11, bleed:0, psn:0, imgKey:'enemy1',
+      behaviors:['⚔ 55%: ataca por 11 de dano','🛡 25%: ataca + carga escudo (+7 bloqueo el siguiente turno)','😡 20%: ataca + se enfurece — siguiente turno sin ataque, luego +25% dano y aliados +25%'] },
+  ],
+  boss: [
+    { name:'El Conde Sombrio', hp:80, dmg:18, bleed:3, psn:0, imgKey:'enemy2',
+      behaviors:['⚔ Ataca por 18 de dano','🩸 Inflige 3 de sangrado con cada golpe','💀 Jefe del Acto I — resistencia elevada'] },
+  ],
+  act2: [
+    { name:'Vampiro Sanguinario', hp:55, dmg:10, bleed:0, psn:0, imgKey:'enemy_vampiro', special:'roba vida',
+      behaviors:['⚔ Ataca por 10 + roba 6 HP para sí mismo al golpear','🧛 Al morir un aliado: se cura ~22 HP','⚠ Prioridad de eliminación alta — cada aliado muerto lo fortalece'] },
+    { name:'Condesa sin Rostro',  hp:50, dmg:11, bleed:0, psn:0, imgKey:'enemy_condesa', special:'ciclo 3 fases',
+      behaviors:['⚔ Turno 1: ataca por 11 de daño','🛡 Turno 2: gana +10 de bloqueo','☠ Turno 3: envenena al jugador (+3 veneno)', '🔄 Ciclo de 3 fases — se repite indefinidamente'] },
+    { name:'Guardián del Candil', hp:58, dmg:6,  bleed:0, psn:0, imgKey:'enemy_guardian', special:'oculta aliados',
+      behaviors:['🕯 Turno par: ataca por 6 + reduce tu daño en 2 (acumulable hasta -6)','👁 Turno impar: oculta a un aliado aleatorio — no puede ser atacado ese turno','⚠ Elimínalo primero para evitar la acumulación de reducción de daño'] },
+    { name:'Murciélago de Hemlock', hp:20, dmg:7, bleed:0, psn:0, imgKey:'enemy_murcielago', special:'evoluciona',
+      behaviors:['⚔ Ataca por 7 de daño cada turno','🧛 A los 5 turnos se transforma en Vampiro Sanguinario','⚠ Invocado por el Barón Hemlock — elimínalo antes de que evolucione'] },
+  ],
+  act2boss: [
+    { name:'Barón Hemlock', hp:130, dmg:16, bleed:0, psn:0, imgKey:'enemy_baron', special:'jefe Acto II',
+      behaviors:['🦇 Turno 1 y cada 5 turnos: invoca hasta 2 Murciélagos de Hemlock','⚔ Ataca por 16 de daño cuando no invoca','💀 Por debajo del 60% de HP: puede curarse ~23 HP','⚠ Mata a los murciélagos rápido — si evolucionan a vampiros la situación se complica'] },
+  ],
+};
+
+// ─── CARD DATA ────────────────────────────────────────────────────────────────
+const CARDS = [
+  // COMUNES
+  {id:'strike',   name:'Golpe Sombrío',   type:'attack', rarity:'common',    cost:1, dmg:6,  blk:0,  bleed:0,psn:0,           desc:'Golpe veloz con tu filo.', base:true},
+  {id:'shield',   name:'Escudo Arcano',   type:'defense',rarity:'common',    cost:1, dmg:0,  blk:7,  bleed:0,psn:0,           desc:'Barrera mágica que absorbe el daño.', base:true},
+  {id:'lance',    name:'Lanza de Niebla', type:'attack', rarity:'common',    cost:1, dmg:4,  blk:0,  bleed:0,psn:2,           desc:'Veneno que consume desde dentro.'},
+  {id:'retaliate',name:'Represalia',      type:'skill',  rarity:'common',    cost:1, dmg:3,  blk:4,  bleed:0,psn:0,           desc:'Ataca y defiende al mismo tiempo.'},
+  {id:'mend',     name:'Susurro Vital',   type:'skill',  rarity:'common',    cost:1, dmg:0,  blk:0,  bleed:0,psn:0, heal:8,   desc:'Recupera 8 de Vitalidad.'},
+  {id:'bullet',   name:'Bala de Plomo',   type:'attack', rarity:'common',    cost:1, dmg:7,  blk:0,  bleed:0,psn:0,           desc:'Disparo certero y rápido.', base:true},
+  // INFRECUENTES
+  {id:'slash',    name:'Tajo Cruento',    type:'attack', rarity:'uncommon',  cost:2, dmg:10, blk:0,  bleed:2,psn:0,           desc:'Daño directo con sangrado severo.'},
+  {id:'double',   name:'Golpe Doble',     type:'attack', rarity:'uncommon',  cost:2, dmg:8,  blk:0,  bleed:0,psn:0, dbl:true, desc:'Golpea dos veces consecutivas.'},
+  {id:'mantle',   name:'Manto de Sombras',type:'defense',rarity:'uncommon',  cost:2, dmg:0,  blk:17, bleed:0,psn:0,           desc:'Protección pesada contra cualquier golpe.'},
+  {id:'cloud',    name:'Nube Venenosa',   type:'skill',  rarity:'uncommon',  cost:2, dmg:0,  blk:0,  bleed:0,psn:4,           desc:'Envenena al enemigo con niebla tóxica.'},
+  {id:'quickdraw',name:'Tiro Rápido',     type:'attack', rarity:'uncommon',  cost:1, dmg:5,  blk:0,  bleed:0,psn:0, dbl:true, desc:'Dos disparos instantáneos.'},
+  {id:'smokebomb',name:'Bomba de Humo',   type:'defense',rarity:'uncommon',  cost:2, dmg:0,  blk:10, bleed:0,psn:2,           desc:'Escudo y envenena al objetivo.'},
+  // RARAS
+  {id:'smite',    name:'Golpe Sagrado',   type:'attack', rarity:'rare',      cost:1, dmg:8,  blk:0,  bleed:0,psn:0,           desc:'Luz arcana concentrada en un filo.'},
+  {id:'ritual',   name:'Ritual de Sangre',type:'skill',  rarity:'rare',      cost:2, dmg:0,  blk:0,  bleed:4,psn:0,           desc:'Maldición de sangrado severo.'},
+  {id:'fanfire',  name:'Fuego Cerrado',   type:'attack', rarity:'rare',      cost:2, dmg:6,  blk:0,  bleed:0,psn:0, triple:true,desc:'Dispara tres veces consecutivas.'},
+  // LEGENDARIAS
+  {id:'headshot', name:'Disparo Certero', type:'attack', rarity:'legendary', cost:3, dmg:28, blk:0,  bleed:0,psn:0,           desc:'Un disparo. El fin.'},
+  {id:'bloodpact',name:'Pacto de Sangre', type:'skill',  rarity:'legendary', cost:2, dmg:0,  blk:0,  bleed:3,psn:0, heal:10,  desc:'Cura con la sangre del enemigo.'},
+  {id:'nightmare',name:'Pesadilla Eterna',type:'attack', rarity:'legendary', cost:3, dmg:9,  blk:0,  bleed:3,psn:3,           desc:'Inflige todos los males de una vez.'},
+];
+
+// ─── RARITY CONFIG ────────────────────────────────────────────────────────────
+const RARITY = {
+  common:    { label:'COMÚN',      color:'#a0a0b0', bg:'#a0a0b011', border:'#a0a0b044' },
+  uncommon:  { label:'INFRECUENTE',color:'#60aaee', bg:'#60aaee11', border:'#60aaee44' },
+  rare:      { label:'RARA',       color:'#cc80ff', bg:'#cc80ff11', border:'#cc80ff44' },
+  legendary: { label:'LEGENDARIA', color:'#ffcc44', bg:'#ffcc4411', border:'#ffcc4444' },
+};
+const TYPE_LABELS = { attack:'Ataque', defense:'Defensa', skill:'Habilidad' };
+const TYPE_COLORS = { attack:'#e87070', defense:'#70b8e8', skill:'#80cc70' };
+
+// ─── BUILD ENEMY CARD ─────────────────────────────────────────────────────────
+function buildEnemyCard(e, badgeClass, badgeLabel, accentColor) {
+  const art = imgTag(e.imgKey, 'enemy-img', e.name);
+  const stats = [];
+  stats.push(`<span class="stat-pill stat-hp">❤ ${e.hp} HP</span>`);
+  if(e.dmg) stats.push(`<span class="stat-pill stat-dmg">⚔ ${e.dmg} daño</span>`);
+  if(e.bleed) stats.push(`<span class="stat-pill stat-bleed">🩸 ${e.bleed} sangrado</span>`);
+  if(e.psn)   stats.push(`<span class="stat-pill stat-psn">☠ ${e.psn} veneno</span>`);
+  if(e.heal)  stats.push(`<span class="stat-pill stat-heal">❤ cura ${e.heal}</span>`);
+  if(e.shld)  stats.push(`<span class="stat-pill stat-shld">🛡 +${e.shld} esc.</span>`);
+  const beh = (e.behaviors||[]).map(b=>{
+    const chars = [...b];
+    const icon = chars[0];
+    const rest = chars.slice(1).join('').trim();
+    return `<div class="behavior"><span class="behavior-icon">${icon}</span><span>${rest}</span></div>`;
+  }).join('');
+  return `
+    <div class="enemy-card" style="--card-accent:linear-gradient(90deg,transparent,${accentColor}55,transparent)">
+      ${art}
+      <div class="enemy-body">
+        <span class="enemy-tier-badge ${badgeClass}">${badgeLabel}</span>
+        <div class="enemy-name">${e.name}</div>
+        <div class="enemy-stats">${stats.join('')}</div>
+        ${beh ? `<div class="enemy-behaviors">${beh}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+// ─── BUILD CARD GRIMOIRE ──────────────────────────────────────────────────────
+function buildGrimCard(c) {
+  const r = RARITY[c.rarity];
+  const art = imgTag('card_'+c.id, 'grim-card-art', c.name);
+  const stats = [];
+  if(c.dmg)    stats.push(`<span class="grim-stat stat-dmg">⚔ ${c.triple?c.dmg+'×3':c.dbl?c.dmg+'×2':c.dmg}</span>`);
+  if(c.blk)    stats.push(`<span class="grim-stat stat-shld">🛡 ${c.blk}</span>`);
+  if(c.bleed)  stats.push(`<span class="grim-stat stat-bleed">🩸 ${c.bleed}</span>`);
+  if(c.psn)    stats.push(`<span class="grim-stat stat-psn">☠ ${c.psn}</span>`);
+  if(c.heal)   stats.push(`<span class="grim-stat stat-heal">❤ +${c.heal}</span>`);
+  const baseMark = c.base ? `<span style="font-size:8px;color:#4a3a5a;font-family:'Cinzel',serif;letter-spacing:.1em">BASE</span>` : '';
+  return `
+    <div class="grim-card">
+      <div class="grim-card-top" style="background:${r.color}"></div>
+      ${art}
+      <div class="grim-card-body">
+        <div class="grim-cost">${c.cost}</div>
+        <div class="grim-rarity" style="background:${r.bg};color:${r.color};border:1px solid ${r.border}">${r.label}</div>
+        <div class="grim-name">${c.name}</div>
+        <div class="grim-type" style="color:${TYPE_COLORS[c.type]}">${TYPE_LABELS[c.type]||c.type} ${baseMark}</div>
+        <div class="grim-stats">${stats.join('')}</div>
+        <div class="grim-desc">${c.desc}</div>
+      </div>
+    </div>`;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+// ─── UI SOUND ─────────────────────────────────────────────────────────────────
+const UI_SOUND_SRC = 'resources/music/ui_click.mp3';
+function playUI() {
+  try {
+    const v = parseFloat(localStorage.getItem('noctis_sfx_vol'));
+    const vol = isNaN(v) ? 0.6 : v;
+    const s = new Audio(UI_SOUND_SRC);
+    s.volume = vol;
+    s.play().catch(()=>{});
+  } catch(e){}
+}
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
+function openLightbox(src) {
+  playUI();
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  playUI();
+  document.getElementById('lightbox').classList.remove('open');
+}
+// Delegacion: captura clicks en imagenes con data-lightbox desde cualquier parte del DOM
+document.addEventListener('click', function(e) {
+  if(e.target.matches('[data-lb]') && e.target.src) {
+    openLightbox(e.target.src);
+  }
+});
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if(e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') closeLightbox();
+});
+
+function renderAll() {
+  // Enemies Acto I
+  document.getElementById('grid-normal').innerHTML  = ENEMIES.normal.map(e=>buildEnemyCard(e,'badge-normal','NORMAL','#c03040')).join('');
+  document.getElementById('grid-healer').innerHTML  = ENEMIES.healer.map(e=>buildEnemyCard(e,'badge-healer','SANADORA','#4acc70')).join('');
+  document.getElementById('grid-elite').innerHTML   = ENEMIES.elite.map(e=>buildEnemyCard(e,'badge-elite','ÉLITE','#8a1a2a')).join('');
+  document.getElementById('grid-boss').innerHTML    = ENEMIES.boss.map(e=>buildEnemyCard(e,'badge-boss','JEFE','#c03040')).join('');
+  // Enemies Acto II
+  document.getElementById('grid-act2').innerHTML    = ENEMIES.act2.map(e=>buildEnemyCard(e,'badge-special','ACTO II','#7a3acc')).join('');
+  document.getElementById('grid-act2boss').innerHTML= ENEMIES.act2boss.map(e=>buildEnemyCard(e,'badge-boss','JEFE','#c03040')).join('');
+
+  // Grimoire cards by rarity
+  ['common','uncommon','rare','legendary'].forEach(r => {
+    const rc = RARITY[r];
+    const cards = CARDS.filter(c=>c.rarity===r);
+    document.getElementById('sec-'+r).innerHTML = `
+      <div style="margin-bottom:14px">
+        <span class="rarity-section-title" style="background:${rc.bg};color:${rc.color};border:1px solid ${rc.border}">${rc.label}</span>
+      </div>
+      <div class="grimoire-grid">${cards.map(buildGrimCard).join('')}</div>
+      <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+    `;
+  });
+}
+
+// ─── TAB SWITCH ──────────────────────────────────────────────────────────────
+function switchTab(id) {
+  playUI();
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('visible');
+  event.target.classList.add('active');
+}
+
+// ─── FOG ─────────────────────────────────────────────────────────────────────
+(()=>{
+  const l=document.getElementById('fog-layer');
+  for(let i=0;i<6;i++){
+    const p=document.createElement('div');p.className='fog-p';
+    const s=200+Math.random()*400;
+    p.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:-${s}px;animation-duration:${28+Math.random()*30}s;animation-delay:${Math.random()*20}s`;
+    l.appendChild(p);
+  }
+})();
+
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if(e.key==='F12')e.preventDefault();
+  if(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key))e.preventDefault();
+  if(e.ctrlKey&&e.key==='U')e.preventDefault();
+});
+
+renderAll();
+</script>
+</body>
+</html>

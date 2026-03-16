@@ -71,9 +71,9 @@
 .map-acts { gap: 48px !important; padding: 10px 0 !important; }
 .act-lbl  { font-size: 18px !important; letter-spacing: 3.5px !important; margin-bottom: 12px !important; }
 .map-row  { gap: 16px !important; }
-.mnode    { width: 100px !important; height: 80px !important; font-size: 16px !important; border-radius: 9px !important; gap: 4px !important; }
-.n-ico    { font-size: 28px !important; }
-.n-lbl    { font-size: 15px !important; letter-spacing: 2px !important; }
+.mnode    { width: 88px !important; height: 66px !important; font-size: 15px !important; border-radius: 9px !important; gap: 4px !important; }
+.n-ico    { font-size: 24px !important; }
+.n-lbl    { font-size: 13px !important; letter-spacing: 2px !important; }
 .mconn-h  { height: 20px !important; width: 2px !important; }
 .map-gold-display { font-size: 24px !important; }
 
@@ -490,7 +490,7 @@
 .status-tooltip { font-size: 15px !important; }
 
 /* ── TUTORIAL ── */
-#tutorialBtn { position: absolute !important; top: 8px !important; left: 52px !important; z-index: 100 !important; }
+#tutorialBtn { position: fixed !important; top: 10px !important; left: 4px !important; z-index: 9999 !important; }
 #tutorialHoverTip { display: none !important; }
 @media (min-width: 641px) { #tutorialHoverTip { display: block !important; } }
 #tutorialOverlay div ul { padding-left: 18px !important; margin: 8px 0 !important; }
@@ -517,4 +517,12 @@
   .shop-price   { font-size: 14px !important; }
   .char-passive { font-size: 13px !important; }
   .char-stat    { font-size: 13px !important; }
+}
+
+/* ── Botón principal: sin clip-path, sin bordes laterales ── */
+.btn {
+  clip-path: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
 }

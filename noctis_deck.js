@@ -275,23 +275,23 @@ const CHARS=[
   // Cazador — pasiva reworked: Vampirismo (roba vida al hacer daño directo)
   {id:'cazador',name:'El Cazador',title:'Maestro del Filo',imgKey:'char_cazador',hp:70,mana:3,
    passive:'Vampirismo: cada carta de ataque que dañe directamente te cura 2 HP.',pid:'lifesteal',
-   deck:['strike','strike','shield','shield'],
+   deck:['strike','strike','strike','strike','strike','shield','shield','shield','shield','shield'],
    stats:{Vida:'70',Maná:'3/turno',Estilo:'Ataque y robo de vida'},color:'#c9984a',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="30" ry="4" fill="#00000044"/><circle cx="50" cy="28" r="14" fill="#1a1228" stroke="#c9984a88" stroke-width="1.5"/><circle cx="50" cy="28" r="10" fill="#2a1838"/><rect x="32" y="43" width="36" height="44" rx="5" fill="#1a1228" stroke="#c9984a66"/><rect x="24" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><rect x="64" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><path d="M32 52 Q16 68 20 88 Q30 78 32 84" fill="#0f0c18" stroke="#c9984a33"/><path d="M68 52 Q84 68 80 88 Q70 78 68 84" fill="#0f0c18" stroke="#c9984a33"/><line x1="82" y1="22" x2="76" y2="82" stroke="#c9984a" stroke-width="2.5"/><circle cx="82" cy="22" r="5" fill="#1a1228" stroke="#c9984a" stroke-width="1.5"/><circle cx="82" cy="22" r="2.5" fill="#c9984a88"/></svg>`},
   {id:'hechicera',name:'La Hechicera',title:'Tejedora de Miasmas',imgKey:'char_hechicera',hp:60,mana:4,
    passive:'Miasma: el veneno que aplicas hace +1 daño extra por turno.',pid:'poison_bonus',
-   deck:['lance','lance','shield','shield'],
+   deck:['lance','lance','lance','lance','lance','shield','shield','shield','shield','shield'],
    stats:{Vida:'60',Maná:'4/turno',Estilo:'Veneno y control'},color:'#7a3acc',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="28" ry="4" fill="#00000044"/><circle cx="50" cy="26" r="13" fill="#1a1028" stroke="#7a3acc88" stroke-width="1.5"/><ellipse cx="50" cy="22" rx="16" ry="8" fill="#130c1e" stroke="#7a3acc66"/><rect x="33" y="40" width="34" height="48" rx="4" fill="#1a1028" stroke="#7a3acc66"/><path d="M33 50 Q14 60 16 82 Q26 72 33 78" fill="#130c1e" stroke="#7a3acc44"/><path d="M67 50 Q86 60 84 82 Q74 72 67 78" fill="#130c1e" stroke="#7a3acc44"/><circle cx="50" cy="62" r="10" fill="#3a1a5a44" stroke="#9a5aee" stroke-width="1"/><circle cx="50" cy="62" r="5" fill="#7a3acc66"/><path d="M40 90 Q50 108 60 90" fill="#1a0a28" stroke="#7a3acc66"/></svg>`},
   {id:'espectro',name:'El Espectro',title:'Sombra del Pacto',imgKey:'char_espectro',hp:65,mana:3,
    passive:'Forma Etérea: el primer golpe de cada combate es ignorado.',pid:'first_hit',
-   deck:['strike','strike','shield','shield'],
+   deck:['strike','strike','strike','strike','strike','shield','shield','shield','shield','shield'],
    stats:{Vida:'65',Maná:'3/turno',Estilo:'Equilibrio y esquiva'},color:'#4a8aaa',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="26" ry="4" fill="#00000033"/><ellipse cx="50" cy="55" rx="28" ry="50" fill="#1a2a3a88" stroke="#4a8aaa55" stroke-width="1"/><circle cx="50" cy="28" r="14" fill="#1a2a3a" stroke="#4a8aaa88" stroke-width="1.5"/><circle cx="44" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="56" cy="26" r="5" fill="#0a1018" stroke="#4a8aaa66"/><circle cx="44" cy="26" r="2.5" fill="#4a8aaa88"/><circle cx="56" cy="26" r="2.5" fill="#4a8aaa88"/><path d="M30 45 Q14 58 18 80 Q28 70 30 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M70 45 Q86 58 82 80 Q72 70 70 76" fill="#1a2a3a66" stroke="#4a8aaa33"/><path d="M36 100 Q50 118 64 100 Q58 112 50 110 Q42 112 36 100Z" fill="#1a2a3a88" stroke="#4a8aaa44"/></svg>`},
   // PISTOLERO — imagen en resources/personajes/pistolero.png (o sube la tuya en Personalización)
   {id:'pistolero',name:'El Pistolero',title:'Heraldo del Trueno',imgKey:'char_pistolero',hp:65,mana:3,
    passive:'Cargador: cada 3 cartas de ataque jugadas en un turno, la siguiente carta de ataque hace el doble de daño.',pid:'gunslinger',
-   deck:['bullet','bullet','shield','shield'],
+   deck:['bullet','bullet','bullet','bullet','bullet','shield','shield','shield','shield','shield'],
    stats:{Vida:'65',Maná:'3/turno',Estilo:'Ráfagas y precisión'},color:'#d4804a',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="28" ry="4" fill="#00000044"/><circle cx="50" cy="27" r="13" fill="#1a1228" stroke="#d4804a88" stroke-width="1.5"/><rect x="33" y="41" width="34" height="46" rx="5" fill="#1a1228" stroke="#d4804a66"/><rect x="25" y="44" width="11" height="32" rx="4" fill="#13101e" stroke="#d4804a44"/><rect x="64" y="44" width="11" height="32" rx="4" fill="#13101e" stroke="#d4804a44"/><rect x="64" y="56" width="22" height="8" rx="3" fill="#1a1228" stroke="#d4804a88"/><rect x="82" y="57" width="12" height="6" rx="2" fill="#d4804a66"/><circle cx="86" cy="60" r="2" fill="#d4804aaa"/><rect x="65" y="64" width="6" height="14" rx="2" fill="#2a1818" stroke="#d4804a44"/><line x1="78" y1="60" x2="96" y2="58" stroke="#d4804a" stroke-width="1.5"/></svg>`},
 ];
@@ -313,7 +313,7 @@ const CARDS=[
   // ── INFRECUENTES ──
   {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
   {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true}, // ✏ CAMBIO 1: dmg 5→8 (bufeo)
-  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:14,bleed:0,psn:0,desc:'Protección pesada.'},
+  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:17,bleed:0,psn:0,desc:'Protección pesada.'},
   {id:'cloud',    name:'Nube Venenosa',    type:'skill',  rarity:'uncommon',  cost:2,dmg:0,  blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
   {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Dos disparos instantáneos.',dbl:true},
   {id:'smokebomb',name:'Bomba de Humo',    type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:10,bleed:0,psn:2,desc:'Escudo y envenena al enemigo.'},
@@ -379,16 +379,16 @@ function pickRewardCards(count, tier) {
 // Acto 1 — enemigos originales
 const ENM_TEMPLATES = {
   normal: [
-    {name:'Rata Espectral',    hp:18,dmg:5, bleed:0,psn:0,rw:6},
-    {name:'Mendigo Maldito',   hp:16,dmg:6, bleed:0,psn:0,rw:6},
-    {name:'Sombra Errante',    hp:20,dmg:4, bleed:1,psn:0,rw:7},
-    {name:'Lacayo Corrupto',   hp:17,dmg:5, bleed:0,psn:1,rw:6},
-    {name:'Espectro Callejero',hp:15,dmg:7, bleed:0,psn:0,rw:7},
+    {name:'Goblin de Niebla',   hp:18,dmg:5, bleed:0,psn:0,rw:6,  isGoblin:true},
+    {name:'Goblin Maldito',     hp:16,dmg:6, bleed:0,psn:0,rw:6,  isGoblin:true},
+    {name:'Goblin Errante',     hp:20,dmg:4, bleed:1,psn:0,rw:7,  isGoblin:true},
+    {name:'Goblin Corrupto',    hp:17,dmg:5, bleed:0,psn:1,rw:6,  isGoblin:true},
+    {name:'Goblin Callejero',   hp:15,dmg:7, bleed:0,psn:0,rw:7,  isGoblin:true},
   ],
   elite: [
-    {name:'Guardia Corrompido',hp:38,dmg:11,bleed:0,psn:0,rw:18},
-    {name:'Heraldo de Niebla', hp:34,dmg:12,bleed:0,psn:2,rw:20},
-    {name:'Vampiro Menor',     hp:40,dmg:10,bleed:3,psn:0,rw:18},
+    {name:'Goblin Guardia',     hp:38,dmg:11,bleed:0,psn:0,rw:18, isGoblin:true,isGoblinElite:true},
+    {name:'Goblin Heraldo',     hp:34,dmg:12,bleed:0,psn:2,rw:20, isGoblin:true,isGoblinElite:true},
+    {name:'Goblin Cazador',     hp:40,dmg:10,bleed:3,psn:0,rw:18, isGoblin:true,isGoblinElite:true},
   ],
   // HEALER — aparece en grupos normales y elite de cualquier acto, nunca en boss
   // Imagen: resources/enemigos/healer.png
@@ -409,32 +409,29 @@ const ENM_TEMPLATES = {
 // ── ACTO 2 — Nuevos enemigos ──────────────────────────────────────────────
 // Imagen: resources/enemigos/vampiro.png
 // Al matar a otros enemigos recupera mucha vida. Roba vida al atacar.
+// ── Dañmos reducidos en Acto 2 ──
 const ACT2_VAMPIRO = {
-  name:'Vampiro Sanguinario', hp:55, dmg:12, bleed:0, psn:0, rw:22,
+  name:'Vampiro Sanguinario', hp:55, dmg:10, bleed:0, psn:0, rw:22,
   imgKey:'enemy_vampiro', tier:1,
   isVampiro: true,
-  lifestealOnAttack: 6,   // HP que roba al jugador al atacar
-  reviveHealOnKill: 22,   // HP que recupera cuando muere un aliado
+  lifestealOnAttack: 6,
+  reviveHealOnKill: 22,
 };
 
-// Imagen: resources/enemigos/condesa.png
-// Cambia de modo cada turno: ataque → defensa → veneno
 const ACT2_CONDESA = {
-  name:'Condesa sin Rostro', hp:50, dmg:13, bleed:0, psn:0, rw:22,
+  name:'Condesa sin Rostro', hp:50, dmg:11, bleed:0, psn:0, rw:22,
   imgKey:'enemy_condesa', tier:1,
   isCondesa: true,
-  condensaTurn: 0,  // 0=ataque, 1=defensa, 2=veneno
+  condensaTurn: 0,
   shieldPerTurn: 10,
   poisonPerTurn: 3,
 };
 
-// Imagen: resources/enemigos/guardian.png
-// Reduce el daño del jugador y oculta a un aliado el siguiente turno
 const ACT2_GUARDIAN = {
-  name:'Guardián del Candil', hp:58, dmg:10, bleed:0, psn:0, rw:22,
+  name:'Guardián del Candil', hp:58, dmg:6, bleed:0, psn:0, rw:22,
   imgKey:'enemy_guardian', tier:1,
   isGuardian: true,
-  damageReductionStacks: 0, // se acumula: cada 2 turnos reduce 2 de daño del jugador
+  damageReductionStacks: 0,
   hiddenAllyIdx: null,
 };
 
@@ -1078,7 +1075,7 @@ function newRun(cid, heroName){
     enemies:[],
     targetIdx:0,
     map:genMap(),
-    path:{act:0,row:0,col:null},
+    path:{act:0,row:0,branch:null},
     firstHitUsed:false,
     infiniteMode:false,
     infiniteEncounters:0
@@ -1112,7 +1109,7 @@ function restoreRun(d){
     enemies:[],
     targetIdx:0,
     map:d.map,
-    path:d.path||{act:0,row:0,col:null},
+    path:d.path||{act:0,row:0,branch:null},
     firstHitUsed:false,
     infiniteMode: d.infiniteMode||false,
     infiniteEncounters: d.infiniteEncounters||0
@@ -1124,39 +1121,114 @@ function restoreRun(d){
 //  MAP GENERATION
 // ═══════════════════════════════════════════════
 function pickType(row, actNum){
-  const d=G.difficulty||0;
-  if(row===0)return'combat';
-  if(row===5)return'rest';
+  // Used only as fallback — genMap now controls types directly
   const r=Math.random();
-  const elite = 0.08+actNum*0.04+d*0.03;
-  const rest   = elite+0.16;
-  const shop   = rest+0.12;
-  const chest  = shop+0.15;
+  const elite = 0.08+actNum*0.04;
   if(r<elite) return'elite';
-  if(r<rest)  return'rest';
-  if(r<shop)  return'shop';
-  if(r<chest) return'chest';
   return'combat';
 }
 
+// ═══════════════════════════════════════════════
+//  NUEVO SISTEMA DE MAPA — 4 RAMAS CON FUSIONES
+// ═══════════════════════════════════════════════
+// Estructura de cada nodo:
+//   { type, visited, branch, merged }
+//   branch  → índice de la rama propietaria (0-3), o null si es nodo fusionado
+//   merged  → [ramaA, ramaB] si es nodo compartido entre dos ramas, null si no
+//
+// G.path ahora incluye: { act, row, branch }
+//   branch → rama activa del jugador (0-3), se fija al elegir en fila 0
+//
+// Cada fila tiene 4 slots (uno por rama).
+// Los nodos fusionados comparten el mismo objeto en dos posiciones de la fila.
+
+function _shuffleArr(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function _genBranchPool(totalRows){
+  // Genera una pool de tipos para una sola rama de `totalRows` nodos.
+  // Fila 0 siempre combat, fila totalRows-1 siempre rest, resto variado.
+  const interior = totalRows - 2; // filas 1 .. totalRows-2
+  const shopC  = 1 + Math.floor(Math.random()*2);
+  const chestC = 1 + Math.floor(Math.random()*2);
+  const restC  = 1;
+  const eliteC = 1 + Math.floor(Math.random()*2);
+  const filled = shopC + chestC + restC + eliteC;
+  const combC  = Math.max(0, interior - filled);
+  const pool = [
+    ...Array(shopC).fill('shop'),
+    ...Array(chestC).fill('chest'),
+    ...Array(restC).fill('rest'),
+    ...Array(eliteC).fill('elite'),
+    ...Array(combC).fill('combat'),
+  ];
+  return _shuffleArr(pool);
+}
+
 function genMap(){
-  const raw = Array.from({length:3},(_,ai)=>({
-    rows: Array.from({length:6},(_,ri)=>[
-      {type:pickType(ri,ai),visited:false},
-      {type:pickType(ri,ai),visited:false}
-    ]),
-    boss:{type:'boss',visited:false},
-    dialoguePool:[],
-    dialogueUsed:[],
-    dialogueTriggers:[]
-  }));
-  // Asignar triggers de diálogo: filas del mapa tras las que aparecerá el evento
-  // Son entre 2 y 4 por acto, en filas aleatorias (no la última antes del boss)
+  const NUM_BRANCHES = 4;
+  const NUM_ROWS     = 11;
+
+  const raw = Array.from({length:3},(_,ai)=>{
+
+    // ── 1. Tipos por rama ──────────────────────────────────────
+    const branchTypes = Array.from({length:NUM_BRANCHES}, () => {
+      const pool = _genBranchPool(NUM_ROWS);
+      return ['combat', ...pool, 'rest'];
+    });
+
+    // ── 2. Fusiones: SOLO [0,1] y [2,3], exactamente 2 veces cada par
+    // Filas elegibles: 2..8, sin dos consecutivas del mismo par
+    const mergedAt = Array(NUM_ROWS).fill(null);
+    const PAIRS = [[0,1],[2,3]];
+    for(const [a,b] of PAIRS){
+      const eligible = _shuffleArr(Array.from({length:7},(_,i)=>i+2));
+      let count = 0;
+      for(const ri of eligible){
+        if(count >= 2) break;
+        if(mergedAt[ri] !== null) continue;
+        // No consecutivas del mismo par
+        if(ri>0 && mergedAt[ri-1] && mergedAt[ri-1][0]===a) continue;
+        if(ri<NUM_ROWS-1 && mergedAt[ri+1] && mergedAt[ri+1] && mergedAt[ri+1][0]===a) continue;
+        mergedAt[ri] = [a,b];
+        count++;
+      }
+    }
+
+    // ── 3. Construir filas ─────────────────────────────────────
+    const rows = [];
+    for(let ri=0;ri<NUM_ROWS;ri++){
+      const merge = mergedAt[ri];
+      const rowNodes = Array.from({length:NUM_BRANCHES}, (_,bi) => ({
+        type: branchTypes[bi][ri],
+        visited: false,
+        branch: bi,
+        merged: null,
+      }));
+      if(merge){
+        const [a,b] = merge;
+        const fusionType = branchTypes[Math.random()<0.5?a:b][ri];
+        const sharedNode = { type:fusionType, visited:false, branch:null, merged:[a,b] };
+        rowNodes[a] = sharedNode;
+        rowNodes[b] = sharedNode;
+      }
+      rows.push(rowNodes);
+    }
+
+    return {
+      rows,
+      boss:{type:'boss',visited:false},
+      dialoguePool:[],
+      dialogueUsed:[],
+      dialogueTriggers:[],
+      revealed: ai === 0,
+    };
+  });
+
+  // Diálogos en filas 1-9
   raw.forEach((act, ai) => {
-    act.dialoguePool = pickDialogueEvents(ai); // 2-4 eventos
+    act.dialoguePool = pickDialogueEvents(ai);
     act.dialogueUsed = [];
-    // Elegir en qué filas (0-5) se disparará el diálogo al completarlas
-    const eligibleRows = [0,1,2,3,4,5];
+    const eligibleRows = [1,2,3,4,5,6,7,8,9];
     const shuffled = [...eligibleRows].sort(()=>Math.random()-0.5);
     act.dialogueTriggers = shuffled.slice(0, act.dialoguePool.length).sort((a,b)=>a-b);
   });
@@ -1178,13 +1250,74 @@ function show(id){
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
 }
 function goTitle(){playUI();updateTitle();show('title')}
+// ═══════════════════════════════════════════════
+//  SPLASH TEXTS — edita esta lista para cambiar los mensajes
+// ═══════════════════════════════════════════════
+const SPLASH_TEXTS = [
+  'Intenta pasar del segundo acto',
+  'Edicion pre-pre-pre-pre alpha!',
+  'Versión 0.0.10 — todavía sin dragones',
+  '¿Has probado a poner el cursor sobre las cartas?',
+  'Low cortisol',
+  'U i a i',
+  '¡ Un caballo dorado !',
+  '¡Mas de 5000 lineas de codigo!',
+  '90% libre de bugs',
+  'GOTY',
+  'Noctis deck 33',
+  'El acto II es .... ¿ragebait?',
+  'Gugu gaaaaga',
+  'Aqui no hay nada de petróleo!',
+  'Ama el grindeo!',
+  'Job offer',
+  'japan is converting footsteps into electricity!',
+  'El sangrado es solo daño con estilo.',
+  'Stop doomscrolling',
+  'Explaining to WW3 recruiter that i only do pve content',
+];
+
+function initSplash() {
+  const wrap = document.getElementById('splashWrap');
+  const el   = document.getElementById('splashText');
+  if(!wrap || !el) return;
+  const txt = SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)];
+  el.textContent = '✦ ' + txt + ' ✦';
+
+  function placeSplash() {
+    const titleEl = document.getElementById('titleMain');
+    if(!titleEl) return;
+    const r = titleEl.getBoundingClientRect();
+    wrap.style.left      = (r.right - 150) + 'px';
+    wrap.style.top       = (r.top - 25) + 'px';
+    wrap.style.transform = 'rotate(+18deg)';
+    wrap.style.display   = 'block';
+  }
+  requestAnimationFrame(() => requestAnimationFrame(placeSplash));
+  window.addEventListener('resize', placeSplash);
+}
+
 function updateTitle(){
-  const sv=loadG();
-  const bc=document.getElementById('btnContinue'),sb=document.getElementById('saveBadge'),bd=document.getElementById('btnDel');
-  if(sv){bc.style.display='';sb.style.display='';bd.style.display='';const ch=chById(sv.charId);const p=sv.path||{act:0,row:0};sb.textContent=`${sv.heroName||ch?.name||'?'}  ·  ${sv.infiniteMode?'Modo Infinito':'Acto '+(p.act||0+1)}  ·  ${sv.savedAt}`}
-  else{bc.style.display='none';sb.style.display='none';bd.style.display='none'}
-  const db=document.getElementById('diffBadge');
-  if(db) db.textContent='';
+  const sv = loadG();
+  const menuNo   = document.getElementById('menuNoSave');
+  const menuWith = document.getElementById('menuWithSave');
+  const sb  = document.getElementById('saveBadge');
+  const db  = document.getElementById('diffBadge');
+  const db2 = document.getElementById('diffBadge2');
+
+  if(sv) {
+    if(menuNo)   menuNo.style.display   = 'none';
+    if(menuWith) { menuWith.style.display = 'flex'; }
+    if(sb) {
+      const ch = chById(sv.charId);
+      const p  = sv.path || {act:0, row:0};
+      sb.textContent = `${sv.heroName||ch?.name||'?'}  ·  ${sv.infiniteMode?'Modo Infinito':'Acto '+((p.act||0)+1)}  ·  ${sv.savedAt}`;
+    }
+    if(db2) db2.textContent = '';
+  } else {
+    if(menuNo)   { menuNo.style.display = 'flex'; }
+    if(menuWith) menuWith.style.display = 'none';
+    if(db) db.textContent = '';
+  }
 }
 function goCharSelect(){playUI();renderChars();show('chars')}
 
@@ -1223,7 +1356,11 @@ function confirmName() {
   const charId  = overlay.dataset.charId;
   const name    = input.value.trim() || DEFAULT_HERO_NAME;
   overlay.classList.remove('active');
-  setTimeout(()=>{ overlay.style.display='none'; newRun(charId, name); showMap(); }, 350);
+  setTimeout(()=>{
+    overlay.style.display='none';
+    newRun(charId, name);
+    showActTransition(0, ()=>{ showMap(); });
+  }, 350);
 }
 
 // ═══════════════════════════════════════════════
@@ -1250,62 +1387,375 @@ function startRunWithChar(){if(!selChar)return; showNameSelect(selChar);}
 function showMap(){renderMap();show('map')}
 
 function renderMap(){
-  const c=document.getElementById('mapActs');c.innerHTML='';
-  // ✏ CAMBIO 7: mostrar oro del jugador en el mapa
-  let mapGold=document.getElementById('mapGoldDisplay');
+  // ══════════════════════════════════════════════════════════════
+  //  4 COLUMNAS · líneas mismo color · layout centrado y amplio
+  //  Fusiones solo entre [0,1] y [2,3]
+  // ══════════════════════════════════════════════════════════════
+  const c = document.getElementById('mapActs');
+  c.innerHTML = '';
+  c.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:0;width:100%;overflow-y:auto;padding-bottom:24px;';
+
+  // ── Oro ─────────────────────────────────────────────────────
+  let mapGold = document.getElementById('mapGoldDisplay');
   if(!mapGold){
-    mapGold=document.createElement('div');
-    mapGold.id='mapGoldDisplay';
-    mapGold.className='map-gold-display';
-    document.getElementById('s-map').insertBefore(mapGold,document.getElementById('mapActs'));
+    mapGold = document.createElement('div');
+    mapGold.id = 'mapGoldDisplay';
+    mapGold.className = 'map-gold-display';
+    const smap = document.getElementById('s-map');
+    smap.insertBefore(mapGold, document.getElementById('mapActs'));
   }
-  mapGold.innerHTML='🪙 <b style="color:var(--gold2);font-family:\'Cinzel Decorative\',cursive">'+(G.gold||0)+'</b> <span style="font-size:0.75em;opacity:.6">oro</span>';
-  const IC={combat:'⚔',elite:'💀',rest:'🕯',shop:'🛒',boss:'👁',chest:'📦'};
-  const LABEL={combat:'COMBATE',elite:'ÉLITE',rest:'DESCANSO',shop:'TIENDA',boss:'JEFE',chest:'COFRE'};
-  const {act:curAct,row:curRow,col:curCol}=G.path;
+  mapGold.innerHTML = '\uD83E\uDE99 <b style="color:var(--gold2);font-family:\'Cinzel Decorative\',cursive">'+(G.gold||0)+'</b> <span style="font-size:.75em;opacity:.6">oro</span>';
 
-  G.map.forEach((actData,ai)=>{
-    const col=document.createElement('div');col.className='map-act';
-    const lbl=document.createElement('div');lbl.className='act-lbl';lbl.textContent=`Acto ${ai+1}`;col.appendChild(lbl);
+  const IC    = {combat:'⚔',elite:'💀',rest:'🕯',shop:'🛒',boss:'👁',chest:'📦'};
+  const LABEL = {combat:'COMBATE',elite:'ÉLITE',rest:'DESCANSO',shop:'TIENDA',boss:'JEFE',chest:'COFRE'};
 
-    actData.rows.forEach((rowPair,ri)=>{
-      const rowEl=document.createElement('div');rowEl.className='map-row';
-      rowPair.forEach((node,ci)=>{
-        const el=document.createElement('div');el.className='mnode';
-        if(node.type==='elite')el.classList.add('elite');
-        if(node.type==='chest')el.classList.add('chest');
-        const isChoosable = ai===curAct && ri===curRow && curCol===null;
-        const isActive    = ai===curAct && ri===curRow && curCol===ci && !node.visited;
-        const isVis       = node.visited;
-        const siblingChosen = rowPair[1-ci]&&rowPair[1-ci].visited;
-        if(isVis){el.classList.add('vis');}
-        else if(isActive){el.classList.add('cur','cur-active');}
-        else if(isChoosable && !siblingChosen){el.classList.add('cur');}
-        else{el.classList.add('lkd');}
-        el.innerHTML=`<div class="n-ico">${IC[node.type]||'?'}</div><div class="n-lbl">${LABEL[node.type]||node.type}</div>`;
-        if((isChoosable && !siblingChosen) || isActive){el.addEventListener('click',()=>enterNode(ai,ri,ci));}
-        rowEl.appendChild(el);
-      });
-      col.appendChild(rowEl);
-      if(ri<actData.rows.length-1){
-        const cn=document.createElement('div');cn.className='mconn-h';col.appendChild(cn);
-      }
-    });
+  const {act:curAct, row:curRow, branch:curBranch} = G.path;
+  const branchChosen = (curBranch !== null && curBranch !== undefined);
 
-    const cnBoss=document.createElement('div');cnBoss.className='mconn-h';col.appendChild(cnBoss);
-    const bossEl=document.createElement('div');bossEl.className='mnode boss';
-    const isBossCur    = ai===curAct && curRow===6 && curCol===null;
-    const isBossActive = ai===curAct && curRow===6 && curCol===0 && !actData.boss.visited;
-    const isBossVis    = actData.boss.visited;
-    if(isBossVis)bossEl.classList.add('vis');
-    else if(isBossActive)bossEl.classList.add('cur','cur-active');
-    else if(isBossCur)bossEl.classList.add('cur');
-    else bossEl.classList.add('lkd');
-    bossEl.innerHTML=`<div class="n-ico">👁</div><div class="n-lbl">JEFE</div>`;
-    if(isBossCur||isBossActive)bossEl.addEventListener('click',()=>enterNode(ai,6,0));
-    col.appendChild(bossEl);
-    c.appendChild(col);
+  // ── Barra progreso de actos ──────────────────────────────────
+  const actBar = document.createElement('div');
+  actBar.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 8px;';
+  G.map.forEach((actData, ai) => {
+    const isDone = actData.boss && actData.boss.visited;
+    const isCur  = ai === curAct;
+    const dot = document.createElement('div');
+    dot.style.cssText = "display:flex;align-items:center;gap:5px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;"
+      +"color:"+(isDone?'#4acc70':isCur?'var(--gold)':'#3a2a4a')+";white-space:nowrap;";
+    const circle = document.createElement('div');
+    circle.style.cssText = "width:"+(isCur?'13px':'9px')+";height:"+(isCur?'13px':'9px')+";border-radius:50%;flex-shrink:0;"
+      +"background:"+(isDone?'#4acc70':isCur?'var(--gold)':'#2a1a3a')+";"
+      +"border:2px solid "+(isDone?'#4acc7066':isCur?'var(--gold)':'#3a2a4a')+";"
+      +"box-shadow:"+(isCur?'0 0 10px var(--gold)':'none')+";";
+    dot.appendChild(circle);
+    const lbl2 = document.createElement('span');
+    lbl2.textContent = isDone ? 'Acto '+(ai+1)+' ✓' : 'Acto '+(ai+1);
+    if(!isDone && !isCur) lbl2.style.opacity = '.3';
+    dot.appendChild(lbl2);
+    actBar.appendChild(dot);
+    if(ai < G.map.length-1){
+      const ln = document.createElement('div');
+      ln.style.cssText = 'width:24px;height:2px;background:'+(ai<curAct?'#4acc7055':'#2a1a3a')+';border-radius:1px;flex-shrink:0;';
+      actBar.appendChild(ln);
+    }
   });
+  c.appendChild(actBar);
+
+  // ── Título acto ──────────────────────────────────────────────
+  const lbl = document.createElement('div');
+  lbl.className = 'act-lbl';
+  lbl.style.cssText = 'text-align:center;margin-bottom:4px;';
+  lbl.textContent = '✦  Acto '+(curAct+1)+'  ✦';
+  c.appendChild(lbl);
+
+  // ── Badge rama activa ────────────────────────────────────────
+  if(branchChosen){
+    const badge = document.createElement('div');
+    badge.style.cssText = 'margin-bottom:10px;font-family:\'Cinzel\',serif;font-size:10px;letter-spacing:2px;'
+      +'padding:3px 14px;border-radius:20px;border:1px solid #d4a84355;color:var(--gold);opacity:.8;';
+    badge.textContent = 'Rama ' + ['I','II','III','IV'][curBranch];
+    c.appendChild(badge);
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  //  DIMENSIONES DEL LAYOUT
+  //  Usamos todo el ancho disponible (~800px en desktop)
+  //  4 columnas con separación generosa entre pares [0,1] y [2,3]
+  // ══════════════════════════════════════════════════════════════
+  const NUM_B    = 4;
+  const NODE_W   = 96;   // ancho nodo
+  const NODE_H   = 70;   // alto nodo
+  const GAP_INNER= 28;   // separación entre ramas del mismo par (0-1, 2-3)
+  const GAP_MID  = 90;   // separación entre los dos pares
+  const ROW_H    = 104;  // altura por fila (nodo + espacio)
+  const PAD_X    = 24;
+  const PAD_TOP  = 16;
+
+  const actData = G.map[curAct];
+  const numRows = actData.rows.length; // 11
+
+  // X centro de cada columna
+  // Orden: 0, 1, [gap_mid], 2, 3
+  const colX = [
+    PAD_X + NODE_W/2,
+    PAD_X + NODE_W + GAP_INNER + NODE_W/2,
+    PAD_X + NODE_W + GAP_INNER + NODE_W + GAP_MID + NODE_W/2,
+    PAD_X + NODE_W + GAP_INNER + NODE_W + GAP_MID + NODE_W + GAP_INNER + NODE_W/2,
+  ];
+  const totalW = PAD_X*2 + NODE_W*4 + GAP_INNER*2 + GAP_MID;
+  const totalH = PAD_TOP + (numRows+1)*ROW_H + NODE_H + 10;
+
+  const rowTY = ri => PAD_TOP + ri*ROW_H;
+  const rowCY = ri => rowTY(ri) + NODE_H/2;
+
+  // Contenedor
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative;width:'+totalW+'px;height:'+totalH+'px;flex-shrink:0;margin:0 auto;';
+
+  // ── SVG de líneas ─────────────────────────────────────────────
+  // Color único para todas las líneas
+  const LINE_COLOR_DIM    = '#4a3a5a';   // ramas no activas / no elegidas aún
+  const LINE_COLOR_ACTIVE = '#c9984a99'; // rama activa del jugador
+  const LINE_W_DIM    = '1.2';
+  const LINE_W_ACTIVE = '2';
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+  svg.setAttribute('viewBox','0 0 '+totalW+' '+totalH);
+  svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;';
+
+  // Helper: ¿esta rama es visible para el jugador?
+  const branchVisible = (bi) => !branchChosen || bi===curBranch;
+  const isActive      = (bi) => branchChosen && bi===curBranch;
+
+  // ── Helpers SVG ──────────────────────────────────────────────
+  const mkPath = (d, active) => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', d);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke', active ? LINE_COLOR_ACTIVE : LINE_COLOR_DIM);
+    p.setAttribute('stroke-width', active ? LINE_W_ACTIVE : LINE_W_DIM);
+    svg.appendChild(p);
+  };
+
+  // Línea recta vertical simple
+  const addStraight = (x,y1,y2,active) => mkPath(`M${x},${y1} L${x},${y2}`, active);
+
+  // Llave invertida: sale de x1 hacia abajo, se une con x2 en un punto central yJoin,
+  // luego baja verticalmente hasta yEnd.
+  // Forma:  x1 baja un poco → curva hacia centro → centro baja → curva hacia x2 → x2 sube un poco
+  // + línea vertical del centro hacia yEnd
+  const addBracket = (xa,xb,y1a,y1b,xCenter,yJoin,yEnd,active) => {
+    const r = 10; // radio de la esquina
+    const yHook = y1a + (yJoin - y1a) * 0.55; // punto de inflexión
+    // Rama izquierda: xa baja, curva hacia centro
+    mkPath(`M${xa},${y1a} L${xa},${yHook} Q${xa},${yJoin} ${xCenter},${yJoin}`, active);
+    // Rama derecha: xb baja, curva hacia centro
+    mkPath(`M${xb},${y1b} L${xb},${yHook} Q${xb},${yJoin} ${xCenter},${yJoin}`, active);
+    // Línea central hacia el nodo fusionado
+    mkPath(`M${xCenter},${yJoin} L${xCenter},${yEnd}`, active);
+  };
+
+  for(let ri=0; ri<numRows; ri++){
+    const y1bot = rowCY(ri) + NODE_H/2 - 3;
+    const isLastNormal = ri === numRows-1;
+    const curRowNodes  = actData.rows[ri];
+    const nextRowNodes = !isLastNormal ? actData.rows[ri+1] : null;
+
+    // Detectar si la fila ACTUAL tiene nodos fusionados (para saber el origen)
+    // curFusionByBranch[bi] = { fusX, a, b }  si bi pertenece a un nodo fusionado
+    const curFusionByBranch = {};
+    for(let bi=0;bi<NUM_B;bi++){
+      const nd = curRowNodes[bi];
+      if(nd && nd.merged){
+        const [a,b] = nd.merged;
+        const fusX = (colX[a]+colX[b])/2;
+        curFusionByBranch[a] = {fusX, a, b};
+        curFusionByBranch[b] = {fusX, a, b};
+      }
+    }
+
+    // Detectar fusiones en la fila SIGUIENTE (destino)
+    const nextFusionByBranch = {};
+    if(nextRowNodes){
+      for(let bi=0;bi<NUM_B;bi++){
+        const nd = nextRowNodes[bi];
+        if(nd && nd.merged){
+          const [a,b] = nd.merged;
+          const fusX = (colX[a]+colX[b])/2;
+          nextFusionByBranch[a] = {fusX, a, b};
+          nextFusionByBranch[b] = {fusX, a, b};
+        }
+      }
+    }
+
+    if(isLastNormal){
+      // Última fila: todas convergen al boss centrado
+      const bossX = totalW/2;
+      const yEnd  = rowTY(numRows) + 3;
+      const yJoinL = y1bot + (yEnd-y1bot)*0.5;
+      // Par izquierdo [0,1]
+      if(branchVisible(0) || branchVisible(1)){
+        const act2 = isActive(0)||isActive(1);
+        // origen: si hay fusión en esta fila para el par, sale del centro fusionado
+        const srcL = curFusionByBranch[0] ? curFusionByBranch[0].fusX : null;
+        if(srcL !== null){
+          // el par ya está fusionado → línea recta del centro al boss
+          addStraight(srcL, y1bot, yEnd, act2);
+        } else {
+          addBracket(colX[0],colX[1],y1bot,y1bot,bossX,yJoinL,yEnd,act2);
+        }
+      }
+      // Par derecho [2,3]
+      if(branchVisible(2) || branchVisible(3)){
+        const act2 = isActive(2)||isActive(3);
+        const srcR = curFusionByBranch[2] ? curFusionByBranch[2].fusX : null;
+        if(srcR !== null){
+          addStraight(srcR, y1bot, yEnd, act2);
+        } else {
+          addBracket(colX[2],colX[3],y1bot,y1bot,bossX,yJoinL,yEnd,act2);
+        }
+      }
+      continue;
+    }
+
+    const y2top = rowTY(ri+1) + 3;
+    const drawnBrackets = new Set();
+    const drawnStraights = new Set();
+
+    for(let bi=0;bi<NUM_B;bi++){
+      if(!branchVisible(bi)) continue;
+
+      const fromFusion = curFusionByBranch[bi];  // ¿sale de nodo fusionado?
+      const toFusion   = nextFusionByBranch[bi]; // ¿llega a nodo fusionado?
+
+      if(fromFusion && toFusion){
+        // fusionado → fusionado: línea recta del centro al centro
+        const key = 'ff'+fromFusion.a+toFusion.a;
+        if(!drawnStraights.has(key)){
+          drawnStraights.add(key);
+          const act2 = isActive(fromFusion.a)||isActive(fromFusion.b);
+          addStraight(fromFusion.fusX, y1bot, y2top, act2);
+        }
+      } else if(fromFusion){
+        // fusionado → dos nodos separados: llave que abre (invertida hacia abajo)
+        const key = 'fo'+fromFusion.a+'-'+fromFusion.b;
+        if(!drawnBrackets.has(key)){
+          drawnBrackets.add(key);
+          const {fusX,a,b} = fromFusion;
+          const act2 = isActive(a)||isActive(b);
+          // Llave que abre: sale del centro y se bifurca hacia colX[a] y colX[b]
+          const yJoin = y1bot + (y2top-y1bot)*0.45;
+          mkPath(`M${fusX},${y1bot} L${fusX},${yJoin} Q${fusX},${y2top} ${colX[a]},${y2top}`, act2);
+          mkPath(`M${fusX},${yJoin} Q${fusX},${y2top} ${colX[b]},${y2top}`, act2);
+        }
+      } else if(toFusion){
+        // dos nodos separados → fusionado: llave que cierra
+        const key = 'of'+toFusion.a+'-'+toFusion.b;
+        if(!drawnBrackets.has(key)){
+          drawnBrackets.add(key);
+          const {fusX,a,b} = toFusion;
+          const act2 = isActive(a)||isActive(b);
+          const yJoin = y1bot + (y2top-y1bot)*0.55;
+          // Llave que cierra: dos ramas convergen al centro
+          mkPath(`M${colX[a]},${y1bot} Q${colX[a]},${yJoin} ${fusX},${yJoin} L${fusX},${y2top}`, act2);
+          mkPath(`M${colX[b]},${y1bot} Q${colX[b]},${yJoin} ${fusX},${yJoin}`, act2);
+        }
+      } else {
+        // normal → normal: línea recta
+        addStraight(colX[bi], y1bot, y2top, isActive(bi));
+      }
+    }
+  }
+
+  wrap.appendChild(svg);
+
+
+
+  // ── Nodos ─────────────────────────────────────────────────────
+  const renderedFusions = new Set();
+
+  for(let ri=0; ri<=numRows; ri++){
+    const isBossRow = ri===numRows;
+    const ty = rowTY(ri);
+
+    if(isBossRow){
+      const bx = totalW/2 - NODE_W/2;
+      const el = document.createElement('div');
+      el.className = 'mnode boss';
+      el.style.cssText = 'position:absolute;left:'+bx+'px;top:'+ty+'px;width:'+NODE_W+'px;height:'+NODE_H+'px;';
+      const isBossActive = curRow===numRows && !actData.boss.visited;
+      const isBossVis    = actData.boss.visited;
+      if(isBossVis)        el.classList.add('vis');
+      else if(isBossActive)el.classList.add('cur','cur-active');
+      else if(curRow===numRows) el.classList.add('cur');
+      else                 el.classList.add('lkd');
+      el.innerHTML = '<div class="n-ico">👁</div><div class="n-lbl">JEFE</div>';
+      if(isBossActive)
+        el.addEventListener('click',()=>enterNodeBranch(curAct,numRows,curBranch||0,false));
+      wrap.appendChild(el);
+      continue;
+    }
+
+    const rowNodes = actData.rows[ri];
+
+    for(let bi=0;bi<NUM_B;bi++){
+      const node = rowNodes[bi];
+      const isFused = node && node.merged;
+
+      if(isFused){
+        const [fa,fb] = node.merged;
+        const fusKey = ri+'-'+fa+'-'+fb;
+        if(renderedFusions.has(fusKey)) continue;
+        renderedFusions.add(fusKey);
+
+        // Centrado entre las dos columnas del par
+        const fusX = (colX[fa]+colX[fb])/2 - NODE_W/2;
+        const el = document.createElement('div');
+        el.className = 'mnode';
+        el.style.cssText = 'position:absolute;left:'+fusX+'px;top:'+ty+'px;'
+          +'width:'+NODE_W+'px;height:'+NODE_H+'px;';
+
+        if(node.type==='elite') el.classList.add('elite');
+        if(node.type==='chest') el.classList.add('chest');
+
+        const isCurrentRow   = ri===curRow;
+        const playerInFusion = fa===curBranch || fb===curBranch;
+        const isChoosableNow = isCurrentRow && !branchChosen;
+        const isActiveNow    = isCurrentRow && branchChosen && playerInFusion && !node.visited;
+        const isVis          = node.visited;
+        const involved       = !branchChosen || playerInFusion;
+
+        if(!involved)           el.classList.add('lkd');
+        else if(isVis)          el.classList.add('vis');
+        else if(isActiveNow)    el.classList.add('cur','cur-active');
+        else if(isChoosableNow) el.classList.add('cur');
+        // nodos fusionados futuros: aspecto normal sin brillo
+
+        el.innerHTML += '<div class="n-ico">'+(IC[node.type]||'?')+'</div>'
+          +'<div class="n-lbl">'+(LABEL[node.type]||node.type)+'</div>';
+
+        if(involved&&!isVis&&(isChoosableNow||isActiveNow||(isCurrentRow&&playerInFusion))){
+          el.style.cursor='pointer';
+          el.addEventListener('click',()=>enterNodeBranch(curAct,ri,fa,true));
+        }
+        wrap.appendChild(el);
+        continue;
+      }
+
+      // ── Nodo normal ──────────────────────────────────────────
+      const isMyBranch = !branchChosen || bi===curBranch;
+      const nx = colX[bi]-NODE_W/2;
+      const el = document.createElement('div');
+      el.className = 'mnode';
+      el.style.cssText = 'position:absolute;left:'+nx+'px;top:'+ty+'px;width:'+NODE_W+'px;height:'+NODE_H+'px;';
+
+      if(node.type==='elite') el.classList.add('elite');
+      if(node.type==='chest') el.classList.add('chest');
+
+      const isCurrentRow   = ri===curRow;
+      const isChoosableNow = isCurrentRow && !branchChosen;
+      const isActiveNow    = isCurrentRow && branchChosen && bi===curBranch && !node.visited;
+      const isVis          = node.visited;
+
+      if(!isMyBranch)         el.classList.add('lkd');
+      else if(isVis)          el.classList.add('vis');
+      else if(isActiveNow)    el.classList.add('cur','cur-active');
+      else if(isChoosableNow) el.classList.add('cur');
+      // nodos futuros de mi rama: aspecto normal sin brillo (no lkd)
+
+      el.innerHTML = '<div class="n-ico">'+(IC[node.type]||'?')+'</div>'
+        +'<div class="n-lbl">'+(LABEL[node.type]||node.type)+'</div>';
+
+      if(isMyBranch&&!isVis&&(isChoosableNow||isActiveNow)){
+        el.style.cursor='pointer';
+        el.addEventListener('click',()=>enterNodeBranch(curAct,ri,bi,false));
+      }
+      wrap.appendChild(el);
+    }
+  }
+
+  c.appendChild(wrap);
 }
 
 
@@ -1921,11 +2371,16 @@ function getResultBadge(type, pickedCard, amount) {
 }
 
 
-function enterNode(ai,ri,ci){
-  G.path={act:ai,row:ri,col:ci};
+// Punto de entrada unificado para el nuevo sistema de ramas
+function enterNodeBranch(ai, ri, bi, isFused){
+  const numRowsAct = G.map[ai] ? G.map[ai].rows.length : 11;
+  const node = ri === numRowsAct ? G.map[ai].boss : (G.map[ai].rows[ri]||[])[bi];
+  if(!node) return;
+
+  // Fijar rama si aún no se había elegido (fila 0)
+  G.path = {act:ai, row:ri, branch:bi};
   saveG();
-  const node = ri===6 ? G.map[ai].boss : G.map[ai].rows[ri][ci];
-  if(!node)return;
+
   if(['combat','elite','boss'].includes(node.type)){
     playUI();
     runEncounters++;
@@ -1939,40 +2394,59 @@ function enterNode(ai,ri,ci){
   }
 }
 
+// Mantener compatibilidad con código que aún llama enterNode(ai,ri,ci)
+function enterNode(ai,ri,ci){
+  enterNodeBranch(ai, ri, ci, false);
+}
+
 function advance(){
-  const {act,row,col}=G.path;
+  const {act, row, branch} = G.path;
+  const numRowsAct = G.map[act].rows.length;
+
   // Marcar nodo actual como visitado
-  if(row===6){ G.map[act].boss.visited=true; }
-  else if(col!==null){ G.map[act].rows[row][col].visited=true; }
+  if(row === numRowsAct){
+    G.map[act].boss.visited = true;
+  } else if(branch !== null && branch !== undefined){
+    const node = G.map[act].rows[row][branch];
+    if(node) node.visited = true;
+  }
 
   // ── Cambio de acto (tras boss) ──
-  if(row===6){
-    const nextAct=act+1;
-    if(nextAct>=G.map.length){
+  if(row === numRowsAct){
+    const nextAct = act + 1;
+    if(nextAct >= G.map.length){
       localStorage.removeItem(SK);
       showPostAct3();
       return;
     }
-    // Arrancar el acto siguiente siempre desde fila 0, sin columna elegida
-    G.path={act:nextAct, row:0, col:null};
+    if(G.map[nextAct]) G.map[nextAct].revealed = true;
+    // Nuevo acto: sin rama elegida hasta fila 0
+    G.path = {act:nextAct, row:0, branch:null};
     saveG();
-    showMap();
+    showActTransition(nextAct, ()=>{
+      showMap();
+      setTimeout(()=>{
+        const mapEl = document.getElementById('mapActs');
+        if(mapEl) mapEl.scrollTop = 0;
+        const smap = document.getElementById('s-map');
+        if(smap) smap.scrollTop = 0;
+      }, 100);
+    });
     return;
   }
 
   // ── Avance normal dentro del mismo acto ──
   const nextRow = row + 1;
-  G.path = {act, row:nextRow, col:null};
+  // Si el nodo actual era fusionado, la rama puede mantenerse o restaurarse
+  // (ya está guardada en G.path.branch desde enterNodeBranch)
+  G.path = {act, row:nextRow, branch};
   saveG();
 
-  // ¿Toca evento de diálogo tras completar esta fila?
+  // ¿Toca evento de diálogo?
   const actData = G.map[act];
   if(actData && Array.isArray(actData.dialogueTriggers) && actData.dialogueTriggers.includes(row)){
     const evt = getNextDialogueEvent(act);
-    if(evt){
-      showDialogueEvent(evt, ()=>showMap());
-      return;
-    }
+    if(evt){ showDialogueEvent(evt, ()=>showMap()); return; }
   }
   showMap();
 }
@@ -2254,58 +2728,104 @@ function applyPort(){
 //  INTENT SYSTEM — icono de intención del enemigo
 // ═══════════════════════════════════════════════
 function getEnemyIntent(e) {
-  // Devuelve ARRAY de { icon, text } — uno por acción prevista
-  if(e._hidden) return [{ icon:'👤', text:'Oculto en la oscuridad — no puede ser atacado' }];
+  // Si está oculto: muestra su intención real (para que el jugador se prepare)
+  // más un indicador de que está oculto
+  const hiddenPrefix = e._hidden ? [{ icon:'👤', text:'Oculto — no puede ser atacado este turno' }] : [];
 
   if(e.isHealer) {
     const action = getHealerAction(e, combatTurn);
-    if(action==='heal')   return [{ icon:'❤', text:`Curará al aliado con menos vida (+${e.healAmt||8} HP)` }];
-    if(action==='shield') return [{ icon:'🛡', text:`Escudará a todos los aliados (+${e.shieldAmt||6} de bloqueo cada uno)` }];
-    if(action==='debuff') return [{ icon:'☠', text:`Lanzará una maldición: veneno o sangrado al jugador` }];
-    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    let intents;
+    if(action==='heal')   intents = [{ icon:'❤', text:`Curará al aliado con menos vida (+${e.healAmt||8} HP)` }];
+    else if(action==='shield') intents = [{ icon:'🛡', text:`Escudará a todos los aliados (+${e.shieldAmt||6} de bloqueo cada uno)` }];
+    else if(action==='debuff') intents = [{ icon:'☠', text:`Lanzará una maldición: veneno o sangrado al jugador` }];
+    else intents = [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    return [...hiddenPrefix, ...intents];
   }
   if(e.isVampiro) {
-    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }, { icon:'🧛', text:`Robará ${e.lifestealOnAttack} HP para sí mismo al golpear` }];
+    const intents = [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }, { icon:'🧛', text:`Robará ${e.lifestealOnAttack} HP para sí mismo al golpear` }];
+    return [...hiddenPrefix, ...intents];
   }
   if(e.isCondesa) {
     const mode = (e.condensaTurn||0) % 3;
-    if(mode === 0) return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
-    if(mode === 1) return [{ icon:'🛡', text:`Se defenderá: ganará +${e.shieldPerTurn} de bloqueo` }];
-    return [{ icon:'☠', text:`Envenenará al jugador (+${e.poisonPerTurn} veneno)` }];
+    let intents;
+    if(mode === 0) intents = [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    else if(mode === 1) intents = [{ icon:'🛡', text:`Se defenderá: ganará +${e.shieldPerTurn} de bloqueo` }];
+    else intents = [{ icon:'☠', text:`Envenenará al jugador (+${e.poisonPerTurn} veneno)` }];
+    return [...hiddenPrefix, ...intents];
   }
   if(e.isGuardian) {
     const phase = (combatTurn||0) % 2;
-    if(phase === 1) return [
-      { icon:'⚔', text:`Atacará desde las sombras por ${e.dmg} de daño` },
-      { icon:'👁', text:`Ocultará a un aliado aleatorio hasta el próximo turno (no puede ser atacado)` }
+    let intents;
+    if(phase === 1) intents = [
+      { icon:'👁', text:`Ocultará a un aliado aleatorio hasta el próximo turno` }
     ];
-    return [
+    else intents = [
       { icon:'⚔', text:`Atacará por ${e.dmg} de daño` },
       { icon:'🕯', text:`Reducirá tu daño en 2 (acumulable hasta −6)` }
     ];
+    return [...hiddenPrefix, ...intents];
   }
   if(e.isBaron) {
     const summonedAlive = G.enemies.filter(en=>!en.dead&&(en.isMurcielago||en.isVampiro)&&en!==e).length;
     const turnsSince = (e.baronPhase||0) - (e.lastSummonTurn||(-99));
-    const isFirstTurn = (e.baronPhase||0) === 0; // antes de que actúe
+    const isFirstTurn = (e.baronPhase||0) === 0;
     const canSummon = summonedAlive < 2 && (turnsSince >= 5 || isFirstTurn);
-    if(canSummon) return [{ icon:'🦇', text:`Invocará ${summonedAlive===0?2:1} Murciélago(s) de Hemlock al campo` }];
-    if(e.hp/e.maxHp < 0.60) return [
+    let intents;
+    if(canSummon) intents = [{ icon:'🦇', text:`Invocará ${summonedAlive===0?2:1} Murciélago(s) de Hemlock al campo` }];
+    else if(e.hp/e.maxHp < 0.60) intents = [
       { icon:'💀', text:`Puede curarse (~${Math.round(e.maxHp*0.18)} HP)` },
       { icon:'⚔', text:`O atacará por ${e.dmg} de daño` }
     ];
-    return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    else intents = [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+    return [...hiddenPrefix, ...intents];
   }
   if(e.isMurcielago) {
     const turnsLeft = Math.max(0, 5 - (e.murcielagoTurns||0));
-    if(turnsLeft === 0) return [{ icon:'🧛', text:`¡Se transformará en Vampiro Sanguinario este turno!` }];
-    return [
+    let intents;
+    if(turnsLeft === 0) intents = [{ icon:'🧛', text:`¡Se transformará en Vampiro Sanguinario este turno!` }];
+    else intents = [
       { icon:'⚔', text:`Atacará por ${e.dmg} de daño` },
       { icon:'🧛', text:`Se transforma en vampiro en ${turnsLeft} turno(s)` }
     ];
+    return [...hiddenPrefix, ...intents];
+  }
+  // GOBLIN ELITE con comportamientos especiales
+  if(e.isGoblinElite) {
+    if(e._shielding) {
+      return [...hiddenPrefix, { icon:'🛡', text:`Se esta escudando! No atacara este turno · +7 escudo` }];
+    }
+    if(e._enraging) {
+      return [...hiddenPrefix, { icon:'😡', text:`Se esta enfureciendo! No atacara este turno` }];
+    }
+    if(e._pendingEliteEnrage) {
+      const boostedDmg = Math.round(e.dmg * 1.25);
+      return [...hiddenPrefix, { icon:'⚡', text:`BUFEADO! Atacara por ${boostedDmg} (+25%) + companeros +25%` }];
+    }
+    if(e._eliteAllyBuff) {
+      const boostedDmg = Math.round(e.dmg * 1.25);
+      return [...hiddenPrefix, { icon:'⚡', text:`Bufeado por el elite! Atacara por ${boostedDmg} (+25%)` }];
+    }
+    return [...hiddenPrefix, { icon:'⚔', text:`Atacara por ${e.dmg} de dano` }];
+  }
+  // GOBLIN NORMAL con enfurecimiento
+  if(e.isGoblin) {
+    if(e._enraging) {
+      return [...hiddenPrefix, { icon:'😡', text:`Se esta enfureciendo! No atacara este turno` }];
+    }
+    if(e._enraged) {
+      const boostedDmg = Math.round(e.dmg * 1.5);
+      return [...hiddenPrefix, { icon:'⚡', text:`BUFEADO! Atacara por ${boostedDmg} (+50%)` }];
+    }
+    if(e._eliteAllyBuff) {
+      const boostedDmg = Math.round(e.dmg * 1.25);
+      return [...hiddenPrefix, { icon:'⚡', text:`Bufeado por elite! Atacara por ${boostedDmg} (+25%)` }];
+    }
+    return [...hiddenPrefix, { icon:'⚔', text:`Atacara por ${e.dmg} de dano` }];
   }
   // Enemigo estándar
-  return [{ icon:'⚔', text:`Atacará por ${e.dmg} de daño` }];
+  const intents = [];
+  intents.push({ icon:'⚔', text:`Atacará por ${e.dmg} de daño` });
+  return [...hiddenPrefix, ...intents];
 }
 
 function renderEnemies() {
@@ -2795,10 +3315,17 @@ function endTurn(){
     } else if(e.isMurcielago) {
       doMurcielagoAction(e);
     } else {
-      // Normal attack
-      if(!e._hidden) {
+      // ── GOBLIN ÉLITE ──────────────────────────────────────────
+      if(e.isGoblinElite) {
+        doGoblinEliteAction(e);
+      }
+      // ── GOBLIN NORMAL ─────────────────────────────────────────
+      else if(e.isGoblin) {
+        doGoblinNormalAction(e);
+      }
+      // ── Enemigo genérico (sin flag) ───────────────────────────
+      else if(!e._hidden) {
         let actualDmg=e.dmg;
-        // Espectro firstHit OR Espejo Espectral relic
         const hasFirstHitEffect = (G.charId==='espectro') || hasRelic('espejo_espectral');
         if(hasFirstHitEffect && !G.firstHitUsed){
           G.firstHitUsed=true;actualDmg=0;
@@ -2806,7 +3333,6 @@ function endTurn(){
           if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
           else addLog('Forma Etérea: golpe evitado!','sta');
         }
-        // Guardián: reduce daño del jugador (accumulated stacks)
         const dmgReduction = G._playerDmgReduction || 0;
         actualDmg = Math.max(1, actualDmg - dmgReduction);
         const ab=Math.min(p.block,actualDmg);
@@ -2862,6 +3388,8 @@ function endTurn(){
   G.turn++;
   sfxPlayerTurn();
   p.block=0;
+  // El escudo de los enemigos dura un turno — se resetea al inicio del turno del jugador
+  G.enemies.forEach(e => { if(!e.dead) e.block = 0; });
   p.mana=p.maxMana;
   drawUpTo(getMaxHand());
 
@@ -3029,31 +3557,14 @@ function doGuardianAction(e) {
   const phase = (combatTurn || 0) % 2;
 
   if(phase === 1) {
-    // Turno de ocultación: usar _hiddenNextTurn para que dure el turno del jugador
+    // Turno de ocultación SOLO: el guardián únicamente oculta, no ataca
     const aliveOthers = G.enemies.filter(en => !en.dead && en !== e);
     const target = aliveOthers.length > 0
       ? aliveOthers[Math.floor(Math.random() * aliveOthers.length)]
-      : e; // Solo: se oculta a sí mismo
+      : e;
     target._hiddenNextTurn = true;
     addLog(`${e.name} apaga el candil · ${target === e ? 'desaparece en la oscuridad' : target.name + ' queda oculto'} hasta el próximo turno 👤`, 'sta');
-
-    // El guardián también ataca en este turno
-    let actualDmg = e.dmg;
-    const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
-    if(hasFirstHit && !G.firstHitUsed){
-      G.firstHitUsed = true; actualDmg = 0;
-      const relicBonus = hasRelic('espejo_espectral') && G.charId!=='espectro';
-      if(relicBonus){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
-      else addLog('Forma Etérea: golpe evitado!','sta');
-    }
-    const dmgRed0 = G._playerDmgReduction || 0;
-    actualDmg = Math.max(1, actualDmg - dmgRed0);
-    const ab0 = Math.min(p.block, actualDmg);
-    p.block = Math.max(0, p.block - actualDmg);
-    const nd0 = actualDmg - ab0;
-    p.hp = Math.max(0, p.hp - nd0);
-    if(nd0 > 0){ addLog(`${e.name} ataca desde las sombras por ${nd0}`,'ene'); spawnN(nd0,'pl'); runDmgTanked+=nd0; animatePlayerHit(); }
-    return;
+    return; // Solo oculta, NO ataca
   }
 
   // phase === 0: ataque normal + aplica debuff de daño
@@ -3089,6 +3600,204 @@ function doMurcielagoAction(e) {
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
   if(nd > 0){ addLog(`${e.name} ataca por ${nd} 🦇`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+}
+
+// ─── GOBLIN NORMAL — Enfurecimiento ──────────────────────────────────────────
+// 25% de probabilidad de enfurecerse (cara roja): ese turno no ataca,
+// el siguiente turno ataca con +50% de daño y muestra pop-up de rayo naranja.
+function doGoblinNormalAction(e) {
+  const p = G.player;
+  if(e._hidden) return;
+
+  // Turno 2: ya estaba _enraged (cargado el turno anterior) → atacar con +50%
+  if(e._enraged) {
+    e._enraged = false;
+    const boostedDmg = Math.round(e.dmg * 1.5);
+    showEnemyPopup(e, '⚡', `¡${e.name} se ha bufeado!\nAtaca con +50% · ${boostedDmg} dmg`, '#ff8c00');
+    let actualDmg = boostedDmg;
+    const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+    if(hasFirstHit && !G.firstHitUsed){
+      G.firstHitUsed = true; actualDmg = 0;
+      const rb = hasRelic('espejo_espectral') && G.charId!=='espectro';
+      if(rb){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+      else addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const dmgRed = G._playerDmgReduction || 0;
+    actualDmg = Math.max(1, actualDmg - dmgRed);
+    const ab = Math.min(p.block, actualDmg);
+    p.block = Math.max(0, p.block - actualDmg);
+    const nd = actualDmg - ab;
+    p.hp = Math.max(0, p.hp - nd);
+    if(nd > 0){ addLog(`${e.name} golpea ENFURECIDO por ${nd} ⚡`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+    return;
+  }
+
+  // Turno cargando (intent mostró 😡): avanzar a _enraged, NO atacar
+  if(e._enraging) {
+    e._enraging = false;
+    e._enraged = true;
+    return;
+  }
+
+  // Pull normal: 25% enrage, 75% ataque
+  const roll = Math.random();
+  if(roll < 0.25) {
+    // Ataca normal ESTE turno, y marca que el siguiente turno se enfurecera (no atacara, intent 😡)
+    e._enraging = true;
+    showEnemyPopup(e, '😡', `¡${e.name} se esta\nenfureciendo!`, '#cc2200');
+  }
+  // Ataque normal (siempre, tanto si sale enrage como si no en este pull)
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const rb = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(rb){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){ addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+}
+
+// ─── GOBLIN ÉLITE — Escudo, Enfurecimiento y Ataque ──────────────────────────
+// 25% → se defiende con +7 escudo (no ataca)
+// 20% → se enfurece: no ataca, siguiente turno +25% daño y todos los aliados también +25%
+// 55% → ataque normal
+function doGoblinEliteAction(e) {
+  const p = G.player;
+  if(e._hidden) return;
+
+  // Estado: escudandose (intent mostro 🛡) → poner escudo, NO atacar
+  if(e._shielding) {
+    e._shielding = false;
+    e.block += 7;
+    addLog(`${e.name} se defiende · +7 escudo`, 'sta');
+    showEnemyPopup(e, '🛡', `¡${e.name} se defiende!\n+7 escudo`, '#4488cc');
+    return;
+  }
+
+  // Estado: cargado y listo → atacar con +25%, buffear aliados
+  if(e._pendingEliteEnrage) {
+    e._pendingEliteEnrage = false;
+    const boostedDmg = Math.round(e.dmg * 1.25);
+    const aliveAllies = G.enemies.filter(en => !en.dead && en !== e && en.isGoblin);
+    aliveAllies.forEach(ally => { ally._eliteAllyBuff = true; });
+    const allyMsg = aliveAllies.length > 0 ? `\n¡Sus aliados atacan +25%!` : '';
+    showEnemyPopup(e, '⚡', `¡${e.name} se ha bufeado!\n+25% · ${boostedDmg} dmg${allyMsg}`, '#ff8c00');
+    if(aliveAllies.length > 0) addLog(`${e.name} buffea a sus aliados (+25% dano)`, 'ene');
+    let actualDmg = boostedDmg;
+    const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+    if(hasFirstHit && !G.firstHitUsed){
+      G.firstHitUsed = true; actualDmg = 0;
+      const rb = hasRelic('espejo_espectral') && G.charId!=='espectro';
+      if(rb){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+      else addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const dmgRed = G._playerDmgReduction || 0;
+    actualDmg = Math.max(1, actualDmg - dmgRed);
+    const ab = Math.min(p.block, actualDmg);
+    p.block = Math.max(0, p.block - actualDmg);
+    const nd = actualDmg - ab;
+    p.hp = Math.max(0, p.hp - nd);
+    if(nd > 0){ addLog(`${e.name} golpea ENFURECIDO por ${nd}`, 'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+    return;
+  }
+
+  // Estado: cargando (intent mostro 😡) → NO ataca, avanza a pendingEliteEnrage
+  if(e._enraging) {
+    e._enraging = false;
+    e._pendingEliteEnrage = true;
+    return;
+  }
+
+  // Estado: buff de aliado → atacar con +25%
+  if(e._eliteAllyBuff) {
+    e._eliteAllyBuff = false;
+    const boostedDmg = Math.round(e.dmg * 1.25);
+    let actualDmg = boostedDmg;
+    const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+    if(hasFirstHit && !G.firstHitUsed){
+      G.firstHitUsed = true; actualDmg = 0;
+      const rb = hasRelic('espejo_espectral') && G.charId!=='espectro';
+      if(rb){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+      else addLog('Forma Etérea: golpe evitado!','sta');
+    }
+    const dmgRed = G._playerDmgReduction || 0;
+    actualDmg = Math.max(1, actualDmg - dmgRed);
+    const ab = Math.min(p.block, actualDmg);
+    p.block = Math.max(0, p.block - actualDmg);
+    const nd = actualDmg - ab;
+    p.hp = Math.max(0, p.hp - nd);
+    if(nd > 0){ addLog(`${e.name} golpea bufeado por ${nd}`, 'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+    return;
+  }
+
+  // Pull normal
+  const roll = Math.random();
+  if(roll < 0.25) {
+    // 25%: ataca normal ESTE turno, siguiente turno se escuda (no ataca, intent 🛡)
+    e._shielding = true;
+    showEnemyPopup(e, '🛡', `¡${e.name} se\nescudara!`, '#4488cc');
+  }
+  if(roll >= 0.25 && roll < 0.45) {
+    // 20%: ataca normal ESTE turno, siguiente turno se enfurece (no ataca, intent 😡)
+    e._enraging = true;
+    showEnemyPopup(e, '😡', `¡${e.name} se esta\nenfureciendo!`, '#cc2200');
+  }
+  // Ataque normal (siempre en el pull — escudo, enrage o ataque puro)
+  let actualDmg = e.dmg;
+  const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
+  if(hasFirstHit && !G.firstHitUsed){
+    G.firstHitUsed = true; actualDmg = 0;
+    const rb = hasRelic('espejo_espectral') && G.charId!=='espectro';
+    if(rb){ G.player.block+=4; addLog('Espejo Espectral: golpe evitado · +4 bloqueo','sta'); }
+    else addLog('Forma Etérea: golpe evitado!','sta');
+  }
+  const dmgRed = G._playerDmgReduction || 0;
+  actualDmg = Math.max(1, actualDmg - dmgRed);
+  const ab = Math.min(p.block, actualDmg);
+  p.block = Math.max(0, p.block - actualDmg);
+  const nd = actualDmg - ab;
+  p.hp = Math.max(0, p.hp - nd);
+  if(nd > 0){ addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+}
+
+// ─── POP-UP VISUAL SOBRE EL ENEMIGO ───────────────────────────────────────────
+// Muestra un pequeño popup flotante encima del sprite del enemigo.
+function showEnemyPopup(e, icon, text, color) {
+  const idx = G.enemies.indexOf(e);
+  if(idx < 0) return;
+  const sprite = document.getElementById('eSprite' + idx);
+  if(!sprite) return;
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position:absolute;
+    left:50%;bottom:calc(100% + 6px);
+    transform:translateX(-50%);
+    background:linear-gradient(135deg,#12091e,#1e1030);
+    border:2px solid ${color};
+    border-radius:6px;
+    padding:5px 9px;
+    font-family:'Cinzel',serif;
+    font-size:10px;
+    color:${color};
+    text-align:center;
+    white-space:pre-line;
+    line-height:1.5;
+    z-index:200;
+    pointer-events:none;
+    box-shadow:0 0 14px ${color}55;
+    animation:enemyPopupAnim 2.6s forwards;
+  `;
+  popup.innerHTML = `<span style="font-size:16px">${icon}</span><br>${text}`;
+  sprite.style.position = 'relative';
+  sprite.appendChild(popup);
+  setTimeout(() => popup.remove(), 2700);
 }
 
 // Evoluciona un murciélago a vampiro
@@ -3340,11 +4049,9 @@ function buildCardHTML(card, w, h, showDesc){
 function showRew(tier){
   tier = tier ?? 0;
   const isBoss = (tier === 2);
-  const count = isBoss ? 2 : 1; // boss: pick 2, others: pick 1 from 3
   const opts = pickRewardCards(isBoss ? 4 : 3, tier);
 
   const c = document.getElementById('rewCards'); c.innerHTML='';
-  // Title update
   const rt = document.getElementById('rewTitle');
   if(rt){
     if(isBoss) rt.textContent = '✦ Victoria sobre el Jefe ✦';
@@ -3352,31 +4059,89 @@ function showRew(tier){
     else rt.textContent = '✦ Elige una Recompensa ✦';
   }
 
-  // Sub-hint for boss
   const subEl = document.getElementById('rewSub');
-  if(subEl) subEl.textContent = isBoss ? 'Elige 2 cartas' : 'Elige 1 carta (o sáltate)';
 
-  let bossChosen = 0;
+  // ── BOSS: selección libre 0-2 cartas, deseleccionables, botón Continuar ──
+  if(isBoss) {
+    const chosen = new Set();   // ids seleccionados (staging, NO en deck todavía)
+    const stagedCards = [];     // [{id}] staging — se añaden al deck solo al Continuar
+
+    function updateSubAndBtn() {
+      const n = chosen.size;
+      if(subEl) subEl.textContent = n === 0 ? 'Elige hasta 2 cartas (puedes saltarte)' :
+                                    n === 1 ? '1 carta elegida · elige otra o continúa' :
+                                              '2 cartas elegidas';
+      const btn = document.getElementById('bossContBtn');
+      if(btn) btn.textContent = n === 0 ? 'Continuar sin cartas →' :
+               n === 1 ? 'Continuar con 1 carta →' : 'Continuar con 2 cartas →';
+    }
+
+    updateSubAndBtn();
+
+    opts.forEach(card => {
+      const w = document.createElement('div'); w.className='rew-wrap';
+      w.innerHTML = buildCardHTML(card, 170, 258, true);
+      w.dataset.cardId = card.id;
+      requestAnimationFrame(()=>addStatusTooltips(w, card));
+      w.addEventListener('click', ()=>{
+        playUI();
+        if(chosen.has(card.id)) {
+          // Deseleccionar: quitar del staging
+          chosen.delete(card.id);
+          const si = stagedCards.indexOf(card.id);
+          if(si >= 0) stagedCards.splice(si, 1);
+          w.style.opacity='1';
+          w.style.outline='none';
+          w.style.transform='';
+        } else {
+          if(chosen.size >= 2) return;
+          chosen.add(card.id);
+          stagedCards.push(card.id);  // staging — NO va a G.player.deck todavía
+          w.style.opacity='.55';
+          w.style.outline='2px solid var(--gold)';
+          w.style.transform='scale(.96)';
+        }
+        updateSubAndBtn();
+      });
+      c.appendChild(w);
+    });
+
+    // Botón continuar — aquí SÍ se mueven las cartas al deck
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'display:flex;justify-content:center;margin-top:10px;';
+    const btn = document.createElement('button');
+    btn.id = 'bossContBtn';
+    btn.className = 'btn-sm';
+    btn.textContent = 'Continuar sin cartas →';
+    btn.style.cssText = 'font-size:13px;padding:9px 22px;';
+    btn.addEventListener('click', ()=>{
+      playUI();
+      // Ahora sí se añaden al mazo real
+      stagedCards.forEach(id => G.player.deck.push(id));
+      saveG();
+      doAdvance();
+    });
+    btnWrap.appendChild(btn);
+    const rewScreen = document.getElementById('s-reward');
+    const existingSkip = rewScreen.querySelector('.btn-sm');
+    if(existingSkip) existingSkip.parentNode.insertBefore(btnWrap, existingSkip);
+    else rewScreen.appendChild(btnWrap);
+
+    show('reward');
+    return;
+  }
+
+  // ── NORMAL / ÉLITE: elegir 1 carta o saltar ──
+  if(subEl) subEl.textContent = 'Elige 1 carta (o sáltate)';
   opts.forEach(card=>{
     const w = document.createElement('div'); w.className='rew-wrap';
-    w.innerHTML = buildCardHTML(card, 170, 258, true); // ✏ CAMBIO D: reward más grande
-    requestAnimationFrame(()=>addStatusTooltips(w, card)); // ✏ FIX 3a: tooltips en reward
+    w.innerHTML = buildCardHTML(card, 170, 258, true);
+    requestAnimationFrame(()=>addStatusTooltips(w, card));
     w.addEventListener('click', ()=>{
-      if(isBoss){
-        if(bossChosen >= 2) return;
-        playUI();
-        G.player.deck.push(card.id);
-        bossChosen++;
-        w.style.opacity='.3'; w.style.pointerEvents='none';
-        const subEl=document.getElementById('rewSub');
-        if(subEl) subEl.textContent=`${2-bossChosen} carta(s) restante(s)`;
-        if(bossChosen>=2){ saveG(); setTimeout(()=>doAdvance(),600); }
-      } else {
-        playUI();
-        G.player.deck.push(card.id);
-        saveG();
-        doAdvance();
-      }
+      playUI();
+      G.player.deck.push(card.id);
+      saveG();
+      doAdvance();
     });
     c.appendChild(w);
   });
@@ -3684,6 +4449,11 @@ function chestMimic(){
 // ═══════════════════════════════════════════════
 //  STATISTICS SCREEN
 // ═══════════════════════════════════════════════
+function showBestiary() {
+  playUI();
+  window.location.href = 'bestiario.html';
+}
+
 function showStats() {
   playUI();
   let ov = document.getElementById('statsOverlay');
@@ -4187,6 +4957,9 @@ function fixNameModalMobile() {
       .name-hint{ font-size:12px; }
       /* ✏ BLOQUE 4: mapa oro no se desborda */
       #s-map{ overflow:visible !important; }
+      /* Con 11 filas, el mapa es alto — scroll vertical y centrado */
+      #s-map{ justify-content:flex-start !important; padding-top:56px !important; overflow-y:auto !important; }
+      .map-acts{ flex-direction:column !important; align-items:center !important; gap:0 !important; width:100% !important; }
       .map-gold-display{ position:relative; z-index:2; }
     }
   `;
@@ -4327,6 +5100,7 @@ const TUTORIAL_PAGES = [
 ];
 
 function showTutorial(page){
+  playUI();
   page = page||0;
   let ov=document.getElementById('tutorialOverlay');
   if(!ov){ ov=document.createElement('div'); ov.id='tutorialOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:9500;background:#080610f4;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:16px;'; document.body.appendChild(ov); }
@@ -4336,6 +5110,7 @@ function showTutorial(page){
 }
 
 function closeTutorial(){
+  playUI();
   const ov=document.getElementById('tutorialOverlay'); if(!ov) return;
   ov.style.opacity='0'; setTimeout(()=>{ ov.style.display='none'; },300);
 }
@@ -4363,10 +5138,10 @@ function buildTutorialPage(ov, idx){
     if(imgSrc) imgHtml=`<img src="${imgSrc}" style="width:72px;height:72px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 0 14px #c9984a88)">`;
   }
 
-  const dots=Array.from({length:total},(_,i)=>`<div onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${i})" style="width:${i===idx?'22px':'8px'};height:8px;border-radius:4px;background:${i===idx?'#d4a843':'#3a2a4a'};cursor:pointer;transition:all .25s;flex-shrink:0"></div>`).join('');
+  const dots=Array.from({length:total},(_,i)=>`<div onclick="playUI();buildTutorialPage(document.getElementById('tutorialOverlay'),${i})" style="width:${i===idx?'22px':'8px'};height:8px;border-radius:4px;background:${i===idx?'#d4a843':'#3a2a4a'};cursor:pointer;transition:all .25s;flex-shrink:0"></div>`).join('');
 
   ov.innerHTML=`<div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #d4a84366;border-top:2px solid #d4a84388;border-radius:14px;max-width:520px;width:100%;padding:28px 26px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 0 80px #d4a84422;position:relative;max-height:90vh;overflow-y:auto;">
-    <button onclick="closeTutorial()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#7a6888;font-size:20px;cursor:pointer;line-height:1;padding:0" title="Cerrar">✕</button>
+    <button onclick="playUI();closeTutorial()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#7a6888;font-size:20px;cursor:pointer;line-height:1;padding:0" title="Cerrar">✕</button>
     <div style="text-align:center">
       <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:4px;color:#7a6888;text-transform:uppercase;margin-bottom:6px">${idx+1} / ${total}</div>
       <div style="font-family:'Cinzel Decorative',cursive;font-size:clamp(15px,3vw,21px);color:#f0c060;letter-spacing:2px;text-shadow:0 0 30px #d4a84466">${p.title}</div>
@@ -4374,11 +5149,11 @@ function buildTutorialPage(ov, idx){
     ${imgHtml?`<div style="display:flex;justify-content:center">${imgHtml}</div>`:''}
     <div style="font-family:'IM Fell English',serif;font-size:clamp(13px,2vw,15px);color:#c8b8d8;line-height:1.85;text-align:left;width:100%">${p.content}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;margin-top:4px">
-      <button onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${idx-1})" ${isFirst?'disabled':''} style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:${isFirst?'#4a3a58':'#d4a843'};cursor:${isFirst?'default':'pointer'};transition:all .2s;white-space:nowrap;flex-shrink:0">← Anterior</button>
+      <button onclick="playUI();buildTutorialPage(document.getElementById('tutorialOverlay'),${idx-1})" ${isFirst?'disabled':''} style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:${isFirst?'#4a3a58':'#d4a843'};cursor:${isFirst?'default':'pointer'};transition:all .2s;white-space:nowrap;flex-shrink:0">← Anterior</button>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center">${dots}</div>
       ${isLast
         ?`<button onclick="closeTutorial()" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a843;border-radius:3px;background:#d4a84322;color:#d4a843;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0">✓ ¡Entendido!</button>`
-        :`<button onclick="buildTutorialPage(document.getElementById('tutorialOverlay'),${idx+1})" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:#d4a843;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0">Siguiente →</button>`
+        :`<button onclick="playUI();buildTutorialPage(document.getElementById('tutorialOverlay'),${idx+1})" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;border:1px solid #d4a84344;border-radius:3px;background:#d4a84310;color:#d4a843;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0">Siguiente →</button>`
       }
     </div>
   </div>`;
@@ -4557,34 +5332,8 @@ function showSettingsToast(msg) {
 //  INJECT STATS BUTTON INTO TITLE + PATCH HTML
 // ═══════════════════════════════════════════════
 function injectStatsButton() {
-  const tBtns = document.querySelector('.t-btns');
-  if(!tBtns || document.getElementById('btnStats')) return;
-  // Fila principal: stats + desbloqueos
-  const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center;justify-content:center;width:100%';
-  row.innerHTML = `
-    <button class="btn-sm" id="btnStats" onclick="showStats()">📊 Estadísticas</button>
-    <button class="btn-sm" id="btnUnlocks" onclick="showUnlocks()">⚜ Desbloqueos</button>
-  `;
-  const smRow = tBtns.querySelector('div');
-  if(smRow) tBtns.insertBefore(row, smRow);
-  else tBtns.appendChild(row);
-
-  // ✏ FIX ⚙: poner el engranaje en #s-title, position:absolute, justo a la derecha del ?
-  if(!document.getElementById('btnSettings')){
-    const sTitle = document.getElementById('s-title');
-    if(sTitle){
-      const settBtn = document.createElement('button');
-      settBtn.id = 'btnSettings';
-      settBtn.title = 'Ajustes';
-      settBtn.textContent = '⚙';
-      settBtn.style.cssText = 'position:absolute;top:8px;left:8px;z-index:200;background:linear-gradient(135deg,#1a1228,#0e0b18);border:1px solid #4a3a5a;border-radius:4px;color:#b8a8c8;font-size:16px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s;font-family:Arial,sans-serif;';
-      settBtn.onmouseenter = ()=>{ settBtn.style.borderColor='#e8b460'; settBtn.style.color='#e8b460'; };
-      settBtn.onmouseleave = ()=>{ settBtn.style.borderColor='#4a3a5a'; settBtn.style.color='#b8a8c8'; };
-      settBtn.onclick = showSettings;
-      sTitle.appendChild(settBtn);
-    }
-  }
+  // Todos los botones del menú ya están en el HTML.
+  // Esta función queda vacía — nada que inyectar.
 }
 
 // ═══════════════════════════════════════════════
@@ -4593,6 +5342,27 @@ function injectStatsButton() {
 (function injectGameStyles(){
   const s = document.createElement('style');
   s.textContent = `
+    /* ── Mapa: un solo acto centrado, con scroll ── */
+    #s-map {
+      justify-content: flex-start !important;
+      padding-top: 52px !important;
+      overflow-y: auto !important;
+    }
+    #mapActs {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      width: 100% !important;
+      gap: 0 !important;
+    }
+    /* Para que la barra de oro no desaparezca al hacer scroll */
+    #mapGoldDisplay {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 5 !important;
+      background: var(--bg) !important;
+    }
+
     /* ── Intención del enemigo ── */
     .e-intent-row {
       display:flex; justify-content:flex-start; align-items:center;
@@ -4612,6 +5382,14 @@ function injectStatsButton() {
       transform:scale(1.2);
       box-shadow:0 0 12px #d4a84366;
       border-color:#d4a84388;
+    }
+
+    /* ── Pop-up flotante sobre enemigo ── */
+    @keyframes enemyPopupAnim {
+      0%   { opacity:0; transform:translateX(-50%) translateY(6px); }
+      12%  { opacity:1; transform:translateX(-50%) translateY(0); }
+      75%  { opacity:1; transform:translateX(-50%) translateY(0); }
+      100% { opacity:0; transform:translateX(-50%) translateY(-10px); }
     }
 
     /* ── Botón Ver Mazo en combate ── */
@@ -4812,6 +5590,48 @@ function injectDeckViewBtn() {
   document.body.appendChild(btn);
 }
 
+// ═══════════════════════════════════════════════
+//  PANTALLA DE TRANSICIÓN DE ACTO
+// ═══════════════════════════════════════════════
+const ACT_NAMES = [
+  { num:'ACTO  I',   title:'Más allá de las murallas',   sub:'Las calles recuerdan lo que la niebla se llevó.' },
+  { num:'ACTO  II',  title:'El corazón de la ciudad',    sub:'Dentro de las murallas, la oscuridad tiene nombre.' },
+  { num:'ACTO  III', title:'La cámara bajo la catedral', sub:'Donde el pacto fue sellado, el pacto debe romperse.' },
+];
+
+function showActTransition(actIdx, onContinue) {
+  const existing = document.getElementById('actTransitionOverlay');
+  if(existing) existing.remove();
+  const data = ACT_NAMES[actIdx] || { num:'ACTO '+(actIdx+1), title:'', sub:'' };
+  const ov = document.createElement('div');
+  ov.id = 'actTransitionOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9800;background:#080610;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;transition:opacity .6s ease;font-family:Arial,Helvetica,sans-serif;text-align:center;padding:32px;';
+  ov.innerHTML = `
+    <div id="atNum" style="font-family:Arial,Helvetica,sans-serif;font-size:clamp(12px,2vw,16px);letter-spacing:.5em;text-transform:uppercase;color:#7a6888;opacity:0;transition:opacity .5s ease;">${data.num}</div>
+    <div id="atTitle" style="font-family:Arial,Helvetica,sans-serif;font-size:clamp(26px,6vw,64px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#f0e8de;text-shadow:0 0 60px #c9984a44;opacity:0;transition:opacity .6s ease;line-height:1.1;">${data.title}</div>
+    <div id="atSep" style="width:0;height:1px;background:linear-gradient(90deg,transparent,#d4a84388,transparent);transition:width 1s ease;margin:4px 0;"></div>
+    <div id="atSub" style="font-family:Arial,Helvetica,sans-serif;font-size:clamp(13px,1.8vw,16px);color:#7a6888;font-style:italic;letter-spacing:.05em;opacity:0;transition:opacity .5s ease;max-width:480px;line-height:1.9;">${data.sub}</div>
+    <button id="atBtn" style="margin-top:28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:12px 34px;border:1px solid #d4a84366;border-radius:4px;background:linear-gradient(135deg,#1a1228,#0e0b18);color:#d4a843;cursor:pointer;opacity:0;transition:opacity .5s ease,background .2s,border-color .2s;clip-path:polygon(8px 0%,calc(100% - 8px) 0%,100% 50%,calc(100% - 8px) 100%,8px 100%,0% 50%);" onmouseover="this.style.background='linear-gradient(135deg,#2a1a3a,#1a0a28)';this.style.borderColor='#d4a84388'" onmouseout="this.style.background='linear-gradient(135deg,#1a1228,#0e0b18)';this.style.borderColor='#d4a84366'">Continuar</button>
+  `;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    ov.style.opacity='1';
+    setTimeout(()=>{ const n=document.getElementById('atNum');if(n)n.style.opacity='1'; },300);
+    setTimeout(()=>{ const t=document.getElementById('atTitle');if(t)t.style.opacity='1'; },600);
+    setTimeout(()=>{ const s=document.getElementById('atSep');if(s)s.style.width='260px'; },900);
+    setTimeout(()=>{ const b=document.getElementById('atSub');if(b)b.style.opacity='1'; },1400);
+    setTimeout(()=>{ const btn=document.getElementById('atBtn');if(btn)btn.style.opacity='1'; },1800);
+  }));
+  const doClose = ()=>{
+    playUI();
+    ov.style.transition='opacity .4s ease';
+    ov.style.opacity='0';
+    setTimeout(()=>{ ov.remove(); onContinue(); },420);
+  };
+  document.getElementById('atBtn').addEventListener('click', doClose);
+  setTimeout(()=>{ ov.addEventListener('click', e=>{ if(e.target!==document.getElementById('atBtn')) doClose(); }); },2200);
+}
+
 // ─── Botón Ver Mazo en combate (solo emoji) ───
 function injectCombatDeckBtn() {
   const old = document.getElementById('combatDeckBtn');
@@ -4853,6 +5673,6 @@ function injectCombatDeckBtn() {
 // ═══════════════════════════════════════════════
 loadCustom();
 updateTitle();
+initSplash();
 injectStatsButton();
 initMobile();
-document.addEventListener('contextmenu', e => e.preventDefault()); document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); if(e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) e.preventDefault(); if(e.ctrlKey && e.key === 'U') e.preventDefault(); });

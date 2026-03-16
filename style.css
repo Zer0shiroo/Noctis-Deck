@@ -233,7 +233,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .mnode.cur{border-color:var(--gold2);box-shadow:0 0 22px #c9984a88;animation:nodePls 2s ease-in-out infinite;color:var(--gold2)}
 @keyframes nodePls{0%,100%{box-shadow:0 0 22px #c9984a66}50%{box-shadow:0 0 36px #c9984aaa}}
 .mnode.vis{opacity:.32;cursor:default;border-color:#2a1f3a;color:#5a5070}
-.mnode.lkd{opacity:.18;cursor:default;pointer-events:none}
+.mnode.lkd{opacity:.55;cursor:default;pointer-events:none}
 .mnode.boss{border-color:var(--wine2);color:var(--wine2)}
 .mnode.boss.cur{box-shadow:0 0 22px #cc406088}
 .mnode.elite{border-color:#7a3acc;color:#b080ee}
