@@ -4131,6 +4131,7 @@ function showRew(tier){
 
     // Botón continuar — aquí SÍ se mueven las cartas al deck
     const btnWrap = document.createElement('div');
+    btnWrap.className = 'skip-rew-btn';
     btnWrap.style.cssText = 'display:flex;justify-content:center;margin-top:10px;';
     const btn = document.createElement('button');
     btn.id = 'bossContBtn';
@@ -4139,16 +4140,12 @@ function showRew(tier){
     btn.style.cssText = 'font-size:13px;padding:9px 22px;';
     btn.addEventListener('click', ()=>{
       playUI();
-      // Ahora sí se añaden al mazo real
       stagedCards.forEach(id => G.player.deck.push(id));
       saveG();
       doAdvance();
     });
     btnWrap.appendChild(btn);
-    const rewScreen = document.getElementById('s-reward');
-    const existingSkip = rewScreen.querySelector('.btn-sm');
-    if(existingSkip) existingSkip.parentNode.insertBefore(btnWrap, existingSkip);
-    else rewScreen.appendChild(btnWrap);
+    document.getElementById('s-reward').appendChild(btnWrap);
 
     show('reward');
     return;
