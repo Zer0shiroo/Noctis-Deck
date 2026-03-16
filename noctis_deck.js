@@ -4436,7 +4436,9 @@ function showDeckEditorShop(){
     saveG();
     overlay.style.opacity='0';
     setTimeout(()=>{ overlay.remove(); delete window.confirmShopDiscard; }, 300);
-    // Actualizar precio en la tienda si sigue abierta
+    // Actualizar oro y precio en la tienda
+    const goldEl = document.getElementById('shopG');
+    if(goldEl) goldEl.textContent = G.gold;
     const priceEl = document.getElementById('shopDiscardPrice');
     if(priceEl) priceEl.textContent = '🪙 '+(G.discardCost||40);
   };
