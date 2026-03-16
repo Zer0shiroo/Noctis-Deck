@@ -1724,7 +1724,10 @@ function renderMap(){
       }
 
       // ── Nodo normal ──────────────────────────────────────────
-      const isMyBranch = !branchChosen || bi===curBranch;
+      const allowedBranches = G.path.allowedBranches || null;
+      const isMyBranch = !branchChosen
+        ? (allowedBranches ? allowedBranches.includes(bi) : true)
+        : bi===curBranch;
       const nx = colX[bi]-NODE_W/2;
       const el = document.createElement('div');
       el.className = 'mnode';
@@ -2437,9 +2440,20 @@ function advance(){
 
   // ── Avance normal dentro del mismo acto ──
   const nextRow = row + 1;
-  // Si el nodo actual era fusionado, la rama puede mantenerse o restaurarse
-  // (ya está guardada en G.path.branch desde enterNodeBranch)
-  G.path = {act, row:nextRow, branch};
+  // Si el nodo actual era fusionado (merged), al salir de él el jugador
+  // debe poder elegir rama de nuevo, pero SOLO entre las ramas del par fusionado.
+  let nextBranch = branch;
+  let nextAllowed = G.path.allowedBranches || null;
+  if(branch !== null && branch !== undefined){
+    const curNode = G.map[act].rows[row] ? G.map[act].rows[row][branch] : null;
+    if(curNode && curNode.merged){
+      nextBranch = null;
+      nextAllowed = curNode.merged; // ej: [0,1] o [2,3]
+    } else {
+      nextAllowed = null; // nodo normal: ya no hay restricción extra
+    }
+  }
+  G.path = {act, row:nextRow, branch:nextBranch, allowedBranches:nextAllowed};
   saveG();
 
   // ¿Toca evento de diálogo?
@@ -3144,8 +3158,10 @@ function playCard(hi){
     let hits = card.triple ? 3 : (card.dbl ? 2 : 1);
     let totalDmgDealt = 0;
     sfxPlayerAttack();
+    // Guardián del Candil: reduce el daño saliente del jugador este turno
+    const outDmgPenalty = G._playerDmgReduction || 0;
     for(let h=0;h<hits;h++){
-      let d = card.dmg * bonusMult;
+      let d = Math.max(1, card.dmg * bonusMult - outDmgPenalty);
       const ab=Math.min(target.block,d);
       target.block=Math.max(0,target.block-d);
       const nd=d-ab;
@@ -3390,6 +3406,10 @@ function endTurn(){
   p.block=0;
   // El escudo de los enemigos dura un turno — se resetea al inicio del turno del jugador
   G.enemies.forEach(e => { if(!e.dead) e.block = 0; });
+  // Reducción de daño del Guardián del Candil: solo dura 1 turno del jugador
+  if(G._playerDmgReduction > 0){
+    G._playerDmgReduction = 0;
+  }
   p.mana=p.maxMana;
   drawUpTo(getMaxHand());
 
@@ -4052,6 +4072,9 @@ function showRew(tier){
   const opts = pickRewardCards(isBoss ? 4 : 3, tier);
 
   const c = document.getElementById('rewCards'); c.innerHTML='';
+  // Limpiar botones de saltar de la llamada anterior
+  const rewScr0 = document.getElementById('s-reward');
+  if(rewScr0) rewScr0.querySelectorAll('.skip-rew-btn').forEach(el=>el.remove());
   const rt = document.getElementById('rewTitle');
   if(rt){
     if(isBoss) rt.textContent = '✦ Victoria sobre el Jefe ✦';
@@ -4145,6 +4168,18 @@ function showRew(tier){
     });
     c.appendChild(w);
   });
+  // Botón saltar carta en combate normal/élite
+  const skipWrap = document.createElement('div');
+  skipWrap.className = 'skip-rew-btn';
+  skipWrap.style.cssText = 'display:flex;justify-content:center;margin-top:10px;';
+  const skipBtn = document.createElement('button');
+  skipBtn.className = 'btn-sm';
+  skipBtn.textContent = 'Saltar →';
+  skipBtn.style.cssText = 'font-size:13px;padding:9px 22px;opacity:.75;';
+  skipBtn.addEventListener('click', ()=>{ playUI(); doAdvance(); });
+  skipWrap.appendChild(skipBtn);
+  const rewScr = document.getElementById('s-reward');
+  if(rewScr) rewScr.appendChild(skipWrap);
   show('reward');
 }
 
@@ -5103,7 +5138,26 @@ function showTutorial(page){
   playUI();
   page = page||0;
   let ov=document.getElementById('tutorialOverlay');
-  if(!ov){ ov=document.createElement('div'); ov.id='tutorialOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:9500;background:#080610f4;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:16px;'; document.body.appendChild(ov); }
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='tutorialOverlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:9500;background:#080610f4;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:16px;';
+    document.body.appendChild(ov);
+  }
+  // Boton 🔮 directo en body (no en ov, que se sobreescribe con innerHTML)
+  if(!document.getElementById('tutorialOrbBtn')){
+    const orbBtn=document.createElement('button');
+    orbBtn.id='tutorialOrbBtn';
+    orbBtn.title='Consultar al Oraculo';
+    orbBtn.textContent='🔮';
+    orbBtn.style.cssText='position:fixed;top:50%;right:16px;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2a1238,#1a0a28);border:2px solid #9a60ee88;font-size:26px;cursor:pointer;box-shadow:0 0 20px #9a60ee44;transition:transform .2s,box-shadow .2s,border-color .2s;display:flex;align-items:center;justify-content:center;z-index:99999;';
+    orbBtn.addEventListener('mouseenter',()=>{orbBtn.style.transform='translateY(-50%) scale(1.15)';orbBtn.style.boxShadow='0 0 30px #9a60ee88';orbBtn.style.borderColor='#9a60ee';});
+    orbBtn.addEventListener('mouseleave',()=>{orbBtn.style.transform='translateY(-50%)';orbBtn.style.boxShadow='0 0 20px #9a60ee44';orbBtn.style.borderColor='#9a60ee88';});
+    orbBtn.addEventListener('click',()=>{playUI();closeTutorial();showOraculo();});
+    document.body.appendChild(orbBtn);
+  } else {
+    document.getElementById('tutorialOrbBtn').style.display='flex';
+  }
   buildTutorialPage(ov, page);
   ov.style.display='flex';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ ov.style.opacity='1'; }));
@@ -5113,6 +5167,7 @@ function closeTutorial(){
   playUI();
   const ov=document.getElementById('tutorialOverlay'); if(!ov) return;
   ov.style.opacity='0'; setTimeout(()=>{ ov.style.display='none'; },300);
+  const orb=document.getElementById('tutorialOrbBtn'); if(orb) orb.style.display='none';
 }
 
 function buildTutorialPage(ov, idx){
@@ -5157,6 +5212,216 @@ function buildTutorialPage(ov, idx){
       }
     </div>
   </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  ORÁCULO DE LA TORRE — Chat con Gemini AI
+// ═══════════════════════════════════════════════
+
+// ── PON AQUÍ TU API KEY DE GROQ ─────────────
+// 1. Ve a: console.anthropic.com → API Keys → crear key
+// 2. Pega la key aquí abajo (empieza por sk-ant-...)
+// Tiene $5 de crédito gratis al registrarte
+const GEMINI_API_KEY = 'PON_AQUI_TU_API_KEY_GROQ';
+// ─────────────────────────────────────────────
+
+const ORACULO_SYSTEM = `Eres el Oráculo de la Torre Obscura, el espíritu anciano que habita en Noctis Deck, un juego roguelike de cartas de ambientación gótico-victoriana. Hablas con un tono misterioso, poético y solemne, propio de la ambientación. Puedes usar metáforas oscuras y referencias a la noche, la niebla y el pacto antiguo. Eres sabio y útil, respondes preguntas sobre el juego con precisión.
+
+INFORMACIÓN COMPLETA DEL JUEGO:
+
+=== HISTORIA ===
+La ciudad que nunca amanece está atrapada en una noche eterna. El jugador encarna a un Cazador marcado por el pacto antiguo que debe atravesar tres actos para romper la maldición. Acto I: Más allá de las murallas (las calles). Acto II: El corazón de la ciudad. Acto III: La cámara bajo la catedral, donde el pacto fue sellado.
+
+=== PERSONAJES (4 cazadores) ===
+- El Cazador (70 HP, 3 maná): Pasiva Vampirismo — cada carta de ataque que dañe directamente cura 2 HP.
+- La Hechicera (60 HP, 4 maná): Pasiva Miasma — el veneno hace +1 daño extra por turno.
+- El Espectro (65 HP, 3 maná): Pasiva Forma Etérea — el primer golpe de cada combate es ignorado.
+- El Pistolero (65 HP, 3 maná): Pasiva Cargador — cada 3 cartas de ataque jugadas en un turno, la siguiente hace el doble de daño.
+
+=== MECÁNICAS DE COMBATE ===
+Cada turno el jugador recupera todo su maná y roba cartas hasta tener 6 en mano. Se selecciona un enemigo pulsando sobre él. Al pulsar una carta primero se selecciona (resaltada) y al segundo click se juega. El bloqueo del jugador y de todos los enemigos se resetea a 0 al inicio de cada turno del jugador. Estados: Bloqueo (absorbe daño), Sangrado (pierde 2 HP/turno y decae), Veneno (pierde HP igual a su nivel y decae).
+
+=== CARTAS (18 en total) ===
+COMUNES: Golpe Sombrío (1 maná, 6 dmg), Escudo Arcano (1 maná, 7 bloqueo), Lanza de Niebla (1 maná, 4 dmg + 2 veneno), Represalia (1 maná, 3 dmg + 4 bloqueo), Susurro Vital (1 maná, cura 8 HP), Bala de Plomo (1 maná, 7 dmg).
+INFRECUENTES: Tajo Cruento (2 maná, 10 dmg + 2 sangrado), Golpe Doble (2 maná, 8 dmg × 2 hits), Manto de Sombras (2 maná, 17 bloqueo), Nube Venenosa (2 maná, 4 veneno), Tiro Rápido (1 maná, 5 dmg × 2 hits), Bomba de Humo (2 maná, 10 bloqueo + 2 veneno).
+RARAS: Golpe Sagrado (1 maná, 8 dmg), Ritual de Sangre (2 maná, 4 sangrado), Fuego Cerrado (2 maná, 6 dmg × 3 hits).
+LEGENDARIAS: Disparo Certero (3 maná, 28 dmg), Pacto de Sangre (2 maná, 10 cura + 3 sangrado), Pesadilla Eterna (3 maná, 9 dmg + 3 sangrado + 3 veneno).
+
+=== ENEMIGOS ACTO I ===
+NORMALES (goblins): 15-20 HP, 4-7 daño. Tienen 25% de probabilidad de enfurecerse: el turno que lo hace ataca normal + popup 😡, el siguiente turno NO ataca (intent 😡), el turno posterior ataca con +50% de daño (intent ⚡).
+SANADORAS: Ciclo de 4 acciones — curar al aliado más débil / escudar a todos / maldición (veneno o sangrado) / ataque débil. Aparecen con 20% de probabilidad.
+ÉLITES (goblins élite): 34-40 HP, 10-12 daño. 55% ataque normal, 25% se escuda (+7 bloqueo siguiente turno), 20% se enfurece (siguiente turno +25% daño + aliados también +25%).
+JEFES: El Conde Sombrío (80 HP, 18 dmg + 3 sangrado), Madre de Niebla (75 HP, 15 dmg + 4 veneno).
+
+=== ENEMIGOS ACTO II ===
+Vampiro Sanguinario (55 HP, 10 dmg): roba 6 HP al atacar, se cura 22 HP al morir un aliado.
+Condesa sin Rostro (50 HP, 11 dmg): ciclo — ataque / +10 bloqueo / 3 veneno.
+Guardián del Candil (58 HP, 6 dmg): turnos pares ataca y reduce tu daño en 2 (máx -6); turnos impares oculta un aliado (no atacable ese turno).
+Murciélago de Hemlock (20 HP, 7 dmg): invocado por el Barón, se transforma en Vampiro a los 5 turnos.
+Barón Hemlock — JEFE (130 HP, 16 dmg): invoca murciélagos (siempre turno 1, luego cada 5 turnos si hay menos de 2), se cura si está por debajo del 60% HP.
+
+=== MAPA ===
+3 Actos, cada uno con 6 filas de nodos y 4 ramas. Tipos de nodo: Combate normal, Élite (mejor recompensa), Descanso (cura 20 HP), Tienda (compra cartas con oro), Cofre (carta o monedas gratis), Jefe (al ganar eliges 2 cartas). Los enemigos escalan ×1.5 por acto.
+
+=== RELIQUIAS (7 en total) ===
+Corazón Eterno (Cazador): +10 HP máximo, +6 HP al iniciar combate.
+Tomo Envenenado (Hechicera): +1 veneno extra por carta, el veneno no decae.
+Espejo Espectral (Espectro): primer golpe ignorado para cualquier personaje + 4 bloqueo al esquivar.
+Cilindro Veloz (Pistolero): Cargador activa a los 2 ataques, +1 maná al iniciar combate.
+Amuleto Carmesí: roba 1 carta al matar enemigo, legendarias cuestan 1 menos.
+Corona Voraz: +2 HP permanentes por encuentro (máx +20), +50% oro.
+Orbe Eterno: empieza con 2 legendarias, +1 maná máximo.
+
+=== MODO INFINITO ===
+Tras completar los 3 actos se puede entrar en Modo Infinito. Los enemigos escalan con multiplicador creciente. Jefe cada 10 encuentros. Superar 10 encuentros desbloquea Corona Voraz, superar 20 desbloquea Orbe Eterno.
+
+Responde siempre en español. Si no sabes algo del juego, admítelo con elegancia. Mantén las respuestas concisas (máx 3-4 párrafos). Si el jugador pregunta algo ajeno al juego, redirige amablemente la conversación hacia Noctis Deck.`;
+
+let _oraculoHistory = [];
+
+function showOraculo() {
+  playUI();
+  const existing = document.getElementById('oraculoOverlay');
+  if(existing) { existing.remove(); return; }
+
+  if(GEMINI_API_KEY === 'PON_AQUI_TU_API_KEY_GROQ') {
+    const warn = document.createElement('div');
+    warn.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#080610ee;display:flex;align-items:center;justify-content:center;padding:20px;';
+    warn.innerHTML = `<div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #cc803355;border-top:2px solid #cc8033;border-radius:12px;max-width:420px;width:100%;padding:32px 28px;text-align:center;font-family:'Cinzel',serif;">
+      <div style="font-size:36px;margin-bottom:12px">🔮</div>
+      <div style="font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#e8a050;margin-bottom:16px">Oráculo no configurado</div>
+      <div style="font-size:12px;color:#7a6888;line-height:1.8;font-family:'IM Fell English',serif;margin-bottom:20px">Para activar el Oráculo, abre <code style="background:#2a1a3a;padding:2px 6px;border-radius:3px;color:#e8b870">noctis_deck.js</code> y reemplaza <code style="background:#2a1a3a;padding:2px 6px;border-radius:3px;color:#e8b870">PON_AQUI_TU_API_KEY_GROQ</code> con tu clave gratuita.<br><br>1. Crea cuenta GRATIS en <b style="color:#e8a050">console.groq.com</b> (sin tarjeta)<br>2. Ve a API Keys → crear key<br>3. Pégala en el archivo</div>
+      <button onclick="playUI();this.closest('div[style]').parentNode.remove()" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 20px;border:1px solid #d4a843;border-radius:3px;background:#d4a84322;color:#d4a843;cursor:pointer">Cerrar</button>
+    </div>`;
+    document.body.appendChild(warn);
+    return;
+  }
+
+  _oraculoHistory = [];
+
+  const ov = document.createElement('div');
+  ov.id = 'oraculoOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#080610ee;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .25s ease;';
+
+  ov.innerHTML = `
+  <div style="background:linear-gradient(160deg,#1a1228,#0e0b18);border:1px solid #9a60ee55;border-top:2px solid #9a60ee88;border-radius:14px;max-width:540px;width:100%;display:flex;flex-direction:column;max-height:88vh;box-shadow:0 0 80px #9a60ee22;position:relative;">
+
+    <!-- Header -->
+    <div style="padding:18px 22px 14px;border-bottom:1px solid #2a1a3a;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="font-size:24px;filter:drop-shadow(0 0 10px #9a60ee88)">🔮</div>
+      <div>
+        <div style="font-family:'Cinzel Decorative',serif;font-size:14px;color:#cc80ff;letter-spacing:.1em;text-shadow:0 0 12px #9a60ee55">El Oráculo de la Torre</div>
+        <div style="font-family:'IM Fell English',serif;font-size:11px;color:#5a4a6a;font-style:italic">Pregunta lo que desees sobre Noctis Deck</div>
+      </div>
+      <button onclick="playUI();document.getElementById('oraculoOverlay').remove()" style="margin-left:auto;background:none;border:none;color:#5a4a6a;font-size:20px;cursor:pointer;line-height:1;padding:4px;transition:color .2s;" onmouseover="this.style.color='#cc80ff'" onmouseout="this.style.color='#5a4a6a'">✕</button>
+    </div>
+
+    <!-- Messages -->
+    <div id="oraculoMessages" style="flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:55vh;">
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:32px;margin-bottom:8px;opacity:.5">🔮</div>
+        <div style="font-family:'IM Fell English',serif;font-size:13px;color:#5a4a6a;font-style:italic;line-height:1.7">"La niebla guarda todos los secretos.<br>Formula tu pregunta, Cazador."</div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:14px 16px;border-top:1px solid #2a1a3a;display:flex;gap:8px;flex-shrink:0">
+      <input id="oraculoInput" type="text" placeholder="¿Qué deseas saber del juego?" maxlength="300"
+        style="flex:1;background:#12091e;border:1px solid #3a2a4a;border-radius:6px;padding:10px 14px;font-family:'IM Fell English',serif;font-size:13px;color:#c8b8d8;outline:none;transition:border-color .2s;"
+        onfocus="this.style.borderColor='#9a60ee55'" onblur="this.style.borderColor='#3a2a4a'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendOraculoMessage();}">
+      <button onclick="sendOraculoMessage()" id="oraculoSend"
+        style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border:1px solid #9a60ee55;border-radius:6px;background:linear-gradient(135deg,#2a1238,#1a0a28);color:#cc80ff;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0"
+        onmouseover="this.style.borderColor='#9a60ee';this.style.background='linear-gradient(135deg,#3a1a4a,#2a0a38)'"
+        onmouseout="this.style.borderColor='#9a60ee55';this.style.background='linear-gradient(135deg,#2a1238,#1a0a28)'">
+        Consultar ✦
+      </button>
+    </div>
+
+  </div>`;
+
+  document.body.appendChild(ov);
+  setTimeout(() => document.getElementById('oraculoInput')?.focus(), 100);
+}
+
+function _oraculoAddMessage(role, text) {
+  const box = document.getElementById('oraculoMessages');
+  if(!box) return;
+  const isUser = role === 'user';
+  const label = isUser ? 'Cazador' : 'Oráculo';
+  const borderColor = isUser ? '#d4a84333' : '#9a60ee33';
+  const bgColor = isUser ? 'linear-gradient(135deg,#2a1a3a,#1a0a28)' : 'linear-gradient(135deg,#1e1030,#130820)';
+  const labelColor = isUser ? '#7a6888' : '#7a50aa';
+  const textColor = isUser ? '#c8b8d8' : '#d8c0f0';
+  const align = isUser ? 'flex-end' : 'flex-start';
+  const radius = isUser ? '12px 4px 12px 12px' : '4px 12px 12px 12px';
+  const msg = document.createElement('div');
+  msg.style.cssText = `display:flex;flex-direction:column;align-items:${align};gap:4px`;
+  msg.innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:${labelColor};margin:0 4px">${label}</div>
+    <div style="max-width:88%;padding:10px 14px;border-radius:${radius};background:${bgColor};border:1px solid ${borderColor};font-family:'IM Fell English',serif;font-size:13px;color:${textColor};line-height:1.7;white-space:pre-wrap;">${text}</div>`;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function _oraculoSetLoading(on) {
+  const btn = document.getElementById('oraculoSend');
+  const input = document.getElementById('oraculoInput');
+  if(!btn || !input) return;
+  btn.disabled = on;
+  input.disabled = on;
+  btn.textContent = on ? '...' : 'Consultar ✦';
+  btn.style.opacity = on ? '.5' : '1';
+}
+
+async function sendOraculoMessage() {
+  const input = document.getElementById('oraculoInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+
+  playUI();
+  input.value = '';
+  _oraculoAddMessage('user', text);
+  _oraculoSetLoading(true);
+
+  _oraculoHistory.push({ role:'user', content: text });
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GEMINI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: ORACULO_SYSTEM },
+          ..._oraculoHistory
+        ],
+        max_tokens: 512,
+        temperature: 0.8
+      })
+    });
+
+    if(!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err?.error?.message || `Error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data?.choices?.[0]?.message?.content || 'El Oráculo guarda silencio...';
+
+    _oraculoHistory.push({ role:'assistant', content: reply });
+    _oraculoAddMessage('assistant', reply);
+
+  } catch(e) {
+    _oraculoAddMessage('assistant', `La niebla interrumpe la visión...\n\n(${e.message})`);
+  } finally {
+    _oraculoSetLoading(false);
+    document.getElementById('oraculoInput')?.focus();
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -5395,30 +5660,17 @@ function injectStatsButton() {
     /* ── Botón Ver Mazo en combate ── */
     #combatDeckBtn {
       display:inline-flex; align-items:center; justify-content:center;
-      width:28px; height:28px; border-radius:6px;
-      background:linear-gradient(135deg,#1a1228,#2a1a3a);
-      border:1px solid #d4a84355; cursor:pointer;
-      font-size:16px; transition:all .2s;
-      box-shadow:0 0 6px #d4a84322;
-      flex-shrink:0; vertical-align:middle;
+      background:none; border:none; cursor:pointer;
+      font-size:20px; transition:opacity .2s, transform .2s;
+      flex-shrink:0; opacity:.75;
     }
     #combatDeckBtn:hover, #combatDeckBtn:active {
-      border-color:#d4a843;
-      box-shadow:0 0 14px #d4a84466;
+      opacity:1;
       transform:scale(1.15);
     }
-    /* En móvil el botón de mazo va fixed a la IZQUIERDA, encima del portBtn */
     @media (max-width:640px){
       #combatDeckBtn {
-        position:fixed !important;
-        bottom:64px !important;
-        left:8px !important;
-        right:auto !important;
-        width:38px !important; height:38px !important;
-        font-size:20px !important;
-        border-radius:50% !important;
-        z-index:500 !important;
-        box-shadow:0 0 14px #d4a84355 !important;
+        font-size:22px !important;
       }
       /* Botón ver mazo en pantallas fuera de combate — izquierda para no solapar log btn (derecha) */
       .deck-view-btn {
@@ -5639,32 +5891,41 @@ function injectCombatDeckBtn() {
 
   const btn = document.createElement('button');
   btn.id = 'combatDeckBtn';
-  btn.title = 'Ver tu mazo';
-  btn.textContent = '🃏';
+  btn.title = 'Ver mazo';
+  btn.textContent = '';
+  const btnIco = document.createTextNode('🃏 ');
+  const btnLbl = document.createElement('span');
+  btnLbl.textContent = 'MAZO';
+  btnLbl.style.cssText = 'font-family:Cinzel,serif;font-size:10px;letter-spacing:1.5px;color:#d4a843;vertical-align:middle;opacity:.9;';
+  btn.appendChild(btnIco);
+  btn.appendChild(btnLbl);
+  btn.style.cssText = [
+    'display:inline-flex;align-items:center;gap:5px;',
+    'background:linear-gradient(135deg,#1a1228,#2a1a3a);',
+    'border:1px solid #d4a84366;border-radius:6px;',
+    'padding:5px 11px;cursor:pointer;flex-shrink:0;',
+    'font-size:17px;',
+    'box-shadow:0 0 10px #d4a84322;',
+    'transition:all .2s;'
+  ].join('');
+  btn.addEventListener('mouseenter', ()=>{
+    btn.style.borderColor='#d4a843';
+    btn.style.boxShadow='0 0 18px #d4a84366';
+    btn.style.transform='scale(1.07)';
+  });
+  btn.addEventListener('mouseleave', ()=>{
+    btn.style.borderColor='#d4a84366';
+    btn.style.boxShadow='0 0 10px #d4a84322';
+    btn.style.transform='';
+  });
   btn.addEventListener('click', e => { e.stopPropagation(); showDeckViewer(); });
 
-  if(isMobile()) {
-    // Móvil: fixed por CSS, añadimos al body
-    document.body.appendChild(btn);
+  // Siempre en la bot-bar, visible en escritorio y móvil
+  const botBar = document.querySelector('.bot-bar');
+  if(botBar) {
+    botBar.insertBefore(btn, botBar.firstChild);
   } else {
-    // Escritorio: junto al label "Mazo" en el panel izquierdo
-    let targetLabel = null;
-    document.querySelectorAll('.p-label').forEach(el => {
-      if(el.textContent.trim() === 'Mazo') targetLabel = el;
-    });
-    if(targetLabel && !targetLabel.querySelector('#combatDeckBtn')) {
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:0;';
-      const labelClone = document.createElement('span');
-      labelClone.textContent = targetLabel.textContent;
-      labelClone.style.cssText = 'font-family:Arial,sans-serif;font-size:14px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;';
-      wrapper.appendChild(labelClone);
-      wrapper.appendChild(btn);
-      targetLabel.replaceWith(wrapper);
-    } else {
-      // Fallback
-      document.body.appendChild(btn);
-    }
+    document.body.appendChild(btn);
   }
 }
 
