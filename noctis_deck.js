@@ -2979,9 +2979,12 @@ function renderEnemies() {
     if(e.burn)   statusHtml += `<span class="si si-br">🔥 ${e.burn}</span>`;
 
     const intents = getEnemyIntent(e);
-    const intentIconsHtml = intents.map((it, ii) =>
-      `<span class="e-intent-icon" data-tip="${it.text.replace(/"/g,'&quot;')}" data-idx="${i}">${it.icon}</span>`
-    ).join('');
+    const intentIconsHtml = intents.map((it, ii) => {
+      // Extract numeric value from intent text for the badge
+      const valMatch = it.text.match(/(\d+)/);
+      const badge = valMatch ? `<span style="position:absolute;bottom:-4px;right:-4px;background:#1a1030;border:1px solid #d4a84355;border-radius:8px;font-size:8px;font-family:'Cinzel',serif;color:#f0c060;padding:0 3px;line-height:14px;pointer-events:none">${valMatch[1]}</span>` : '';
+      return `<span class="e-intent-icon" data-tip="${it.text.replace(/"/g,'&quot;')}" data-idx="${i}" style="position:relative">${it.icon}${badge}</span>`;
+    }).join('');
     const healerBadge = e.isHealer ? `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:#60ee90;background:#1a3a1a55;border:1px solid #4acc7066;padding:2px 6px;border-radius:3px;margin-bottom:2px">✚ SANADORA</div>` : '';
 
     const hiddenStyle = e._hidden ? 'opacity:.22;filter:grayscale(.9) blur(1px)' : '';
@@ -3017,6 +3020,38 @@ function renderEnemies() {
       wrap.addEventListener('click', () => { G.targetIdx = i; renderEnemies(); });
     }
     zone.appendChild(wrap);
+  });
+
+  // Añadir tooltips a los badges de estado del enemigo (veneno, sangrado, fuego, escudo)
+  zone.querySelectorAll('.si').forEach(si => {
+    let sk = null;
+    if(si.classList.contains('si-ps'))  sk = 'poison';
+    else if(si.classList.contains('si-bl')) sk = 'bleed';
+    else if(si.classList.contains('si-br')) sk = 'burn';
+    else if(si.classList.contains('si-bk')) sk = 'block';
+    if(!sk) return;
+    const info = STATUS_DESCRIPTIONS[sk]; if(!info) return;
+    function showSiTip(){
+      _removeTip();
+      const rect = si.getBoundingClientRect();
+      const tip = document.createElement('div');
+      tip.className = 'status-tooltip';
+      tip.innerHTML = `<b style="color:${info.color}">${info.label}</b>${info.text}`;
+      const portal = _getTipPortal();
+      tip.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
+      portal.appendChild(tip);
+      _activeTip = tip;
+      const tw = tip.offsetWidth||200, th = tip.offsetHeight||88;
+      let lx = rect.left + rect.width/2 - tw/2;
+      lx = Math.max(8, Math.min(window.innerWidth - tw - 8, lx));
+      let ty = rect.top - th - 10;
+      if(ty < 8) ty = rect.bottom + 8;
+      tip.style.cssText = `position:fixed;left:${lx}px;top:${ty}px;pointer-events:none;visibility:visible`;
+    }
+    si.style.cursor = 'help';
+    si.addEventListener('mouseenter', e => { e.stopPropagation(); showSiTip(); });
+    si.addEventListener('mouseleave', () => _removeTip());
+    si.addEventListener('touchstart', e => { e.stopPropagation(); if(_activeTip){_removeTip();return;} showSiTip(); setTimeout(_removeTip,3200); }, {passive:true});
   });
 
   // Añadir tooltips a los iconos de intención
@@ -3454,7 +3489,7 @@ function playCard(hi){
     }
   }
 
-  renderHand();renderEnemies();renderPS();updMana();
+  renderHand();renderEnemies();renderPS();updMana();renderPowersHUD();
 }
 
 function updateGunslingerHUD(){
@@ -4326,6 +4361,16 @@ function animatePlayerHit(){
 }
 
 function combatWin(){
+  // Si murió el Barón Hemlock, matar todos los murciélagos y vampiros que invocó
+  const baronWasKilled = G.enemies.some(e => e.isBaron && e.dead);
+  if(baronWasKilled){
+    G.enemies.forEach(e => {
+      if(!e.dead && (e.isMurcielago || e.isVampiro)){
+        e.dead = true;
+        addLog(`${e.name} cae al morir el Barón Hemlock`, 'ene');
+      }
+    });
+  }
   let totalRw = G.enemies.reduce((sum,e)=>sum+(e.rw||0),0);
   // Corona Voraz: +50% gold
   if(hasRelic('corona_voraz')){ totalRw = Math.ceil(totalRw * 1.5); }
@@ -5438,6 +5483,8 @@ window.show = function(id) {
     // Ocultar powers HUD fuera del combate
     const phud = document.getElementById('powersHUD');
     if(phud) phud.innerHTML = '';
+    const apanel = document.getElementById('activePowersPanel');
+    if(apanel){ apanel.innerHTML=''; apanel.style.display='none'; }
   }
   // Remove old deck view button
   const dvb = document.getElementById('deckViewBtn');
@@ -6011,40 +6058,42 @@ function injectStatsButton() {
 //  POWERS HUD — muestra powers activos en combate
 // ═══════════════════════════════════════════════
 function renderPowersHUD() {
-  let hud = document.getElementById('powersHUD');
-  if(!hud) {
-    hud = document.createElement('div');
-    hud.id = 'powersHUD';
-    hud.style.cssText = `
-      position:fixed;top:8px;right:8px;z-index:490;
-      display:flex;flex-direction:column;gap:5px;pointer-events:none;
-    `;
-    document.body.appendChild(hud);
+  // Renderizar en el panel lateral izquierdo (debajo de reliquias)
+  const panel = document.getElementById('activePowersPanel');
+  // También limpiar el HUD flotante anterior si existía
+  const oldHud = document.getElementById('powersHUD');
+  if(oldHud) oldHud.innerHTML = '';
+
+  if(!panel) return;
+  panel.innerHTML = '';
+
+  if(!G._activePowers || Object.keys(G._activePowers).length === 0) {
+    panel.style.display = 'none';
+    return;
   }
-  hud.innerHTML = '';
-  if(!G._activePowers) return;
+
   const labels = {
-    midnight_pact: { icon:'🕯', name:'Pacto de Medianoche', desc:'+1 energía/turno', color:'#9a60ee' },
-    clockwork_eye: { icon:'⚙', name:'Ojo del Relojero',    desc:'4 gastados = +1 energía', color:'#d4a843' },
-    void_pact:     { icon:'❖', name:'Pacto del Vacío',    desc:`${G._freecards||0} cartas gratis`, color:'#cc80ff' },
-    invisibilitis: { icon:'👻', name:'Invisibilitis',       desc:'oculto este turno',         color:'#4a8aaa' },
+    midnight_pact: { icon:'🕯', name:'Pacto Medianoche', desc:'+1 energía/turno',                                   color:'#9a60ee' },
+    clockwork_eye: { icon:'⚙', name:'Ojo Relojero',      desc:`${G._manaSpentSinceLastTick||0}/4 para +1 energía`, color:'#d4a843' },
+    void_pact:     { icon:'❖', name:'Pacto del Vacío',   desc:`${G._freecards||0} cartas gratuitas`,               color:'#cc80ff' },
+    invisibilitis: { icon:'👻', name:'Invisibilitis',     desc:'oculto este turno',                                 color:'#4a8aaa' },
   };
+
+  // Título de sección
+  const title = document.createElement('div');
+  title.style.cssText = "font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px";
+  title.textContent = 'Poderes Activos';
+  panel.appendChild(title);
+
   Object.keys(G._activePowers).forEach(pid => {
     const info = labels[pid]; if(!info) return;
-    const pill = document.createElement('div');
-    pill.style.cssText = `
-      display:flex;align-items:center;gap:6px;
-      background:linear-gradient(135deg,#1a1228dd,#2a1a3add);
-      border:1px solid ${info.color}66;border-radius:20px;
-      padding:4px 10px 4px 7px;
-      font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;
-      color:${info.color};pointer-events:none;
-      box-shadow:0 0 10px ${info.color}33;
-      backdrop-filter:blur(4px);
-    `;
-    pill.innerHTML = `<span style="font-size:13px">${info.icon}</span><span>${info.name}</span><span style="color:#7a6888;font-size:8px;margin-left:2px">${info.desc}</span>`;
-    hud.appendChild(pill);
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;align-items:center;gap:5px;padding:3px 5px;background:${info.color}11;border:1px solid ${info.color}44;border-radius:4px;`;
+    row.innerHTML = `<span style="font-size:20px">${info.icon}</span><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><div style="font-family:'Cinzel',serif;font-size:13px;color:${info.color};letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${info.name}</div><div style="font-family:Arial,sans-serif;font-size:12px;color:#a090b8">${info.desc}</div></div>`;
+    panel.appendChild(row);
   });
+
+  panel.style.display = 'flex';
 }
 
 

@@ -117,7 +117,7 @@
      style="position:fixed;bottom:22px;left:24px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#c9984a;text-decoration:none;opacity:.75;transition:opacity .2s,text-shadow .2s;text-shadow:0 0 8px #c9984a44;z-index:100;"
      onmouseover="this.style.opacity='1';this.style.textShadow='0 0 16px #c9984aaa'"
      onmouseout="this.style.opacity='.75';this.style.textShadow='0 0 8px #c9984a44'">
-    ✦ Notas del Parche (v0.0.12)
+    ✦ Notas del Parche (v0.0.11)
   </a>
 </div>
 
@@ -181,10 +181,9 @@
     <div><div class="p-label">Mazo</div><div class="dk-cnt"><span>Mazo: <span id="dkC">0</span></span><span>Desc: <span id="dsC">0</span></span><span>Mano: <span id="handC">0/6</span></span></div></div>
     <div><div class="p-label">Oro</div><div class="gold-row">🪙 <span id="goldN">0</span></div></div>
     <div><div class="p-label">Reliquias</div><div id="relics" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"></div></div>
+    <div id="activePowersPanel" style="display:none;flex-direction:column;gap:4px;margin-top:4px"></div>
     <!-- HUD Pistolero — se muestra solo cuando juegas con El Pistolero -->
     <div id="gunslingerHUD" style="display:none"></div>
-    <div class="sec-title" style="margin-top:6px">Pasiva</div>
-    <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
   </div>
 
   <div class="p-center">
@@ -207,6 +206,8 @@
     <div class="clog" id="clog"></div>
     <div class="sec-title" style="margin-top:4px">Objetivos</div>
     <div id="targetHints" style="font-size:9px;color:var(--fog);font-style:italic;line-height:1.6">Pulsa en un enemigo<br>para seleccionarlo</div>
+    <div class="sec-title" style="margin-top:6px">Pasiva</div>
+    <div id="passiveInfo" style="font-size:10px;color:#a090cc;font-style:italic;line-height:1.5"></div>
   </div>
 </div>
 
