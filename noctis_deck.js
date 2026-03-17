@@ -334,23 +334,23 @@ const CHARS=[
 // ═══════════════════════════════════════════════
 const CARDS=[
   // ── COMUNES ──
-  {id:'strike',   name:'Golpe Sombrío',    type:'attack', rarity:'common',    cost:1,dmg:6,  blk:0, bleed:0,psn:0,desc:'Daño'},
-  {id:'shield',   name:'Escudo Arcano',    type:'defense',rarity:'common',    cost:1,dmg:0,  blk:7, bleed:0,psn:0,desc:'Protección'},
+  {id:'strike',   name:'Golpe Sombrío',    type:'attack', rarity:'common',    cost:1,dmg:6,  blk:0, bleed:0,psn:0,desc:''},
+  {id:'shield',   name:'Escudo Arcano',    type:'defense',rarity:'common',    cost:1,dmg:0,  blk:7, bleed:0,psn:0,desc:''},
   {id:'lance',    name:'Lanza de Niebla',  type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:0,psn:2,desc:'Veneno + daño'},
   {id:'precise',  name:'Corte Preciso',    type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:2,psn:0,desc:'Daño + sangrado.'},
-  {id:'retaliate',name:'Represalia',       type:'skill',  rarity:'common',    cost:1,dmg:3,  blk:4, bleed:0,psn:0,desc:'Daño + protección.'},
+  {id:'retaliate',name:'Represalia',       type:'skill',  rarity:'common',    cost:1,dmg:3,  blk:4, bleed:0,psn:0,desc:''},
   {id:'mend',     name:'Susurro Vital',    type:'skill',  rarity:'common',    cost:1,dmg:0,  blk:0, bleed:0,psn:0,heal:8, desc:'Recupera 8 de Vitalidad.'},
-  {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:'Daño.'},
+  {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:''},
   // ── INFRECUENTES ──
-  {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño + sangrado'},
-  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'Daño',dbl:true},
-  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:17,bleed:0,psn:0,desc:'Protección'},
+  {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:''},
+  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'',dbl:true},
+  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:17,bleed:0,psn:0,desc:''},
   {id:'cloud',    name:'Nube Venenosa',    type:'skill',  rarity:'uncommon',  cost:2,dmg:0,  blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
   {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Daño.',dbl:true},
   {id:'smokebomb',name:'Bomba de Humo',    type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:10,bleed:0,psn:2,desc:'Escudo + envenenar.'},
   // ── RARAS ──
-  {id:'smite',    name:'Golpe Sagrado',    type:'attack', rarity:'rare',      cost:1,dmg:8,  blk:0, bleed:0,psn:0,desc:'Daño.'},
-  {id:'ritual',   name:'Ritual de Sangre', type:'skill',  rarity:'rare',      cost:2,dmg:0,  blk:0, bleed:4,psn:0,desc:'Sangrado.'},
+  {id:'smite',    name:'Golpe Sagrado',    type:'attack', rarity:'rare',      cost:1,dmg:8,  blk:0, bleed:0,psn:0,desc:''},
+  {id:'ritual',   name:'Ritual de Sangre', type:'skill',  rarity:'rare',      cost:1,dmg:0,  blk:0, bleed:4,psn:0,desc:''},
   {id:'fanfire',  name:'Fuego Cerrado',    type:'attack', rarity:'rare',      cost:2,dmg:6,  blk:0, bleed:0,psn:0,desc:'Daño.',triple:true},
   // ── LEGENDARIAS ──
   {id:'headshot', name:'Disparo Certero',  type:'attack', rarity:'legendary', cost:3,dmg:28, blk:0, bleed:0,psn:0,desc:'Daño'},
@@ -372,9 +372,9 @@ const CARDS=[
   {id:'fireball',      name:'Bola de Fuego',    type:'attack', rarity:'common',  cost:1, dmg:0, blk:0, bleed:0, psn:0, burn:5,
    desc:'Daño + 5 quemadura.'},
   {id:'poison_pool',   name:'Charco de Veneno', type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0, psn:8,
-   desc:'Inflige 8 de veneno.'},
+   desc:'☠ Área — 8 veneno a todos.'},
   {id:'solar_rain',    name:'Lluvia Solar',     type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0, psn:0, burn:12,
-   desc:'Inflige 12 de quemadura.'},
+   desc:'🔥 Área — 12 quemadura a todos.'},
   {id:'invisibilitis', name:'Invisibilitis',    type:'power',  rarity:'special', cost:2, dmg:0, blk:0, bleed:0, psn:0,
    playerInvis:true, isSpecial:true, powerEffect:'invisibilitis',
    desc:'[ESPECIAL] El turno siguiente los enemigos no pueden atacarte.'},
@@ -391,7 +391,7 @@ const RARITY_WEIGHTS = {
   uncommon:  {base:48, elite:40, boss:28},
   rare:      {base:24, elite:35, boss:38},
   legendary: {base:8,  elite:15, boss:29},
-  special:   {base:4,  elite:8,  boss:12}, // Cartas especiales — baja probabilidad
+  special:   {base:1,  elite:2,  boss:4 }, // Cartas especiales — muy baja probabilidad
 };
 const RARITY_COLORS = {
   common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44', special:'#cc80ff'
@@ -1047,6 +1047,8 @@ function saveG(){
       infiniteMode: G.infiniteMode || false,
       infiniteEncounters: G.infiniteEncounters || 0,
       exhaustedZone: G._exhaustedZone || [],
+      shopStock: G._shop ? G._shop.map(c=>c.id) : null,
+      discardCost: G.discardCost || 40,
       savedAt:new Date().toLocaleString('es-ES')
     }));
   }catch(e){}
@@ -1136,7 +1138,7 @@ function newRun(cid, heroName){
     enemies:[],
     targetIdx:0,
     map:genMap(),
-    path:{act:0,row:0,branch:null},
+    path:{act:0,row:0,branch:null,allowedBranches:null},
     firstHitUsed:false,
     infiniteMode:false,
     infiniteEncounters:0
@@ -1170,11 +1172,13 @@ function restoreRun(d){
     enemies:[],
     targetIdx:0,
     map:d.map,
-    path:d.path||{act:0,row:0,branch:null},
+    path:d.path||{act:0,row:0,branch:null,allowedBranches:null},
     firstHitUsed:false,
     infiniteMode: d.infiniteMode||false,
     infiniteEncounters: d.infiniteEncounters||0,
     _exhaustedZone: d.exhaustedZone||[],
+    _savedShopStock: d.shopStock||null,
+    discardCost: d.discardCost||40,
   };
   startRunTracking();
 }
@@ -1763,21 +1767,29 @@ function renderMap(){
 
         const isCurrentRow   = ri===curRow;
         const playerInFusion = fa===curBranch || fb===curBranch;
-        const isChoosableNow = isCurrentRow && !branchChosen;
+        // ¿Este nodo fusionado pertenece al par del jugador?
+        // Par del jugador: si ha elegido rama, [0,1] o [2,3] según su rama.
+        // Si aún no eligió rama, allowedBranches fija el par desde la primera elección.
+        const allowedPair = G.path.allowedBranches || null;
+        const fusionInPlayerPair = allowedPair
+          ? (allowedPair.includes(fa) && allowedPair.includes(fb))  // ambas ramas del nodo fusionado deben estar en el par permitido
+          : true; // sin par fijado aún: primera fila, mostrar todo
+        const isChoosableNow = isCurrentRow && !branchChosen && fusionInPlayerPair;
         const isActiveNow    = isCurrentRow && branchChosen && playerInFusion && !node.visited;
         const isVis          = node.visited;
-        const involved       = !branchChosen || playerInFusion;
+        // involved: el nodo es relevante para el jugador solo si pertenece a su par
+        const involved       = fusionInPlayerPair && (!branchChosen || playerInFusion);
 
         if(!involved)           el.classList.add('lkd');
         else if(isVis)          el.classList.add('vis');
         else if(isActiveNow)    el.classList.add('cur','cur-active');
         else if(isChoosableNow) el.classList.add('cur');
-        // nodos fusionados futuros: aspecto normal sin brillo
+        // nodos fusionados futuros del par correcto: aspecto normal sin brillo
 
         el.innerHTML += '<div class="n-ico">'+(IC[node.type]||'?')+'</div>'
           +'<div class="n-lbl">'+(LABEL[node.type]||node.type)+'</div>';
 
-        if(involved&&!isVis&&(isChoosableNow||isActiveNow||(isCurrentRow&&playerInFusion))){
+        if(involved && fusionInPlayerPair && !isVis && (isChoosableNow||isActiveNow||(isCurrentRow&&playerInFusion))){
           el.style.cursor='pointer';
           el.addEventListener('click',()=>enterNodeBranch(curAct,ri,fa,true));
         }
@@ -1787,9 +1799,12 @@ function renderMap(){
 
       // ── Nodo normal ──────────────────────────────────────────
       const allowedBranches = G.path.allowedBranches || null;
-      const isMyBranch = !branchChosen
-        ? (allowedBranches ? allowedBranches.includes(bi) : true)
-        : bi===curBranch;
+      // isMyBranch: si hay allowedBranches (par fijado), solo mostrar ramas de ese par.
+      // Si no hay par fijado aún (primera fila, nueva partida), mostrar todas.
+      // Una vez elegida rama (branchChosen), solo mostrar la rama exacta.
+      const isMyBranch = branchChosen
+        ? bi === curBranch
+        : (allowedBranches ? allowedBranches.includes(bi) : true);
       const nx = colX[bi]-NODE_W/2;
       const el = document.createElement('div');
       el.className = 'mnode';
@@ -2442,14 +2457,29 @@ function enterNodeBranch(ai, ri, bi, isFused){
   const node = ri === numRowsAct ? G.map[ai].boss : (G.map[ai].rows[ri]||[])[bi];
   if(!node) return;
 
-  // Si el nodo es fusionado, guardar su par como allowedBranches para que
-  // al salir solo se pueda elegir entre esas dos ramas.
-  // Si no es fusionado, preservar el allowedBranches actual (puede venir de fusión previa).
-  const mergedPair = (node.merged) ? node.merged : null;
+  // Determinar el par de ramas al que pertenece esta elección.
+  // Par izquierdo = [0,1], par derecho = [2,3]. El jugador NUNCA puede cruzar pares.
+  const playerPair = (bi === 0 || bi === 1) ? [0,1] : [2,3];
   const prevAllowed = G.path.allowedBranches || null;
+
+  // Guardia: si hay par fijado y este nodo es del par contrario, bloquear
+  if(prevAllowed && !prevAllowed.includes(bi)) {
+    console.warn('[MAP] Intento de cruzar par bloqueado:', bi, '→ par permitido:', prevAllowed);
+    return;
+  }
+
+  let newAllowed;
+  if(node.merged) {
+    // Nodo fusionado: su par es exactamente sus dos ramas — debe coincidir con el par del jugador
+    newAllowed = node.merged;
+  } else if(prevAllowed) {
+    newAllowed = prevAllowed; // mantener restricción existente
+  } else {
+    newAllowed = playerPair; // fijar el par desde el primer nodo elegido
+  }
   G.path = {
     act: ai, row: ri, branch: bi,
-    allowedBranches: mergedPair || prevAllowed
+    allowedBranches: newAllowed
   };
   saveG();
 
@@ -2493,7 +2523,7 @@ function advance(){
     }
     if(G.map[nextAct]) G.map[nextAct].revealed = true;
     // Nuevo acto: sin rama elegida hasta fila 0
-    G.path = {act:nextAct, row:0, branch:null};
+    G.path = {act:nextAct, row:0, branch:null, allowedBranches:null};
     saveG();
     showActTransition(nextAct, ()=>{
       showMap();
@@ -2519,7 +2549,8 @@ function advance(){
       nextBranch = null;
       nextAllowed = curNode.merged; // ej: [0,1] o [2,3]
     } else {
-      nextAllowed = null; // nodo normal: ya no hay restricción extra
+      // Nodo normal: conservar el par del jugador para que no pueda saltar al otro par
+      nextAllowed = G.path.allowedBranches || null;
     }
   }
   G.path = {act, row:nextRow, branch:nextBranch, allowedBranches:nextAllowed};
@@ -3140,7 +3171,11 @@ function renderHand(){
     // Tributo de Sangre: jugable si tienes más de 5 HP
     const canBloodTribute = card.hpCost && p.hp > card.hpCost;
     // Powers agotados: no jugables
-    const isExhausted = card.type === 'power' && G._exhaustedPowers && G._exhaustedPowers.has(card.id);
+    // Una power card está agotada SOLO si todas sus copias ya fueron usadas.
+    // Contamos: cuántas copias hay en exhaustedZone vs cuántas hay en total menos las ya agotadas.
+    const exhaustedCount = card.type === 'power' && G._exhaustedZone ? G._exhaustedZone.filter(id => id === card.id).length : 0;
+    const totalCopies = card.type === 'power' ? (G.player.deck.filter(id=>id===card.id).length + G.player.hand.filter(id=>id===card.id).length + G.player.discard.filter(id=>id===card.id).length + exhaustedCount) : 0;
+    const isExhausted = card.type === 'power' && exhaustedCount >= totalCopies && exhaustedCount > 0;
     const canPlay = (canBloodTribute || can) && !isExhausted;
     const g=document.createElement('div');
     g.className=`gcard ${card.type} ${canPlay?'playable':'unplayable'}${isExhausted?' exhausted-power':''}`;
@@ -3500,13 +3535,14 @@ function checkBleedExplosion(victim){
   victim.block = Math.max(0, victim.block - explDmg);
   const nd = explDmg - ab;
   victim.hp = Math.max(0, victim.hp - nd);
-  // Curar 10 al jugador, siempre, capado al máximo
-  const got = Math.min(p.maxHp, p.hp + 10) - p.hp;
+  // Curar 5 al jugador
+  const got = Math.min(p.maxHp, p.hp + 5) - p.hp;
   p.hp += got;
   if(got > 0) animateHeal(got);
-  // Resetear sangrado a 0
-  victim.bleed = 0;
-  addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd}${ab>0?' ('+ab+' bloq)':''} · jugador +${got} HP · sangrado→0`, 'ene');
+  // El sangrado sobrante (bleed - 5) se conserva como nuevo stack
+  const remainder = victim.bleed - 5;
+  victim.bleed = Math.max(0, remainder);
+  addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd}${ab>0?' ('+ab+' bloq)':''} · +${got} HP · sangrado restante: ${victim.bleed}`, 'ene');
   if(nd > 0){
     if(victim === p){ spawnN(nd,'pl'); animatePlayerHit(); }
     else { spawnN(nd,'en'); const idx=G.enemies.indexOf(victim); if(idx>=0) animateAttack(idx,nd); }
@@ -3536,16 +3572,17 @@ function triggerBleedOnHit(victim, caster, dmgDealt){
     const nd2 = explDmg - ab2;
     victim.hp = Math.max(0, victim.hp - nd2);
 
-    // Curar 10 al JUGADOR siempre (sea víctima o atacante)
+    // Curar 5 al JUGADOR
     const p = G.player;
-    const got = Math.min(p.maxHp, p.hp + 10) - p.hp;
+    const got = Math.min(p.maxHp, p.hp + 5) - p.hp;
     p.hp += got;
     if(got > 0) animateHeal(got);
 
-    // Resetear sangrado de la víctima a 0
-    victim.bleed = 0;
+    // El sangrado sobrante (bleed - 5) se conserva
+    const remainder2 = victim.bleed - 5;
+    victim.bleed = Math.max(0, remainder2);
 
-    addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd2}${ab2>0?' ('+ab2+' bloq)':''} · jugador +${got} HP 🩸→0`, 'ene');
+    addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd2}${ab2>0?' ('+ab2+' bloq)':''} · +${got} HP · sangrado restante: ${victim.bleed}`, 'ene');
   }
 
   return nd;
@@ -4615,18 +4652,25 @@ function doPurge(){const i=G.player.deck.indexOf('strike');if(i>=0)G.player.deck
 function showShop(){
   sfxShopEnter();
   document.getElementById('shopG').textContent=G.gold;
-  // Tienda: 4 cartas con sistema de pesos igual que las recompensas de combate
-  // Se usa tier 0 (base) pero con pool más amplia y sin excluir bullet
-  const shopPool = CARDS.filter(c=>!['strike','shield'].includes(c.id));
-  function shopWeightedPick(rem) {
-    const tw = rem.reduce((s,c)=>(s+(RARITY_WEIGHTS[c.rarity]?.base||5)),0);
-    let r=Math.random()*tw;
-    for(const c of rem){r-=(RARITY_WEIGHTS[c.rarity]?.base||5);if(r<=0)return c;}
-    return rem[rem.length-1];
+  // Si hay stock guardado (recarga de página en tienda), restaurarlo
+  let stock;
+  if(G._savedShopStock && G._savedShopStock.length > 0){
+    stock = G._savedShopStock.map(id=>CARDS.find(c=>c.id===id)).filter(Boolean);
+    G._savedShopStock = null; // limpiar tras restaurar
+  } else {
+    const shopPool = CARDS.filter(c=>!['strike','shield'].includes(c.id));
+    function shopWeightedPick(rem) {
+      const tw = rem.reduce((s,c)=>(s+(RARITY_WEIGHTS[c.isSpecial?'special':c.rarity]?.base||5)),0);
+      let r=Math.random()*tw;
+      for(const c of rem){r-=(RARITY_WEIGHTS[c.isSpecial?'special':c.rarity]?.base||5);if(r<=0)return c;}
+      return rem[rem.length-1];
+    }
+    const shopAvail=[...shopPool], stock2=[];
+    while(stock2.length<4&&shopAvail.length>0){const c=shopWeightedPick(shopAvail);stock2.push(c);shopAvail.splice(shopAvail.indexOf(c),1);}
+    stock = stock2;
   }
-  const shopAvail=[...shopPool], stock=[];
-  while(stock.length<4&&shopAvail.length>0){const c=shopWeightedPick(shopAvail);stock.push(c);shopAvail.splice(shopAvail.indexOf(c),1);}
   G._shop=stock;
+  saveG(); // guardar inmediatamente para persistir el stock
   const c=document.getElementById('shopSt');c.innerHTML='';
   stock.forEach(card=>{
     const price=(card.cost+1)*8;
