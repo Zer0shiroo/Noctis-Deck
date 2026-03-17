@@ -266,13 +266,15 @@
     <div id="sec-rare"></div>
     <!-- LEGENDARIAS -->
     <div id="sec-legendary"></div>
+    <!-- ESPECIALES -->
+    <div id="sec-special"></div>
 
   </div><!-- /grimoire -->
 
 </div><!-- /page -->
 
 <div class="back-bar">
-  <a href="index.html" class="back-btn" onclick="playUI()">← Volver al Juego</a>
+  <a href="index.html" class="back-btn" onclick="if(_bgAudio&&!_bgAudio.paused){try{localStorage.setItem('noctis_music_pos',_bgAudio.currentTime);}catch(e){}}playUI()">← Volver al Juego</a>
 </div>
 
 <script>
@@ -297,6 +299,7 @@ const IMG = {
   enemy_guardian: USE_AI ? 'resources/enemigos/guardian.png'       : 'resources/alt/enemigos/guardian.png',
   enemy_murcielago:USE_AI? 'resources/enemigos/murcielago.png'     : 'resources/alt/enemigos/murcielago.png',
   enemy_baron:    USE_AI ? 'resources/enemigos/baron_hemlock.png'  : 'resources/alt/enemigos/baron_hemlock.png',
+  card_precise:    USE_AI ? 'resources/cartas/cortepreciso.jpg'      : 'resources/alt/cartas/precise.png',
   card_strike:    USE_AI ? 'resources/cartas/golpesombrio.jpg'     : 'resources/alt/cartas/strike.png',
   card_shield:    USE_AI ? 'resources/cartas/escudoarcano.jpg'     : 'resources/alt/cartas/shield.png',
   card_lance:     USE_AI ? 'resources/cartas/lanzaniebla.png'      : 'resources/alt/cartas/lance.png',
@@ -314,7 +317,16 @@ const IMG = {
   card_fanfire:   USE_AI ? 'resources/cartas/fanfire.jpg'          : 'resources/alt/cartas/fanfire.png',
   card_headshot:  USE_AI ? 'resources/cartas/headshot.jpg'         : 'resources/alt/cartas/headshot.png',
   card_bloodpact: USE_AI ? 'resources/cartas/ritual of blood.jpg'  : 'resources/alt/cartas/blood.png',
-  card_nightmare: USE_AI ? 'resources/cartas/nube venenosa.jpg'    : 'resources/alt/cartas/nightmare.png',
+  card_nightmare:    USE_AI ? 'resources/cartas/nube venenosa.jpg'    : 'resources/alt/cartas/nightmare.png',
+  card_fireball:       USE_AI ? 'resources/cartas/fireball.jpg'          : 'resources/alt/cartas/fireball.png',
+  card_poison_pool:    USE_AI ? 'resources/cartas/poison_pool.jpg'       : 'resources/alt/cartas/poison_pool.png',
+  card_solar_rain:     USE_AI ? 'resources/cartas/solar_rain.jpg'        : 'resources/alt/cartas/solar_rain.png',
+  card_invisibilitis:  USE_AI ? 'resources/cartas/invisibilitis.jpg'     : 'resources/alt/cartas/invisibilitis.png',
+  card_void_pact:      USE_AI ? 'resources/cartas/void_pact.jpg'         : 'resources/alt/cartas/void_pact.png',
+  card_midnight_pact:  USE_AI ? 'resources/cartas/midnight_pact.jpg'     : 'resources/alt/cartas/midnight_pact.png',
+  card_clockwork_eye:  USE_AI ? 'resources/cartas/clockwork_eye.jpg'     : 'resources/alt/cartas/clockwork_eye.png',
+  card_blood_tribute:  USE_AI ? 'resources/cartas/blood_tribute.jpg'     : 'resources/alt/cartas/blood_tribute.png',
+  card_storm_veil:     USE_AI ? 'resources/cartas/storm_veil.jpg'        : 'resources/alt/cartas/storm_veil.png',
 };
 
 function imgTag(key, cls, alt) {
@@ -361,6 +373,7 @@ const ENEMIES = {
 const CARDS = [
   // COMUNES
   {id:'strike',   name:'Golpe Sombrío',   type:'attack', rarity:'common',    cost:1, dmg:6,  blk:0,  bleed:0,psn:0,           desc:'Golpe veloz con tu filo.', base:true},
+  {id:'precise',  name:'Corte Preciso',   type:'attack', rarity:'common',    cost:1, dmg:4,  blk:0,  bleed:2,psn:0,           desc:'Corte ágil que inflige sangrado.'},
   {id:'shield',   name:'Escudo Arcano',   type:'defense',rarity:'common',    cost:1, dmg:0,  blk:7,  bleed:0,psn:0,           desc:'Barrera mágica que absorbe el daño.', base:true},
   {id:'lance',    name:'Lanza de Niebla', type:'attack', rarity:'common',    cost:1, dmg:4,  blk:0,  bleed:0,psn:2,           desc:'Veneno que consume desde dentro.'},
   {id:'retaliate',name:'Represalia',      type:'skill',  rarity:'common',    cost:1, dmg:3,  blk:4,  bleed:0,psn:0,           desc:'Ataca y defiende al mismo tiempo.'},
@@ -381,6 +394,16 @@ const CARDS = [
   {id:'headshot', name:'Disparo Certero', type:'attack', rarity:'legendary', cost:3, dmg:28, blk:0,  bleed:0,psn:0,           desc:'Un disparo. El fin.'},
   {id:'bloodpact',name:'Pacto de Sangre', type:'skill',  rarity:'legendary', cost:2, dmg:0,  blk:0,  bleed:3,psn:0, heal:10,  desc:'Cura con la sangre del enemigo.'},
   {id:'nightmare',name:'Pesadilla Eterna',type:'attack', rarity:'legendary', cost:3, dmg:9,  blk:0,  bleed:3,psn:3,           desc:'Inflige todos los males de una vez.'},
+  // nuevas cartas v2
+  {id:'fireball',      name:'Bola de Fuego',    type:'attack', rarity:'common',  cost:1, dmg:0, blk:0, bleed:0,psn:0, burn:5,                     desc:'Inflige 5 quemadura a un enemigo.'},
+  {id:'poison_pool',   name:'Charco de Veneno', type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0,psn:8,                              desc:'Inflige 8 de veneno a todos los enemigos.'},
+  {id:'solar_rain',    name:'Lluvia Solar',     type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0,psn:0, burn:12,                     desc:'Inflige 12 de quemadura a todos los enemigos.'},
+  {id:'invisibilitis', name:'Invisibilitis',    type:'power',  rarity:'special', cost:2, dmg:0, blk:0, bleed:0,psn:0, isSpecial:true,              desc:'[ESPECIAL] El turno siguiente los enemigos no pueden atacarte.'},
+  {id:'void_pact',     name:'Pacto del Vacío',  type:'power',  rarity:'special', cost:2, dmg:0, blk:0, bleed:0,psn:0, isSpecial:true,              desc:'[ESPECIAL] Termina tu turno. Las 2 primeras cartas de cada turno son gratuitas.'},
+  {id:'midnight_pact', name:'Pacto de Medianoche',type:'power',rarity:'special', cost:2, dmg:0, blk:0, bleed:0,psn:0, isSpecial:true,              desc:'[ESPECIAL] +1 energía al inicio de cada turno.'},
+  {id:'clockwork_eye', name:'Ojo del Relojero',   type:'power',rarity:'special', cost:2, dmg:0, blk:0, bleed:0,psn:0, isSpecial:true,              desc:'[ESPECIAL] Cada 4 energía gastada, gana 1.'},
+  {id:'blood_tribute', name:'Tributo de Sangre',  type:'skill', rarity:'rare',   cost:0, dmg:0, blk:0, bleed:0,psn:0, hpCost:5, manaGain:2,         desc:'Paga 5 Vitalidad. Gana 2 energía.'},
+  {id:'storm_veil',    name:'Velo de Tormenta',   type:'defense',rarity:'rare',  cost:2, dmg:0, blk:11,bleed:0,psn:0, nextTurnMana:1,               desc:'+11 protección. Próximo turno +1 energía.'},
 ];
 
 // ─── RARITY CONFIG ────────────────────────────────────────────────────────────
@@ -389,8 +412,9 @@ const RARITY = {
   uncommon:  { label:'INFRECUENTE',color:'#60aaee', bg:'#60aaee11', border:'#60aaee44' },
   rare:      { label:'RARA',       color:'#cc80ff', bg:'#cc80ff11', border:'#cc80ff44' },
   legendary: { label:'LEGENDARIA', color:'#ffcc44', bg:'#ffcc4411', border:'#ffcc4444' },
+  special:   { label:'❖ ESPECIAL',  color:'#9a60ee', bg:'#9a60ee11', border:'#9a60ee44' },
 };
-const TYPE_LABELS = { attack:'Ataque', defense:'Defensa', skill:'Habilidad' };
+const TYPE_LABELS = { attack:'Ataque', defense:'Defensa', skill:'Habilidad', power:'Poder' };
 const TYPE_COLORS = { attack:'#e87070', defense:'#70b8e8', skill:'#80cc70' };
 
 // ─── BUILD ENEMY CARD ─────────────────────────────────────────────────────────
@@ -423,7 +447,7 @@ function buildEnemyCard(e, badgeClass, badgeLabel, accentColor) {
 
 // ─── BUILD CARD GRIMOIRE ──────────────────────────────────────────────────────
 function buildGrimCard(c) {
-  const r = RARITY[c.rarity];
+  const r = RARITY[c.rarity] || RARITY['special'];
   const art = imgTag('card_'+c.id, 'grim-card-art', c.name);
   const stats = [];
   if(c.dmg)    stats.push(`<span class="grim-stat stat-dmg">⚔ ${c.triple?c.dmg+'×3':c.dbl?c.dmg+'×2':c.dmg}</span>`);
@@ -431,6 +455,10 @@ function buildGrimCard(c) {
   if(c.bleed)  stats.push(`<span class="grim-stat stat-bleed">🩸 ${c.bleed}</span>`);
   if(c.psn)    stats.push(`<span class="grim-stat stat-psn">☠ ${c.psn}</span>`);
   if(c.heal)   stats.push(`<span class="grim-stat stat-heal">❤ +${c.heal}</span>`);
+  if(c.burn)         stats.push(`<span class="grim-stat" style="background:#3a1a0033;color:#ffb060;border:1px solid #ff904044">🔥 ${c.burn}</span>`);
+  if(c.hpCost)       stats.push(`<span class="grim-stat stat-bleed">HP -${c.hpCost}</span>`);
+  if(c.manaGain)     stats.push(`<span class="grim-stat" style="background:#1a2a4a33;color:#70aaee;border:1px solid #4a8acc44">◆+${c.manaGain}</span>`);
+  if(c.nextTurnMana) stats.push(`<span class="grim-stat" style="background:#1a2a4a33;color:#70aaee88;border:1px solid #4a8acc44">◆+${c.nextTurnMana}▶</span>`);
   const baseMark = c.base ? `<span style="font-size:8px;color:#4a3a5a;font-family:'Cinzel',serif;letter-spacing:.1em">BASE</span>` : '';
   return `
     <div class="grim-card">
@@ -448,9 +476,50 @@ function buildGrimCard(c) {
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
+// ─── MUSIC SYSTEM ─────────────────────────────────────────────────────────────
+const MUSIC_SRC = 'resources/music/background.mp3';
+let _bgAudio = null;
+let _audioUnlocked = false;
+
+function getMusicVolume() {
+  try { const v = parseFloat(localStorage.getItem('noctis_music_vol')); return isNaN(v) ? 0.5 : v; } catch(e) { return 0.5; }
+}
+
+function _startMusic(fromPos) {
+  if(_bgAudio) return;
+  _bgAudio = new Audio(MUSIC_SRC);
+  _bgAudio.loop   = true;
+  _bgAudio.volume = getMusicVolume();
+  if(fromPos > 0) {
+    _bgAudio.addEventListener('canplay', () => { _bgAudio.currentTime = fromPos; }, { once: true });
+  }
+  _bgAudio.play().catch(() => {});
+}
+
+// Arrancar música automáticamente al cargar (viene del index, gesto ya existe)
+(function autoStartMusic() {
+  try {
+    const savedPos = parseFloat(localStorage.getItem('noctis_music_pos') || '0');
+    localStorage.removeItem('noctis_music_pos');
+    _bgAudio = new Audio(MUSIC_SRC);
+    _bgAudio.loop   = true;
+    _bgAudio.volume = getMusicVolume();
+    if(savedPos > 0) {
+      _bgAudio.addEventListener('canplay', () => { _bgAudio.currentTime = savedPos; }, { once: true });
+    }
+    _bgAudio.play().catch(() => {
+      // Autoplay bloqueado: esperar primer click
+      _bgAudio = null;
+      document.addEventListener('click', () => { if(!_bgAudio) _startMusic(savedPos); }, { once: true });
+    });
+    _audioUnlocked = true;
+  } catch(e) {}
+})();
+
 // ─── UI SOUND ─────────────────────────────────────────────────────────────────
 const UI_SOUND_SRC = 'resources/music/ui_click.mp3';
 function playUI() {
+  if(!_audioUnlocked) { _audioUnlocked = true; _startMusic(0); }
   try {
     const v = parseFloat(localStorage.getItem('noctis_sfx_vol'));
     const vol = isNaN(v) ? 0.6 : v;
@@ -494,7 +563,7 @@ function renderAll() {
   document.getElementById('grid-act2boss').innerHTML= ENEMIES.act2boss.map(e=>buildEnemyCard(e,'badge-boss','JEFE','#c03040')).join('');
 
   // Grimoire cards by rarity
-  ['common','uncommon','rare','legendary'].forEach(r => {
+  ['common','uncommon','rare','legendary','special'].forEach(r => {
     const rc = RARITY[r];
     const cards = CARDS.filter(c=>c.rarity===r);
     document.getElementById('sec-'+r).innerHTML = `

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noctis Deck — Notas de Actualización v0.0.11 · Comportamiento de Goblins</title>
+<title>Noctis Deck — Notas de Actualización v0.0.12 · Fuego, Veneno y Poderes</title>
 <link rel="shortcut icon" href="resources/logo/logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
@@ -150,6 +150,9 @@
   .s-rarity .section-title{ color:#cc80ff;text-shadow:0 0 12px #9a40cc44 }
   .s-deck  .section-title { color:#70e8a0;text-shadow:0 0 12px #3acc7044 }
   .s-mob   .section-title { color:#70b8e8;text-shadow:0 0 12px #3a8acc44 }
+  .s-fire  .section-title { color:#ffb060;text-shadow:0 0 12px #ff904044 }
+  .s-power .section-title { color:#cc80ff;text-shadow:0 0 12px #9a60ee44 }
+  .s-music .section-title { color:#70e8a0;text-shadow:0 0 12px #3acc7044 }
 
   .card {
     background:linear-gradient(135deg,#1e1430 0%,#150d22 100%);
@@ -186,6 +189,8 @@
   .tag-deck   { background:#4acc700f;color:var(--green2);border:1px solid #4acc7033 }
   .tag-mob    { background:#3a8acc0f;color:#70b8e8;border:1px solid #3a8acc33 }
   .tag-boss   { background:#c030400f;color:#e87070;border:1px solid #c0304033 }
+  .tag-fire   { background:#ff90400f;color:#ffb060;border:1px solid #ff904033 }
+  .tag-power  { background:#9a60ee0f;color:#cc80ff;border:1px solid #9a60ee33 }
 
   .item-text { font-size:14px;line-height:1.65;color:var(--text-bright); }
   .item-text strong { color:var(--gold2);font-weight:normal;font-style:italic }
@@ -198,7 +203,6 @@
   .sub-item { font-size:13px;color:var(--text-bright);line-height:1.55;display:flex;gap:8px;align-items:flex-start; }
   .sub-item::before { content:'◆';color:var(--gold);font-size:8px;margin-top:4px;flex-shrink:0 }
 
-  /* Tabla de rotacion de goblin */
   .rotation-table {
     width:100%;border-collapse:collapse;margin-top:12px;font-size:12px;
     font-family:'Cinzel',serif;
@@ -212,17 +216,6 @@
     color:var(--text-bright);line-height:1.5;
   }
   .rotation-table tr:hover td { background:#21183a44; }
-  .rot-icon { font-size:16px; }
-
-  .rarity-row { display:flex;gap:10px;flex-wrap:wrap;margin-top:10px; }
-  .rarity-pill {
-    padding:4px 12px;border-radius:4px;font-family:'Cinzel',serif;
-    font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  }
-  .rp-common    { background:#a0a0b011;color:#a0a0b0;border:1px solid #a0a0b044 }
-  .rp-uncommon  { background:#60aaee11;color:#60aaee;border:1px solid #60aaee44 }
-  .rp-rare      { background:#cc80ff11;color:#cc80ff;border:1px solid #cc80ff44 }
-  .rp-legendary { background:#ffcc4411;color:#ffcc44;border:1px solid #ffcc4444 }
 
   .dev-block {
     background:#0f0c18;border:1px solid #c9984a44;border-radius:6px;padding:20px 24px;
@@ -256,21 +249,6 @@
   .dev-role { font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);font-family:'Cinzel',serif;margin-bottom:24px; }
   .credits-seal { display:inline-block;margin-top:20px;font-size:32px;animation:sealSpin 20s linear infinite;filter:drop-shadow(0 0 12px #d4a84366); }
   @keyframes sealSpin{to{transform:rotate(360deg)}}
-
-  .map-demo { display:flex;justify-content:center;gap:8px;padding:20px 0 10px;flex-wrap:wrap; }
-  .map-col { display:flex;flex-direction:column;gap:6px;align-items:center }
-  .map-node {
-    width:52px;height:44px;border-radius:5px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-    border:1px solid #d4a84333;background:#1a1030;font-size:16px;
-    transition:transform .2s,box-shadow .2s;
-  }
-  .map-node:hover{transform:translateY(-2px);box-shadow:0 4px 16px #d4a84322}
-  .map-node span{font-size:8px;font-family:'Cinzel',serif;letter-spacing:.05em;color:var(--dim)}
-  .mn-combat{border-color:#c0304033}.mn-elite{border-color:#8a1a2a55;background:#1a0a20}
-  .mn-rest{border-color:#3a6a3a44;background:#0e1a10}.mn-shop{border-color:#c9984a44;background:#1a140a}
-  .mn-chest{border-color:#d4a84355;background:#1a1505}.mn-boss{border-color:#8a1a2a88;background:#1a0808;width:58px}
-  .map-arrow{color:var(--dim);font-size:10px;margin:2px 0}
 
   .back-bar {
     position:fixed;bottom:0;left:0;right:0;
@@ -309,205 +287,237 @@
 
 
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.11 — LA MÁS RECIENTE
+       VERSIÓN 0.0.12 — LA MÁS RECIENTE
        ══════════════════════════════════ -->
   <div class="version-block">
     <div class="version-header">
-      <div class="version-num latest">v 0.0.11 <span class="version-tag vtag-new">ÚLTIMA</span></div>
+      <div class="version-num latest">v 0.0.12 <span class="version-tag vtag-new">ÚLTIMA</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
 
-      <!-- COMPORTAMIENTO DE GOBLINS -->
-      <div class="section s-combat">
+      <!-- MECÁNICA DE QUEMADURA -->
+      <div class="section s-fire">
         <div class="section-header">
-          <div class="section-icon">😡</div>
-          <div class="section-title">Comportamiento de Goblins — Intenciones con Animación</div>
+          <div class="section-icon">🔥</div>
+          <div class="section-title">Nueva Mecánica — Quemadura</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fire">NUEVO</span>
+              <div class="item-text">
+                La <strong>Quemadura 🔥</strong> es un nuevo estado de daño continuo que funciona de forma distinta al veneno. Al final de cada turno del jugador, el enemigo quemado pierde HP igual a su nivel de quemadura — y ese daño <strong>puede bloquearse</strong> con su escudo. Tras aplicarse, la quemadura se reduce a la mitad (redondeando hacia abajo): <strong>20 → 10 → 5 → 2 → 1 → 0</strong>.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fire">DETALLE</span>
+              <div class="item-text">
+                Diferencias clave respecto al veneno: el veneno decae en 1 por turno y <strong>no</strong> puede bloquearse. La quemadura decae a la mitad y <strong>sí</strong> puede bloquearse. Ambos estados se muestran con badges de color en los enemigos y tooltips informativos al pasar el ratón.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NUEVAS CARTAS -->
+      <div class="section s-cards">
+        <div class="section-header">
+          <div class="section-icon">🃏</div>
+          <div class="section-title">Cinco Cartas Nuevas</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fire">COMÚN</span>
+              <div class="item-text">
+                <strong>Bola de Fuego</strong> — 1 maná. Inflige <strong>5 de quemadura</strong> a un enemigo. Sin daño base directo; todo el daño viene de la quemadura acumulada. Es la carta base del mazo de <strong>La Hechicera</strong> (reemplaza a Lanza de Niebla).
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">RARA</span>
+              <div class="item-text">
+                <strong>Charco de Veneno</strong> — 2 maná. Inflige <strong>8 de veneno a todos los enemigos</strong> en el campo de batalla simultáneamente. El log indica cuántos enemigos han sido afectados.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fire">RARA</span>
+              <div class="item-text">
+                <strong>Lluvia Solar</strong> — 2 maná. Inflige <strong>12 de quemadura a todos los enemigos</strong> en el campo. Habilidad de área pura, ideal para grupos numerosos.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-new">RARA</span>
+              <div class="item-text">
+                <strong>Invisibilitis</strong> — 2 maná. <strong>Carta especial (Poder)</strong> que se agota al usarse y no regresa al descarte hasta el siguiente combate. Al jugarla, los enemigos <strong>no pueden atacarte en tu siguiente turno completo</strong>. El efecto se activa al terminar el turno actual y dura exactamente un turno del jugador.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-power">ESPECIAL</span>
+              <div class="item-text">
+                <strong>Pacto del Vacío</strong> — 2 maná. <strong>Carta especial (Poder)</strong>. Al jugarla <strong>termina tu turno automáticamente</strong>. A partir del siguiente turno y hasta que se agote el contador, las <strong>primeras 2 cartas que juegues en cada turno son gratuitas</strong> (coste 0 de maná). El efecto persiste durante todo el combate. Se agota al usarse.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LA HECHICERA -->
+      <div class="section s-char">
+        <div class="section-header">
+          <div class="section-icon">🧙</div>
+          <div class="section-title">La Hechicera — Mazo Actualizado</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">
+                La Hechicera comienza ahora con <strong>5× Bola de Fuego</strong> en lugar de 5× Lanza de Niebla. Su identidad de personaje se centra en la quemadura y el control de área desde el primer encuentro.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-change">CAMBIO</span>
+              <div class="item-text">
+                Pasiva revertida: <strong>Miasma</strong> vuelve a su descripción original — el veneno que aplicas hace +1 daño extra por turno. Se ha eliminado el bono de +2 quemadura que se había añadido temporalmente.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARTAS ESPECIALES / PODERES -->
+      <div class="section s-power">
+        <div class="section-header">
+          <div class="section-icon">✦</div>
+          <div class="section-title">Sistema de Cartas Especiales (Poderes)</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-power">SISTEMA</span>
+              <div class="item-text">
+                Las cartas de tipo <strong>Poder</strong> (Invisibilitis, Pacto del Vacío, Pacto de Medianoche, Ojo del Relojero) tienen un comportamiento único: al jugarse <strong>se agotan y van a la Zona de Agotadas</strong>, no al descarte. Al inicio del siguiente combate regresan automáticamente al mazo. Aparecen con aspecto grisado en la mano si ya fueron usadas en el combate actual.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-power">HUD</span>
+              <div class="item-text">
+                Los poderes activos se muestran en un <strong>HUD de píldoras</strong> en la esquina superior derecha del combate, con icono, nombre y descripción del efecto en curso.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÚSICA CONTINUA -->
+      <div class="section s-music">
+        <div class="section-header">
+          <div class="section-icon">🎵</div>
+          <div class="section-title">Música Continua — Index ↔ Bestiario</div>
+        </div>
+        <div class="card">
+          <div class="items">
+            <div class="item">
+              <span class="item-tag tag-fix">MEJORA</span>
+              <div class="item-text">
+                La música de fondo ahora <strong>continúa sin interrupción</strong> al navegar entre el juego y el Bestiario. Al entrar al Bestiario la canción retoma exactamente desde el segundo donde se quedó, y al volver al juego hace lo mismo. Ya no hay reinicio ni silencio al cambiar de pantalla.
+              </div>
+            </div>
+            <div class="item">
+              <span class="item-tag tag-fix">MEJORA</span>
+              <div class="item-text">
+                El Bestiario arranca la música <strong>automáticamente al cargarse</strong> (aprovechando el gesto del usuario que ya existe al venir del index). Si se accede al Bestiario directamente sin pasar por el juego, la música arranca en el primer clic.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRIMORIO ACTUALIZADO -->
+      <div class="section s-deck">
+        <div class="section-header">
+          <div class="section-icon">📖</div>
+          <div class="section-title">Grimorio — Sección Especial y Nuevas Cartas</div>
         </div>
         <div class="card">
           <div class="items">
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
               <div class="item-text">
-                Los <strong>Goblins normales</strong> tienen ahora un 25% de probabilidad de anunciar que se están enfureciendo. El turno en que lo hace <strong>sí ataca con normalidad</strong> pero aparece un popup flotante <strong>😡</strong> en rojo sobre su sprite. El turno siguiente <strong>no ataca</strong> y su icono de intención muestra 😡. El turno posterior ataca con <strong>+50% de daño</strong> y aparece un popup <strong>⚡</strong> naranja con el daño total.
-                <table class="rotation-table">
-                  <tr><th>Turno</th><th>Acción</th><th>Intent</th></tr>
-                  <tr><td>A</td><td>Roll 25% → ataca normal + popup 😡</td><td><span class="rot-icon">⚔</span></td></tr>
-                  <tr><td>B</td><td>No ataca — cargando furia</td><td><span class="rot-icon">😡</span></td></tr>
-                  <tr><td>C</td><td>Ataca con +50% de daño + popup ⚡</td><td><span class="rot-icon">⚡</span></td></tr>
-                </table>
+                El Grimorio de Cartas del Bestiario incluye ahora una nueva sección <strong>✦ ESPECIAL</strong> con todas las cartas de poder. Cada carta muestra sus estadísticas de quemadura 🔥, coste en HP, bonus de maná y el texto descriptivo completo.
               </div>
             </div>
             <div class="item">
               <span class="item-tag tag-new">NUEVO</span>
               <div class="item-text">
-                Los <strong>Goblins élite</strong> tienen tres comportamientos posibles por turno con el mismo sistema de dos fases:
+                Rutas de imagen añadidas para las 10 cartas nuevas. Cada carta soporta <strong>imagen IA</strong> (<code>resources/cartas/[id].jpg</code>) e <strong>imagen alternativa</strong> (<code>resources/alt/cartas/[id].png</code>), respetando el ajuste del jugador en Configuración.
                 <div class="sub-items">
-                  <div class="sub-item"><strong>55% — Ataque normal:</strong> golpe directo sin efectos adicionales.</div>
-                  <div class="sub-item"><strong>25% — Escudo:</strong> ataca normal ese turno + popup 🛡 azul. El turno siguiente <strong>no ataca</strong> y se pone +7 de escudo (intent 🛡).</div>
-                  <div class="sub-item"><strong>20% — Enfurecimiento:</strong> ataca normal ese turno + popup 😡. El turno siguiente no ataca (intent 😡). El siguiente ataca con <strong>+25% de daño</strong> y además <strong>todos sus aliados goblins</strong> también atacarán con +25% ese mismo turno (popup ⚡ naranja con el daño total y aviso de aliados).</div>
+                  <div class="sub-item">fireball · poison_pool · solar_rain · invisibilitis · void_pact</div>
+                  <div class="sub-item">midnight_pact · clockwork_eye · blood_tribute · storm_veil</div>
                 </div>
               </div>
             </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                <strong>Popups flotantes sobre el sprite del enemigo.</strong> Al activarse cualquier comportamiento especial aparece un pequeño panel animado encima del enemigo con icono grande + texto descriptivo. Se desvanece solo en 2.6 segundos. Colores: rojo 😡 para enfurecimiento, naranja ⚡ para ataque bufeado, azul 🛡 para escudo.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">
-                Los <strong>iconos de intención</strong> de goblins se actualizan en tiempo real para reflejar el estado actual: ⚔ ataque normal · 😡 cargando furia · ⚡ ataque bufeado inminente · 🛡 se escudará este turno. El tooltip al pasar el ratón muestra el daño exacto con el porcentaje de buff aplicado.
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- ESCUDO DE ENEMIGOS -->
-      <div class="section s-fix">
-        <div class="section-header">
-          <div class="section-icon">🛡</div>
-          <div class="section-title">Escudo de Enemigos — Dura un Solo Turno</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text">
-                El escudo (<strong>block</strong>) de <strong>todos los enemigos</strong> se resetea a 0 al inicio de cada turno del jugador, exactamente igual que el bloqueo del propio jugador. Antes el escudo de los enemigos era permanente y se acumulaba turno a turno. Ahora <strong>no se puede apilar</strong> entre turnos — cada escudo dura solo hasta que el jugador actúa.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-fix">FIX</span>
-              <div class="item-text">
-                Esto afecta a todos los enemigos que generan escudo: <strong>Sanadora Espectral</strong> (escuda aliados), <strong>Goblin Élite</strong> (+7 escudo), <strong>Condesa sin Rostro</strong> (fase de defensa) y cualquier otro que pudiera ganar bloqueo en el futuro.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MAPA — 4 RAMAS -->
-      <div class="section s-map">
-        <div class="section-header">
-          <div class="section-icon">🗺</div>
-          <div class="section-title">Mapa — Separación por Actos en 4 Ramas</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text">
-                El mapa de cada acto ahora genera <strong>4 ramas paralelas</strong> en lugar de 2. Cada fila del mapa ofrece cuatro caminos posibles, aumentando drásticamente la variedad de rutas disponibles por partida. El jugador puede elegir entre más combinaciones de encuentros, tiendas, cofres y descansos.
-              </div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-change">CAMBIO</span>
-              <div class="item-text">
-                La <strong>distribución de tipos de nodo</strong> se mantiene equilibrada entre las 4 ramas: combates normales, élites, tiendas, cofres y descansos siguen las mismas probabilidades pero repartidas en más columnas, garantizando que siempre hay al menos una ruta con descanso y otra con tienda por acto.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /version-body v0.0.11 -->
-  </div><!-- /version-block v0.0.11 -->
+    </div><!-- /version-body v0.0.12 -->
+  </div><!-- /version-block v0.0.12 -->
 
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- ══════════════════════════════════
-       VERSIÓN 0.0.10 — ANTERIOR
+       VERSIÓN 0.0.11
        ══════════════════════════════════ -->
+  <div class="version-block">
+    <div class="version-header">
+      <div class="version-num old">v 0.0.11 <span class="version-tag vtag-old">ANTERIOR</span></div>
+      <div class="version-date">2026</div>
+    </div>
+    <div class="version-body">
+      <div class="section s-combat">
+        <div class="section-header"><div class="section-icon">😡</div><div class="section-title">Comportamiento de Goblins — Intenciones con Animación</div></div>
+        <div class="card"><div class="items">
+          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Goblins normales</strong> — 25% de probabilidad de enfurecerse. Popup 😡 en el turno de aviso, no atacan el turno siguiente, y atacan con <strong>+50% de daño</strong> el turno posterior con popup ⚡.</div></div>
+          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Goblins élite</strong> — tres comportamientos: 55% ataque normal · 25% escudo (+7 el turno siguiente) · 20% enfurecimiento (+25% daño + aliados también +25%).</div></div>
+          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Popups flotantes animados sobre el sprite con fade-out automático en 2.6 segundos. Iconos de intención actualizados en tiempo real.</div></div>
+        </div></div>
+      </div>
+      <div class="section s-fix">
+        <div class="section-header"><div class="section-icon">🛡</div><div class="section-title">Escudo de Enemigos — Dura un Solo Turno</div></div>
+        <div class="card"><div class="items">
+          <div class="item"><span class="item-tag tag-change">CAMBIO</span><div class="item-text">El bloqueo de todos los enemigos se resetea a 0 al inicio de cada turno del jugador. Ya no se acumula entre turnos.</div></div>
+        </div></div>
+      </div>
+      <div class="section s-map">
+        <div class="section-header"><div class="section-icon">🗺</div><div class="section-title">Mapa — 4 Ramas con Fusiones</div></div>
+        <div class="card"><div class="items">
+          <div class="item"><span class="item-tag tag-change">CAMBIO</span><div class="item-text">El mapa de cada acto genera <strong>4 ramas paralelas</strong> con nodos de fusión entre pares [0,1] y [2,3], conectadas por líneas curvas con colores diferenciados.</div></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+
+  <!-- v0.0.10 -->
   <div class="version-block">
     <div class="version-header">
       <div class="version-num old">v 0.0.10 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-
-      <div class="section s-combat">
-        <div class="section-header">
-          <div class="section-icon">👁</div>
-          <div class="section-title">Intenciones de Enemigos — Al Estilo Slay the Spire</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">Cada enemigo muestra uno o varios <strong>iconos circulares</strong> en la esquina inferior de su carta, uno por cada acción que realizará. El texto de intención plano debajo del enemigo ha sido eliminado.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text"><strong>PC:</strong> al pasar el ratón sobre un icono aparece un tooltip con valores dinámicos reales. <strong>Móvil:</strong> al tocar el icono aparece el mismo tooltip durante 3,5 segundos.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">Iconos: <strong>⚔</strong> ataque · <strong>🛡</strong> defensa · <strong>❤</strong> curación · <strong>☠</strong> veneno/maldición · <strong>🧛</strong> robo de vida · <strong>🦇</strong> invocar · <strong>👁</strong> ocultar aliado · <strong>🕯</strong> reducir daño · <strong>💀</strong> curación de jefe · <strong>👤</strong> oculto.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-fix">FIX</span>
-              <div class="item-text"><strong>Barón Hemlock</strong> — ahora siempre invoca en el turno 1 sin excepción.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section s-deck">
-        <div class="section-header">
-          <div class="section-icon">🃏</div>
-          <div class="section-title">Ver Mazo — Disponible en Todo Momento</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-new">NUEVO</span>
-              <div class="item-text">Botón <strong>🃏 Ver Mazo</strong> flotante en Recompensa, Tienda, Cofre, Mapa y Descanso. En combate: botón <strong>🃏</strong> junto al label «Mazo» en escritorio, y circular fijo en esquina inferior izquierda en móvil.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-fix">FIX</span>
-              <div class="item-text">El botón reaparece correctamente tras cerrar diálogos de evento en el mapa.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section s-char">
-        <div class="section-header">
-          <div class="section-icon">🔫</div>
-          <div class="section-title">HUD del Pistolero — Texto Más Legible</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-fix">MEJORA</span>
-              <div class="item-text">El contador del cargador y el aviso de <strong>🔥 ¡CARGADO!</strong> ahora usan fuente Arial 15–17px. La pasiva del personaje sube a 13px para mayor legibilidad.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section s-mob">
-        <div class="section-header">
-          <div class="section-icon">📱</div>
-          <div class="section-title">Móvil — Correcciones de Interfaz en Combate</div>
-        </div>
-        <div class="card">
-          <div class="items">
-            <div class="item">
-              <span class="item-tag tag-fix">FIX</span>
-              <div class="item-text">Corregida regresión que ocultaba la <strong>barra de maná, popups del jugador y botón de registro</strong> en combate móvil.</div>
-            </div>
-            <div class="item">
-              <span class="item-tag tag-fix">FIX</span>
-              <div class="item-text">Botón 🃏 movido a la esquina inferior izquierda en móvil para no solaparse con el registro 📜.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <div class="section s-combat"><div class="section-header"><div class="section-icon">👁</div><div class="section-title">Intenciones de Enemigos — Al Estilo Slay the Spire</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Iconos circulares de intención por enemigo con tooltip al hover/touch. Valores dinámicos reales.</div></div>
+        <div class="item"><span class="item-tag tag-fix">FIX</span><div class="item-text">Barón Hemlock siempre invoca en el turno 1.</div></div>
+      </div></div></div>
+      <div class="section s-deck"><div class="section-header"><div class="section-icon">🃏</div><div class="section-title">Ver Mazo — Disponible en Todo Momento</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Botón flotante 🃏 en Recompensa, Tienda, Cofre, Mapa, Descanso y Combate.</div></div>
+      </div></div></div>
+      <div class="section s-mob"><div class="section-header"><div class="section-icon">📱</div><div class="section-title">Móvil — Correcciones de Interfaz</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-fix">FIX</span><div class="item-text">Barra de maná, popups del jugador y botón de registro visibles en combate móvil.</div></div>
+      </div></div></div>
     </div>
   </div>
 
@@ -520,88 +530,57 @@
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-combat">
-        <div class="section-header"><div class="section-icon">🧛</div><div class="section-title">Acto II — Cinco Nuevos Enemigos</div></div>
-        <div class="card"><div class="items">
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Vampiro Sanguinario</strong> — roba HP al atacar, se cura al morir un aliado.</div></div>
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Condesa sin Rostro</strong> — ciclo de 3 fases: ataque → escudo → veneno.</div></div>
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Guardián del Candil</strong> — reduce el daño del jugador y oculta aliados.</div></div>
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Murciélago de Hemlock</strong> — invocado por el Barón; se transforma en vampiro a los 5 turnos.</div></div>
-          <div class="item"><span class="item-tag tag-boss">BOSS</span><div class="item-text"><strong>Barón Hemlock</strong> — invoca murciélagos, se cura y ataca. Siempre invoca en el turno 1.</div></div>
-        </div></div>
-      </div>
-      <div class="section s-ux">
-        <div class="section-header"><div class="section-icon">👤</div><div class="section-title">Mecánica de Ocultación · Grupos de 3 · Diálogos Mejorados</div></div>
-        <div class="card"><div class="items">
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Enemigos ocultos no atacables — overlay visual 👤, duración de 1 turno.</div></div>
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Grupos del Acto II siempre de 3 miembros con todas las combinaciones posibles.</div></div>
-          <div class="item"><span class="item-tag tag-fix">MEJORA</span><div class="item-text">Badges de diálogo muestran cantidad exacta de oro y vitalidad.</div></div>
-        </div></div>
-      </div>
+      <div class="section s-combat"><div class="section-header"><div class="section-icon">🧛</div><div class="section-title">Acto II — Cinco Nuevos Enemigos</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Vampiro Sanguinario</strong> · <strong>Condesa sin Rostro</strong> · <strong>Guardián del Candil</strong> · <strong>Murciélago de Hemlock</strong> · <strong>Barón Hemlock</strong> (jefe).</div></div>
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Mecánica de ocultación — overlay 👤, grupos siempre de 3 miembros, todas las combinaciones posibles.</div></div>
+      </div></div></div>
     </div>
   </div>
 
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- v0.0.8 -->
-  <div class="version-block">
+  <div class="version-block" style="opacity:.9">
     <div class="version-header">
       <div class="version-num old">v 0.0.8 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-ux">
-        <div class="section-header"><div class="section-icon">🔊</div><div class="section-title">Sistema de Sonido Completo</div></div>
-        <div class="card"><div class="items">
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>8 efectos de sonido independientes</strong> — sfx_player_attack, sfx_player_hit, sfx_player_death, sfx_enemy_death, sfx_play_card, sfx_player_turn, sfx_chest_open, sfx_shop_enter. Las rutas son constantes configurables al inicio de <code>noctis_deck.js</code>.</div></div>
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>ui_click</strong> — todos los botones de navegación reproducen un sonido de interfaz unificado.</div></div>
-        </div></div>
-      </div>
-      <div class="section s-ui">
-        <div class="section-header"><div class="section-icon">⚙</div><div class="section-title">Control de Volumen en Ajustes</div></div>
-        <div class="card"><div class="items">
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Slider <strong>«Volumen de efectos de sonido»</strong> independiente del volumen de música. Persiste en <code>noctis_sfx_vol</code>. Valor por defecto: 60%.</div></div>
-        </div></div>
-      </div>
-      <div class="section s-rarity">
-        <div class="section-header"><div class="section-icon">🎴</div><div class="section-title">Doble Confirmación para Jugar Cartas</div></div>
-        <div class="card"><div class="items">
-          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Primer clic</strong> — la carta se eleva y muestra borde dorado pulsante con etiqueta <strong>✦ CONFIRMAR ✦</strong>. <strong>Segundo clic</strong> — la ejecuta.</div></div>
-        </div></div>
-      </div>
+      <div class="section s-ux"><div class="section-header"><div class="section-icon">🔊</div><div class="section-title">Sistema de Sonido Completo</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">8 efectos de sonido independientes con rutas configurables. Slider de volumen SFX independiente del de música.</div></div>
+      </div></div></div>
+      <div class="section s-rarity"><div class="section-header"><div class="section-icon">🎴</div><div class="section-title">Doble Confirmación para Cartas</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Primer clic selecciona (borde dorado), segundo clic ejecuta. Activable en Ajustes.</div></div>
+      </div></div></div>
     </div>
   </div>
 
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- v0.0.7 -->
-  <div class="version-block" style="opacity:.9">
+  <div class="version-block" style="opacity:.85">
     <div class="version-header">
       <div class="version-num old">v 0.0.7 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-ux"><div class="section-header"><div class="section-icon">🎵</div><div class="section-title">Música de Fondo</div></div><div class="card"><div class="items"><div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Música en bucle (<code>resources/music/background.mp3</code>) activada al primer clic. Slider de volumen en Ajustes.</div></div></div></div></div>
-      <div class="section s-ui"><div class="section-header"><div class="section-icon">⚔</div><div class="section-title">Escalado de Dificultad por Acto</div></div><div class="card"><div class="items"><div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Enemigos escalan ×1.5 por acto: Acto 1 ×1.0 · Acto 2 ×1.5 · Acto 3 ×2.25.</div></div></div></div></div>
-      <div class="section s-rarity"><div class="section-header"><div class="section-icon">🌑</div><div class="section-title">Modo Infinito Procedural</div></div><div class="card"><div class="items"><div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Encuentros procedurales. Jefe garantizado cada 10 encuentros. Probabilidades de eventos positivos se reducen gradualmente.</div></div></div></div></div>
+      <div class="section s-ux"><div class="section-header"><div class="section-icon">🎵</div><div class="section-title">Música · Escalado por Acto · Modo Infinito</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Música en bucle con slider de volumen. Escalado ×1.5 por acto. Modo Infinito con jefe cada 10 encuentros.</div></div>
+      </div></div></div>
     </div>
   </div>
 
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- v0.0.6 -->
-  <div class="version-block" style="opacity:.85">
+  <div class="version-block" style="opacity:.8">
     <div class="version-header">
       <div class="version-num old">v 0.0.6 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-ux"><div class="section-header"><div class="section-icon">⚙</div><div class="section-title">Menú de Ajustes</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Toggle <strong>«Imágenes generadas por IA»</strong> — carga rutas alternativas de <code>resources/alt/</code> sin tocar código.</div></div>
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Opciones de borrado: partida guardada · reliquias · estadísticas · <strong>todo el progreso</strong> (con confirmación).</div></div>
-      </div></div></div>
-      <div class="section s-rarity"><div class="section-header"><div class="section-icon">🎁</div><div class="section-title">Recompensas y Tienda</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-fix">FIX</span><div class="item-text">Reemplazado el sistema sesgado de recompensas por <strong>tirada aleatoria ponderada real</strong> con eliminación progresiva del pool. Infrecuentes y raras aparecen con su probabilidad correcta.</div></div>
+      <div class="section s-ux"><div class="section-header"><div class="section-icon">⚙</div><div class="section-title">Ajustes · Recompensas Ponderadas</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Toggle imágenes IA, opciones de borrado de datos. Sistema de recompensas con tirada ponderada real.</div></div>
       </div></div></div>
     </div>
   </div>
@@ -609,18 +588,14 @@
   <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
 
   <!-- v0.0.5 -->
-  <div class="version-block">
+  <div class="version-block" style="opacity:.75">
     <div class="version-header">
       <div class="version-num old">v 0.0.5 <span class="version-tag vtag-old">ANTERIOR</span></div>
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-char"><div class="section-header"><div class="section-icon">🧑‍🤝‍🧑</div><div class="section-title">Personajes — Cuarto Cazador & Reworks</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>El Pistolero</strong> — 65 HP · 3 maná. Pasiva <em>Cargador</em>: cada 3 ataques el siguiente hace el doble de daño.</div></div>
-        <div class="item"><span class="item-tag tag-change">REWORK</span><div class="item-text"><strong>El Cazador</strong> — nueva pasiva <em>Vampirismo</em>: +2 HP cada vez que una carta de ataque cause daño directo.</div></div>
-      </div></div></div>
-      <div class="section s-feat"><div class="section-header"><div class="section-icon">🔮</div><div class="section-title">Sistema de Reliquias — Implementación Completa</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Pantalla <strong>Desbloqueos</strong> con 7 reliquias. 4 de personaje + 3 legendarias de Modo Infinito. Máximo 1 reliquia equipada.</div></div>
+      <div class="section s-char"><div class="section-header"><div class="section-icon">🧑‍🤝‍🧑</div><div class="section-title">El Pistolero · Reliquias</div></div><div class="card"><div class="items">
+        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Cuarto personaje El Pistolero con pasiva Cargador. Sistema de Reliquias con 7 reliquias y pantalla de Desbloqueos.</div></div>
       </div></div></div>
     </div>
   </div>
@@ -634,21 +609,19 @@
       <div class="version-date">2026</div>
     </div>
     <div class="version-body">
-      <div class="section s-fix"><div class="section-header"><div class="section-icon">🔧</div><div class="section-title">Exorcismos — Corrección de Males</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-fix">BUG</span><div class="item-text">Partida guardada bloqueada · Cartas que desaparecen con duplicadas · Maná máximo incorrecto · Cartas injugables a partir del segundo turno.</div></div>
-      </div></div></div>
-      <div class="section s-map"><div class="section-header"><div class="section-icon">🗺</div><div class="section-title">El Gran Mapa — Nuevas Rutas</div></div><div class="card"><div class="items">
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Mapa ramificado</strong> al estilo Slay the Spire. 6 filas de nodos con opciones por fila y nodos de Cofre 📦.</div></div>
-        <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text"><strong>Múltiples enemigos por encuentro.</strong> Grupos de 2–3 comunes, élites mixtos o jefe solo. Selección de objetivo con clic.</div></div>
-      </div></div></div>
-      <div class="section s-dev"><div class="section-header"><div class="section-icon">⚙</div><div class="section-title">Modo Desarrollador</div></div>
-        <div class="dev-block">
-          <div class="prompt">// Consola del navegador (F12) → pestaña Console</div>
-          <div class="cmd-row"><span class="cmd">DEV.invincible()</span><span class="cmd-desc">— activa/desactiva invencibilidad</span></div>
+      <div class="section s-fix"><div class="section-header"><div class="section-icon">🔧</div><div class="section-title">Correcciones · Mapa Ramificado · Modo Dev</div></div>
+        <div class="card"><div class="items">
+          <div class="item"><span class="item-tag tag-fix">BUG</span><div class="item-text">Partida guardada bloqueada · cartas que desaparecen · maná máximo incorrecto · cartas injugables a partir del segundo turno.</div></div>
+          <div class="item"><span class="item-tag tag-new">NUEVO</span><div class="item-text">Mapa ramificado estilo Slay the Spire, múltiples enemigos por encuentro, selección de objetivo.</div></div>
+        </div></div>
+        <div class="dev-block" style="margin-top:16px">
+          <div class="prompt">// Consola del navegador → DEV</div>
+          <div class="cmd-row"><span class="cmd">DEV.invincible()</span><span class="cmd-desc">— invencibilidad on/off</span></div>
           <div class="cmd-row"><span class="cmd">DEV.winCombat()</span><span class="cmd-desc">— victoria inmediata</span></div>
           <div class="cmd-row"><span class="cmd">DEV.addGold(500)</span><span class="cmd-desc">— añade oro</span></div>
           <div class="cmd-row"><span class="cmd">DEV.skipNode()</span><span class="cmd-desc">— avanza nodo</span></div>
-          <div class="cmd-row"><span class="cmd">DEV.status()</span><span class="cmd-desc">— estado completo de la partida<span class="cursor"></span></span></div>
+          <div class="cmd-row"><span class="cmd">DEV.giveCard("fireball","void_pact")</span><span class="cmd-desc">— añade cartas al mazo por ID</span></div>
+          <div class="cmd-row"><span class="cmd">DEV.listCards()</span><span class="cmd-desc">— lista todos los IDs disponibles por rareza<span class="cursor"></span></span></div>
         </div>
       </div>
     </div>

@@ -76,6 +76,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .si-bl{background:#7a1f3533;border:1px solid #c0304066;color:#f07080}
 .si-ps{background:#3a6a2033;border:1px solid #6a9a3066;color:#a8e060}
 .si-bk{background:#1a3a7a33;border:1px solid #3a6acc66;color:#8aaeff}
+.si-br{background:#3a1a0033;border:1px solid #ff904066;color:#ffb060}
 
 /* Shield big indicator */
 .si-shield-big{font-size:19px;padding:4px 10px;background:#1a3a7a55;border:1px solid #3a6acc99;color:#aaccff;animation:shieldPulse 2s ease-in-out infinite}
@@ -183,6 +184,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fx-bl{background:#6a1a2833;border:1px solid #a0203866;color:#ff7080}
 .fx-p{background:#2a5a1a33;border:1px solid #5a8a3066;color:#a0e060}
 .fx-hl{background:#1a3a1a33;border:1px solid #4acc7066;color:#80ee90}
+.fx-br{background:#3a1a0033;border:1px solid #ff904066;color:#ffb060}
 
 /* Tooltip de estado alterado en carta — siempre fixed sobre todo */
 .status-tooltip{

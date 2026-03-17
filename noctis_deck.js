@@ -10,6 +10,14 @@ function initMusic() {
   _bgAudio = new Audio(MUSIC_SRC);
   _bgAudio.loop = true;
   _bgAudio.volume = getMusicVolume();
+  // Retomar posición si viene del bestiario
+  const savedPos = parseFloat(localStorage.getItem('noctis_music_pos') || '0');
+  if(savedPos > 0) {
+    localStorage.removeItem('noctis_music_pos');
+    _bgAudio.addEventListener('canplay', function() {
+      _bgAudio.currentTime = savedPos;
+    }, { once: true });
+  }
   _bgAudio.play().catch(()=>{});
 }
 function getMusicVolume() {
@@ -137,12 +145,23 @@ const DEFAULT_IMGS = {
   card_smite:      'resources/cartas/golpe sagrado.jpg',
   card_retaliate:  'resources/cartas/cartarepresalia.jpg',
   card_mend:       'resources/cartas/susurro vital.jpg',
+  card_precise:    'resources/cartas/cortepreciso.jpg',
   // PISTOLERO cards — coloca imágenes en resources/cartas/
   card_bullet:     'resources/cartas/bullet.jpg',
   card_quickdraw:  'resources/cartas/quickdraw.jpg',
   card_headshot:   'resources/cartas/headshot.jpg',
   card_fanfire:    'resources/cartas/fanfire.jpg',
   card_smokebomb:  'resources/cartas/smokebomb.jpg',
+  card_fireball:       'resources/cartas/fireball.jpg',
+  card_poison_pool:    'resources/cartas/poison_pool.jpg',
+  card_solar_rain:     'resources/cartas/solar_rain.jpg',
+  card_invisibilitis:  'resources/cartas/invisibilitis.jpg',
+  card_void_pact:      'resources/cartas/void_pact.jpg',
+  // ── Cartas nuevas (pon tus imágenes en resources/cartas/) ──
+  card_midnight_pact:  'resources/cartas/midnight_pact.jpg',
+  card_clockwork_eye:  'resources/cartas/clockwork_eye.jpg',
+  card_blood_tribute:  'resources/cartas/blood_tribute.jpg',
+  card_storm_veil:     'resources/cartas/storm_veil.jpg',
   // ── NPCs / Eventos de diálogo ──
   npc_mendigo:       'resources/npc/mendigo.jpg',
   npc_comerciante:   'resources/npc/comerciante.jpg',
@@ -196,11 +215,22 @@ const ALT_IMGS = {
   card_smite:      'resources/alt/cartas/smite.png',
   card_retaliate:  'resources/alt/cartas/retaliate.png',
   card_mend:       'resources/alt/cartas/mend.png',
+  card_precise:    'resources/alt/cartas/precise.png',
   card_bullet:     'resources/alt/cartas/bullet.png',
   card_quickdraw:  'resources/alt/cartas/quickdraw.png',
   card_headshot:   'resources/alt/cartas/headshot.png',
   card_fanfire:    'resources/alt/cartas/fanfire.png',
   card_smokebomb:  'resources/alt/cartas/smokebomb.png',
+  card_fireball:       'resources/alt/cartas/fireball.png',
+  card_poison_pool:    'resources/alt/cartas/poison_pool.png',
+  card_solar_rain:     'resources/alt/cartas/solar_rain.png',
+  card_invisibilitis:  'resources/alt/cartas/invisibilitis.png',
+  card_void_pact:      'resources/alt/cartas/void_pact.png',
+  // ── Cartas nuevas (pon tus imágenes en resources/alt/cartas/) ──
+  card_midnight_pact:  'resources/alt/cartas/midnight_pact.png',
+  card_clockwork_eye:  'resources/alt/cartas/clockwork_eye.png',
+  card_blood_tribute:  'resources/alt/cartas/blood_tribute.png',
+  card_storm_veil:     'resources/alt/cartas/storm_veil.png',
   // ── NPCs / Eventos de diálogo ──
   npc_mendigo:       'resources/alt/npc/mendigo.png',
   npc_comerciante:   'resources/alt/npc/comerciante.png',
@@ -275,12 +305,12 @@ const CHARS=[
   // Cazador — pasiva reworked: Vampirismo (roba vida al hacer daño directo)
   {id:'cazador',name:'El Cazador',title:'Maestro del Filo',imgKey:'char_cazador',hp:70,mana:3,
    passive:'Vampirismo: cada carta de ataque que dañe directamente te cura 2 HP.',pid:'lifesteal',
-   deck:['strike','strike','strike','strike','strike','shield','shield','shield','shield','shield'],
+   deck:['precise','precise','precise','precise','precise','shield','shield','shield','shield','shield'],
    stats:{Vida:'70',Maná:'3/turno',Estilo:'Ataque y robo de vida'},color:'#c9984a',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="30" ry="4" fill="#00000044"/><circle cx="50" cy="28" r="14" fill="#1a1228" stroke="#c9984a88" stroke-width="1.5"/><circle cx="50" cy="28" r="10" fill="#2a1838"/><rect x="32" y="43" width="36" height="44" rx="5" fill="#1a1228" stroke="#c9984a66"/><rect x="24" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><rect x="64" y="45" width="12" height="34" rx="4" fill="#13101e" stroke="#c9984a44"/><path d="M32 52 Q16 68 20 88 Q30 78 32 84" fill="#0f0c18" stroke="#c9984a33"/><path d="M68 52 Q84 68 80 88 Q70 78 68 84" fill="#0f0c18" stroke="#c9984a33"/><line x1="82" y1="22" x2="76" y2="82" stroke="#c9984a" stroke-width="2.5"/><circle cx="82" cy="22" r="5" fill="#1a1228" stroke="#c9984a" stroke-width="1.5"/><circle cx="82" cy="22" r="2.5" fill="#c9984a88"/></svg>`},
   {id:'hechicera',name:'La Hechicera',title:'Tejedora de Miasmas',imgKey:'char_hechicera',hp:60,mana:4,
    passive:'Miasma: el veneno que aplicas hace +1 daño extra por turno.',pid:'poison_bonus',
-   deck:['lance','lance','lance','lance','lance','shield','shield','shield','shield','shield'],
+   deck:['fireball','fireball','fireball','fireball','fireball','shield','shield','shield','shield','shield'],
    stats:{Vida:'60',Maná:'4/turno',Estilo:'Veneno y control'},color:'#7a3acc',
    svg:`<svg viewBox="0 0 100 130" fill="none"><ellipse cx="50" cy="126" rx="28" ry="4" fill="#00000044"/><circle cx="50" cy="26" r="13" fill="#1a1028" stroke="#7a3acc88" stroke-width="1.5"/><ellipse cx="50" cy="22" rx="16" ry="8" fill="#130c1e" stroke="#7a3acc66"/><rect x="33" y="40" width="34" height="48" rx="4" fill="#1a1028" stroke="#7a3acc66"/><path d="M33 50 Q14 60 16 82 Q26 72 33 78" fill="#130c1e" stroke="#7a3acc44"/><path d="M67 50 Q86 60 84 82 Q74 72 67 78" fill="#130c1e" stroke="#7a3acc44"/><circle cx="50" cy="62" r="10" fill="#3a1a5a44" stroke="#9a5aee" stroke-width="1"/><circle cx="50" cy="62" r="5" fill="#7a3acc66"/><path d="M40 90 Q50 108 60 90" fill="#1a0a28" stroke="#7a3acc66"/></svg>`},
   {id:'espectro',name:'El Espectro',title:'Sombra del Pacto',imgKey:'char_espectro',hp:65,mana:3,
@@ -304,27 +334,53 @@ const CHARS=[
 // ═══════════════════════════════════════════════
 const CARDS=[
   // ── COMUNES ──
-  {id:'strike',   name:'Golpe Sombrío',    type:'attack', rarity:'common',    cost:1,dmg:6,  blk:0, bleed:0,psn:0,desc:'Golpe veloz con tu filo.'},
-  {id:'shield',   name:'Escudo Arcano',    type:'defense',rarity:'common',    cost:1,dmg:0,  blk:7, bleed:0,psn:0,desc:'Barrera mágica.'},
-  {id:'lance',    name:'Lanza de Niebla',  type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:0,psn:2,desc:'Veneno que consume desde dentro.'},
-  {id:'retaliate',name:'Represalia',       type:'skill',  rarity:'common',    cost:1,dmg:3,  blk:4, bleed:0,psn:0,desc:'Ataca y defiende.'},
+  {id:'strike',   name:'Golpe Sombrío',    type:'attack', rarity:'common',    cost:1,dmg:6,  blk:0, bleed:0,psn:0,desc:'Daño'},
+  {id:'shield',   name:'Escudo Arcano',    type:'defense',rarity:'common',    cost:1,dmg:0,  blk:7, bleed:0,psn:0,desc:'Protección'},
+  {id:'lance',    name:'Lanza de Niebla',  type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:0,psn:2,desc:'Veneno + daño'},
+  {id:'precise',  name:'Corte Preciso',    type:'attack', rarity:'common',    cost:1,dmg:4,  blk:0, bleed:2,psn:0,desc:'Daño + sangrado.'},
+  {id:'retaliate',name:'Represalia',       type:'skill',  rarity:'common',    cost:1,dmg:3,  blk:4, bleed:0,psn:0,desc:'Daño + protección.'},
   {id:'mend',     name:'Susurro Vital',    type:'skill',  rarity:'common',    cost:1,dmg:0,  blk:0, bleed:0,psn:0,heal:8, desc:'Recupera 8 de Vitalidad.'},
-  {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:'Disparo certero y rápido.'},
+  {id:'bullet',   name:'Bala de Plomo',    type:'attack', rarity:'common',    cost:1,dmg:7,  blk:0, bleed:0,psn:0,desc:'Daño.'},
   // ── INFRECUENTES ──
-  {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño e inflige sangrado.'},
-  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'Golpea dos veces.',dbl:true}, // ✏ CAMBIO 1: dmg 5→8 (bufeo)
-  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:17,bleed:0,psn:0,desc:'Protección pesada.'},
+  {id:'slash',    name:'Tajo Cruento',     type:'attack', rarity:'uncommon',  cost:2,dmg:10, blk:0, bleed:2,psn:0,desc:'Daño + sangrado'},
+  {id:'double',   name:'Golpe Doble',      type:'attack', rarity:'uncommon',  cost:2,dmg:8,  blk:0, bleed:0,psn:0,desc:'Daño',dbl:true},
+  {id:'mantle',   name:'Manto de Sombras', type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:17,bleed:0,psn:0,desc:'Protección'},
   {id:'cloud',    name:'Nube Venenosa',    type:'skill',  rarity:'uncommon',  cost:2,dmg:0,  blk:0, bleed:0,psn:4,desc:'Envenena al enemigo.'},
-  {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Dos disparos instantáneos.',dbl:true},
-  {id:'smokebomb',name:'Bomba de Humo',    type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:10,bleed:0,psn:2,desc:'Escudo y envenena al enemigo.'},
+  {id:'quickdraw',name:'Tiro Rápido',      type:'attack', rarity:'uncommon',  cost:1,dmg:5,  blk:0, bleed:0,psn:0,desc:'Daño.',dbl:true},
+  {id:'smokebomb',name:'Bomba de Humo',    type:'defense',rarity:'uncommon',  cost:2,dmg:0,  blk:10,bleed:0,psn:2,desc:'Escudo + envenenar.'},
   // ── RARAS ──
-  {id:'smite',    name:'Golpe Sagrado',    type:'attack', rarity:'rare',      cost:1,dmg:8,  blk:0, bleed:0,psn:0,desc:'Luz arcana concentrada.'},
-  {id:'ritual',   name:'Ritual de Sangre', type:'skill',  rarity:'rare',      cost:2,dmg:0,  blk:0, bleed:4,psn:0,desc:'Maldice con sangrado severo.'},
-  {id:'fanfire',  name:'Fuego Cerrado',    type:'attack', rarity:'rare',      cost:2,dmg:6,  blk:0, bleed:0,psn:0,desc:'Dispara tres veces consecutivas.',triple:true},
+  {id:'smite',    name:'Golpe Sagrado',    type:'attack', rarity:'rare',      cost:1,dmg:8,  blk:0, bleed:0,psn:0,desc:'Daño.'},
+  {id:'ritual',   name:'Ritual de Sangre', type:'skill',  rarity:'rare',      cost:2,dmg:0,  blk:0, bleed:4,psn:0,desc:'Sangrado.'},
+  {id:'fanfire',  name:'Fuego Cerrado',    type:'attack', rarity:'rare',      cost:2,dmg:6,  blk:0, bleed:0,psn:0,desc:'Daño.',triple:true},
   // ── LEGENDARIAS ──
-  {id:'headshot', name:'Disparo Certero',  type:'attack', rarity:'legendary', cost:3,dmg:28, blk:0, bleed:0,psn:0,desc:'Un disparo. El fin.'},
-  {id:'bloodpact',name:'Pacto de Sangre',  type:'skill',  rarity:'legendary', cost:2,dmg:0,  blk:0, bleed:3,psn:0,heal:10,desc:'Cura con la sangre del enemigo.'}, // ✏ CAMBIO 3: bleed 6→3, heal 14→10 (nerf)
-  {id:'nightmare',name:'Pesadilla Eterna', type:'attack', rarity:'legendary', cost:3,dmg:9,  blk:0, bleed:3,psn:3,desc:'Inflige todos los males.'}, // ✏ CAMBIO 2: dmg 14→9 (nerf)
+  {id:'headshot', name:'Disparo Certero',  type:'attack', rarity:'legendary', cost:3,dmg:28, blk:0, bleed:0,psn:0,desc:'Daño'},
+  {id:'bloodpact',name:'Pacto de Sangre',  type:'skill',  rarity:'legendary', cost:2,dmg:0,  blk:0, bleed:3,psn:0,heal:10,desc:'Curación + sangrado'},
+  {id:'nightmare',name:'Pesadilla Eterna', type:'attack', rarity:'legendary', cost:3,dmg:9,  blk:0, bleed:3,psn:3,desc:'Daño + sangrado + veneno'},
+  // ── CARTAS ESPECIALES (Powers — se agotan en combate, permanecen en el mazo) ──
+  {id:'midnight_pact', name:'Pacto de Medianoche', type:'power', rarity:'rare', cost:2, dmg:0, blk:0, bleed:0, psn:0,
+   desc:'[ESPECIAL] Gana 1 de energía adicional al inicio de cada turno de este combate.',
+   powerEffect:'mana_per_turn', isSpecial:true},
+  {id:'clockwork_eye',  name:'Ojo del Relojero',   type:'power', rarity:'rare', cost:2, dmg:0, blk:0, bleed:0, psn:0,
+   desc:'[ESPECIAL] Por cada 4 de energía gastada en este combate, gana 1 de energía.',
+   powerEffect:'mana_on_spend', isSpecial:true},
+  // ── RARAS NUEVAS (normales) ──
+  {id:'blood_tribute', name:'Tributo de Sangre', type:'skill', rarity:'rare', cost:0, dmg:0, blk:0, bleed:0, psn:0,
+   hpCost:5, manaGain:2, desc:'Paga 5 de Vitalidad. Gana 2 de energía inmediatamente.'},
+  {id:'storm_veil',    name:'Velo de Tormenta',  type:'defense',rarity:'rare', cost:2, dmg:0, blk:11,bleed:0, psn:0,
+   nextTurnMana:1, desc:'+11 de bloqueo. El próximo turno gana 1 de energía adicional.'},
+  // ── NUEVAS CARTAS v2 ──
+  {id:'fireball',      name:'Bola de Fuego',    type:'attack', rarity:'common',  cost:1, dmg:0, blk:0, bleed:0, psn:0, burn:5,
+   desc:'Daño + 5 quemadura.'},
+  {id:'poison_pool',   name:'Charco de Veneno', type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0, psn:8,
+   desc:'Inflige 8 de veneno.'},
+  {id:'solar_rain',    name:'Lluvia Solar',     type:'skill',  rarity:'rare',    cost:2, dmg:0, blk:0, bleed:0, psn:0, burn:12,
+   desc:'Inflige 12 de quemadura.'},
+  {id:'invisibilitis', name:'Invisibilitis',    type:'power',  rarity:'special', cost:2, dmg:0, blk:0, bleed:0, psn:0,
+   playerInvis:true, isSpecial:true, powerEffect:'invisibilitis',
+   desc:'[ESPECIAL] El turno siguiente los enemigos no pueden atacarte.'},
+  {id:'void_pact',     name:'Pacto del Vacío',  type:'power',  rarity:'special', cost:2, dmg:0, blk:0, bleed:0, psn:0,
+   powerEffect:'free_cards', isSpecial:true,
+   desc:'[ESPECIAL] Termina tu turno. Las 2 primeras cartas de cada turno son gratuitas.'},
 ];
 
 // Rareza → peso base y elite
@@ -335,26 +391,30 @@ const RARITY_WEIGHTS = {
   uncommon:  {base:48, elite:40, boss:28},
   rare:      {base:24, elite:35, boss:38},
   legendary: {base:8,  elite:15, boss:29},
+  special:   {base:4,  elite:8,  boss:12}, // Cartas especiales — baja probabilidad
 };
 const RARITY_COLORS = {
-  common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44'
+  common:'#a0a0b0', uncommon:'#60aaee', rare:'#cc80ff', legendary:'#ffcc44', special:'#cc80ff'
 };
 const RARITY_LABELS = {
-  common:'COMÚN', uncommon:'INFREC.', rare:'RARA', legendary:'LEGENDARIA'
+  common:'COMÚN', uncommon:'INFREC.', rare:'RARA', legendary:'LEGENDARIA', special:'✦ ESPECIAL'
 };
 
 // Weighted random card pick for rewards
 function pickRewardCards(count, tier) {
   const tierKey = tier===2?'boss':tier===1?'elite':'base';
-  const pool = CARDS.filter(c=>!['strike','shield','bullet'].includes(c.id));
+  // Pool: excluye las cartas de inicio pero incluye especiales y nuevas raras
+  const pool = CARDS.filter(c=>!['strike','shield','bullet','fireball'].includes(c.id));
 
-  // Weighted random sin repetición: para cada selección hacemos una tirada real
-  // en base a los pesos, así todas las rarezas tienen su probabilidad exacta
   function weightedPick(remaining) {
-    const totalW = remaining.reduce((sum, c) => sum + (RARITY_WEIGHTS[c.rarity]?.[tierKey] || 5), 0);
+    const totalW = remaining.reduce((sum, c) => {
+      const rarity = c.isSpecial ? 'special' : c.rarity;
+      return sum + (RARITY_WEIGHTS[rarity]?.[tierKey] || 5);
+    }, 0);
     let r = Math.random() * totalW;
     for(const c of remaining) {
-      r -= (RARITY_WEIGHTS[c.rarity]?.[tierKey] || 5);
+      const rarity = c.isSpecial ? 'special' : c.rarity;
+      r -= (RARITY_WEIGHTS[rarity]?.[tierKey] || 5);
       if(r <= 0) return c;
     }
     return remaining[remaining.length - 1];
@@ -986,6 +1046,7 @@ function saveG(){
       path:G.path,
       infiniteMode: G.infiniteMode || false,
       infiniteEncounters: G.infiniteEncounters || 0,
+      exhaustedZone: G._exhaustedZone || [],
       savedAt:new Date().toLocaleString('es-ES')
     }));
   }catch(e){}
@@ -1112,7 +1173,8 @@ function restoreRun(d){
     path:d.path||{act:0,row:0,branch:null},
     firstHitUsed:false,
     infiniteMode: d.infiniteMode||false,
-    infiniteEncounters: d.infiniteEncounters||0
+    infiniteEncounters: d.infiniteEncounters||0,
+    _exhaustedZone: d.exhaustedZone||[],
   };
   startRunTracking();
 }
@@ -2248,7 +2310,7 @@ function applyEventOutcome(outcome) {
 
 function applyPendingDebuffs() {
   const p = G.player;
-  if (G._pendingBleed)    { p.bleed  = (p.bleed  || 0) + G._pendingBleed;  delete G._pendingBleed; }
+  if (G._pendingBleed)    { p.bleed  = (p.bleed  || 0) + G._pendingBleed;  delete G._pendingBleed; checkBleedExplosion(p); }
   if (G._pendingPoison)   { p.poison = (p.poison || 0) + G._pendingPoison; delete G._pendingPoison; }
   if (G._pendingManaMinus){ p.mana   = Math.max(0, p.mana - G._pendingManaMinus); delete G._pendingManaMinus; }
 }
@@ -2380,8 +2442,15 @@ function enterNodeBranch(ai, ri, bi, isFused){
   const node = ri === numRowsAct ? G.map[ai].boss : (G.map[ai].rows[ri]||[])[bi];
   if(!node) return;
 
-  // Fijar rama si aún no se había elegido (fila 0)
-  G.path = {act:ai, row:ri, branch:bi};
+  // Si el nodo es fusionado, guardar su par como allowedBranches para que
+  // al salir solo se pueda elegir entre esas dos ramas.
+  // Si no es fusionado, preservar el allowedBranches actual (puede venir de fusión previa).
+  const mergedPair = (node.merged) ? node.merged : null;
+  const prevAllowed = G.path.allowedBranches || null;
+  G.path = {
+    act: ai, row: ri, branch: bi,
+    allowedBranches: mergedPair || prevAllowed
+  };
   saveG();
 
   if(['combat','elite','boss'].includes(node.type)){
@@ -2710,6 +2779,20 @@ function startCombat(tier, isInfinite){
   // Cilindro Veloz: reduce threshold to 2
   if(hasRelic('cilindro_veloz')) _gunslingerThreshold = 2;
   else _gunslingerThreshold = 3;
+  // Reset powers activos al inicio de cada combate
+  G._activePowers = {};
+  G._manaSpentThisCombat = 0;
+  G._manaSpentSinceLastTick = 0;
+  G._nextTurnManaBonus = 0;
+  G._exhaustedPowers = new Set();
+  G._freecards = 0;
+  G._playerInvis = false;
+  G._playerInvisNextTurn = false;
+  // Devolver cartas especiales agotadas al mazo para este nuevo combate
+  if(G._exhaustedZone && G._exhaustedZone.length > 0) {
+    G.player.deck.push(...G._exhaustedZone);
+  }
+  G._exhaustedZone = [];
   applyRelicCombatStart(); // ← startCombatHeal, firstHitBlock, startCombatMana
   renderRelicsPanel();
   renderEnemies();
@@ -2862,6 +2945,7 @@ function renderEnemies() {
     if(e.block)  statusHtml += `<span class="si si-bk">🛡 ${e.block}</span>`;
     if(e.bleed)  statusHtml += `<span class="si si-bl">🩸 ${e.bleed}</span>`;
     if(e.poison) statusHtml += `<span class="si si-ps">☠ ${e.poison}</span>`;
+    if(e.burn)   statusHtml += `<span class="si si-br">🔥 ${e.burn}</span>`;
 
     const intents = getEnemyIntent(e);
     const intentIconsHtml = intents.map((it, ii) =>
@@ -2973,6 +3057,8 @@ const STATUS_DESCRIPTIONS = {
     text:'Al final de cada turno el objetivo pierde HP igual a su nivel de veneno. Decae en 1 por turno.' },
   block:  { label:'🛡 Bloqueo', color:'#90c8ff',
     text:'Absorbe el daño entrante antes de afectar la Vitalidad. Se pierde al inicio del siguiente turno.' },
+  burn:   { label:'🔥 Quemadura', color:'#ff9040',
+    text:'Al final de cada turno el objetivo pierde HP igual a su quemadura (puede bloquearse). Se reduce a la mitad cada turno.' },
 };
 
 // Portal dedicado — se añade directamente al <html> para escapar de
@@ -3000,6 +3086,7 @@ function addStatusTooltips(wrapEl, card){
     if(fxEl.classList.contains('fx-bl'))     sk = 'bleed';
     else if(fxEl.classList.contains('fx-p')) sk = 'poison';
     else if(fxEl.classList.contains('fx-b')) sk = 'block';
+    else if(fxEl.classList.contains('fx-br')) sk = 'burn';
     if(!sk) return;
     const info = STATUS_DESCRIPTIONS[sk];
     if(!info) return;
@@ -3049,8 +3136,15 @@ function renderHand(){
     const wrap=document.createElement('div');wrap.className='c-slot';
     const sp=Math.min(26,13*n),angle=n>1?-sp/2+(sp/(n-1))*hi:0;
     wrap.style.cssText=`transform:rotate(${angle}deg) translateY(${Math.abs(angle)*.5}px);z-index:${hi+1};margin-left:${hi===0?0:-16}px`;
-    const can=card.cost<=p.mana;
-    const g=document.createElement('div');g.className=`gcard ${card.type} ${can?'playable':'unplayable'}`;
+    const can=card.cost<=p.mana && !card.hpCost;
+    // Tributo de Sangre: jugable si tienes más de 5 HP
+    const canBloodTribute = card.hpCost && p.hp > card.hpCost;
+    // Powers agotados: no jugables
+    const isExhausted = card.type === 'power' && G._exhaustedPowers && G._exhaustedPowers.has(card.id);
+    const canPlay = (canBloodTribute || can) && !isExhausted;
+    const g=document.createElement('div');
+    g.className=`gcard ${card.type} ${canPlay?'playable':'unplayable'}${isExhausted?' exhausted-power':''}`;
+    if(isExhausted) g.title = 'Ya activada este combate';
     const ds=card.triple?card.dmg*3:card.dbl?card.dmg*2:card.dmg;
     let fx='';
     if(card.dmg)fx+=`<span class="fx fx-d">⚔ ${ds}</span>`;
@@ -3058,9 +3152,15 @@ function renderHand(){
     if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;
     if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
     if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
-    g.innerHTML=`<div class="c-bar"></div><div class="c-cost">${card.cost}</div><div class="c-art">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-fx">${fx}</div>`;
+    if(card.burn)fx+=`<span class="fx fx-br">🔥 ${card.burn}</span>`;
+    if(card.manaGain)fx+=`<span class="fx" style="color:#60aaee">◆+${card.manaGain}</span>`;
+    if(card.nextTurnMana)fx+=`<span class="fx" style="color:#60aaee88">◆+${card.nextTurnMana}▶</span>`;
+    const costBadge = card.hpCost
+      ? `<div class="c-cost" style="background:#1a0a14;border-color:#c0304a88;color:#ff7080;font-size:10px">🩸${card.hpCost}</div>`
+      : `<div class="c-cost">${card.cost}</div>`;
+    g.innerHTML=`<div class="c-bar"></div>${costBadge}<div class="c-art">${getCArt(card)}</div><div class="c-name">${card.name}</div><div class="c-desc">${card.desc||''}</div><div class="c-fx">${fx}</div>`;
     wrap.appendChild(g);
-    if(can){
+    if(canPlay){
       // Capturar el ID de la carta — buscar posición en tiempo de click para evitar índices obsoletos
       (function(cardId,w){
         w.addEventListener('click',function(ev){
@@ -3094,6 +3194,16 @@ function renderHand(){
 function getCArt(card){
   const img=getImg('card_'+card.id);
   if(img)return`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:2px">`;
+  // Cartas especiales (powers)
+  if(card.id==='midnight_pact') return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="20" fill="#1a1030" stroke="#9a60ee88" stroke-width="1.5"/><circle cx="30" cy="30" r="10" fill="#2a1040" stroke="#cc80ff66"/><path d="M30 14 L32 26 L30 28 L28 26 Z" fill="#cc80ff88"/><path d="M46 30 L34 32 L32 30 L34 28 Z" fill="#cc80ff66"/><path d="M30 46 L28 34 L30 32 L32 34 Z" fill="#cc80ff77"/><path d="M14 30 L26 28 L28 30 L26 32 Z" fill="#cc80ff55"/><circle cx="30" cy="30" r="3" fill="#cc80ffaa"/></svg>`;
+  if(card.id==='clockwork_eye') return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="18" fill="#1a1418" stroke="#d4a84366"/><circle cx="30" cy="30" r="10" fill="#0a0810" stroke="#d4a84388"/><circle cx="30" cy="30" r="5" fill="#d4a84366"/><path d="M30 12 L31 18 L30 20 L29 18 Z" fill="#d4a84388"/><path d="M30 40 L31 46 L30 48 L29 46 Z" fill="#d4a84388"/><path d="M12 30 L18 29 L20 30 L18 31 Z" fill="#d4a84388"/><path d="M40 30 L46 29 L48 30 L46 31 Z" fill="#d4a84388"/><path d="M16 16 L21 21 L20 23 L18 21 Z" fill="#d4a84366"/><path d="M44 44 L39 39 L40 37 L42 39 Z" fill="#d4a84366"/><line x1="30" y1="30" x2="38" y2="22" stroke="#d4a843" stroke-width="1.5" stroke-linecap="round"/><line x1="30" y1="30" x2="30" y2="38" stroke="#d4a84388" stroke-width="1" stroke-linecap="round"/></svg>`;
+  if(card.id==='blood_tribute') return`<svg viewBox="0 0 60 60" fill="none"><path d="M30 8 Q36 18 36 26 Q36 34 30 38 Q24 34 24 26 Q24 18 30 8Z" fill="#c0304088" stroke="#ff4060" stroke-width="1.5"/><path d="M30 20 Q33 26 33 30 Q33 34 30 36 Q27 34 27 30 Q27 26 30 20Z" fill="#ff4060aa"/><circle cx="30" cy="44" r="4" fill="#c0304066" stroke="#ff406044"/></svg>`;
+  if(card.id==='storm_veil') return`<svg viewBox="0 0 60 60" fill="none"><path d="M30 8 L50 20 L50 38 Q50 52 30 56 Q10 52 10 38 L10 20 Z" fill="#1a2a4a44" stroke="#3a6acc" stroke-width="1.5"/><path d="M30 16 L44 24 L44 38 Q44 48 30 52 Q16 48 16 38 L16 24 Z" fill="#3a6acc22"/><path d="M22 32 L30 20 L38 32 L30 44 Z" fill="#d4a84333" stroke="#d4a84388" stroke-width="1"/><circle cx="30" cy="32" r="3" fill="#d4a843aa"/></svg>`;
+  if(card.id==='fireball')return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="20" fill="#3a1a0044" stroke="#ff9040" stroke-width="1.5"/><circle cx="30" cy="30" r="12" fill="#ff904055"/><circle cx="30" cy="30" r="6" fill="#ffcc0088"/><path d="M30 10 Q36 18 30 24 Q24 18 30 10Z" fill="#ff6020aa"/><path d="M18 18 Q26 24 22 32 Q16 26 18 18Z" fill="#ff602066"/><path d="M42 18 Q34 24 38 32 Q44 26 42 18Z" fill="#ff602066"/><text x="30" y="48" text-anchor="middle" font-size="9" fill="#ff9040" font-family="Arial">(F) 5</text></svg>`;
+  if(card.id==='poison_pool')return`<svg viewBox="0 0 60 60" fill="none"><ellipse cx="30" cy="42" rx="22" ry="11" fill="#2a5a1a66" stroke="#5a8a30"/><circle cx="20" cy="36" r="5" fill="#5a8a3066"/><circle cx="40" cy="36" r="6" fill="#5a8a3066"/><circle cx="30" cy="32" r="7" fill="#5a8a3088"/><path d="M26 22 Q30 12 34 22" stroke="#80cc50" stroke-width="2" fill="none"/></svg>`;
+  if(card.id==='solar_rain')return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="18" r="10" fill="#ffcc0066" stroke="#ffaa00" stroke-width="1.5"/><line x1="20" y1="30" x2="22" y2="48" stroke="#ff9040" stroke-width="2"/><line x1="28" y1="28" x2="30" y2="46" stroke="#ffcc00" stroke-width="2"/><line x1="36" y1="30" x2="38" y2="48" stroke="#ff9040" stroke-width="2"/><line x1="13" y1="33" x2="15" y2="51" stroke="#ff7020" stroke-width="1.5"/><line x1="45" y1="33" x2="43" y2="51" stroke="#ff7020" stroke-width="1.5"/></svg>`;
+  if(card.id==='invisibilitis')return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="26" r="16" fill="#1a2a3a44" stroke="#4a8aaa44" stroke-width="1" stroke-dasharray="4 2"/><circle cx="22" cy="22" r="5" fill="#0a1018" stroke="#4a8aaa33"/><circle cx="38" cy="22" r="5" fill="#0a1018" stroke="#4a8aaa33"/><path d="M22 34 Q30 40 38 34" stroke="#4a8aaa44" stroke-width="1.5" fill="none"/><line x1="12" y1="12" x2="48" y2="48" stroke="#4a8aaaaa" stroke-width="2" stroke-dasharray="5 3"/></svg>`;
+  if(card.id==='void_pact')return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="20" fill="#1a1030" stroke="#9a60ee88" stroke-width="1.5"/><circle cx="30" cy="30" r="12" fill="#2a1040" stroke="#cc80ff55"/><circle cx="30" cy="30" r="4" fill="#cc80ffcc"/><line x1="30" y1="10" x2="30" y2="20" stroke="#cc80ff88" stroke-width="2"/><line x1="30" y1="40" x2="30" y2="50" stroke="#cc80ff88" stroke-width="2"/><line x1="10" y1="30" x2="20" y2="30" stroke="#cc80ff66" stroke-width="2"/><line x1="40" y1="30" x2="50" y2="30" stroke="#cc80ff66" stroke-width="2"/></svg>`;
   if(card.type==='attack'){if(card.id==='double')return`<svg viewBox="0 0 60 60" fill="none"><line x1="10" y1="50" x2="35" y2="10" stroke="#c03050" stroke-width="3" stroke-linecap="round"/><line x1="25" y1="50" x2="50" y2="10" stroke="#e05070" stroke-width="3" stroke-linecap="round"/><circle cx="34" cy="11" r="4" fill="#e05070"/><circle cx="49" cy="11" r="4" fill="#c03050"/></svg>`;return`<svg viewBox="0 0 60 60" fill="none"><line x1="12" y1="48" x2="48" y2="12" stroke="#c9984a" stroke-width="3" stroke-linecap="round"/><polygon points="48,12 42,20 38,14" fill="#c9984a"/><rect x="8" y="44" width="14" height="5" rx="2" transform="rotate(-45 8 44)" fill="#7a5a2a"/></svg>`}
   if(card.type==='defense')return`<svg viewBox="0 0 60 60" fill="none"><path d="M30 8 L50 18 L50 36 Q50 50 30 56 Q10 50 10 36 L10 18 Z" fill="#1a3a7a44" stroke="#3a6acc" stroke-width="2"/><path d="M30 16 L42 22 L42 36 Q42 46 30 50 Q18 46 18 36 L18 22 Z" fill="#3a6acc22"/></svg>`;
   if(card.id==='mend')return`<svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="20" fill="#1a3a1a44" stroke="#4acc70" stroke-width="1.5"/><rect x="26" y="16" width="8" height="28" rx="3" fill="#4acc7088"/><rect x="16" y="26" width="28" height="8" rx="3" fill="#4acc7088"/><circle cx="30" cy="30" r="8" fill="#4acc7033" stroke="#6aee90" stroke-width="1"/></svg>`;
@@ -3134,10 +3244,71 @@ function playCard(hi){
   }
   const target = G.enemies[G.targetIdx];
 
-  p.mana-=Math.max(0, card.cost - costReduction);
+  // Pacto del Vacío: cartas gratuitas
+  const isFree = (G._freecards > 0 && card.type !== 'power');
+  if(isFree) { G._freecards = Math.max(0, G._freecards - 1); addLog('Pacto del Vacío: carta gratuita ❖','sta'); }
+  const manaCostFinal = isFree ? 0 : Math.max(0, card.cost - costReduction);
+  p.mana -= manaCostFinal;
+  // Tracking de maná gastado para Ojo del Relojero
+  const manaSpent = manaCostFinal;
+  if(manaSpent > 0 && G._activePowers && G._activePowers['clockwork_eye']) {
+    G._manaSpentSinceLastTick = (G._manaSpentSinceLastTick || 0) + manaSpent;
+    while(G._manaSpentSinceLastTick >= 4) {
+      G._manaSpentSinceLastTick -= 4;
+      p.mana = Math.min(p.maxMana + 3, p.mana + 1); // permite superar maxMana ligeramente
+      addLog('Ojo del Relojero: +1 energía (4 gastados) ⚙','sta');
+    }
+  }
   p.hand.splice(hi,1);
   p.discard.push(id);
   let msg=`Jugaste: ${card.name}`;
+
+  // ── CARTAS ESPECIALES (Powers) ──────────────────────────────────────────
+  if(card.type === 'power') {
+    if(!G._exhaustedPowers) G._exhaustedPowers = new Set();
+    G._exhaustedPowers.add(card.id);
+    if(!G._activePowers) G._activePowers = {};
+    G._activePowers[card.id] = true;
+    // Sacar del descarte (donde fue a parar por el flujo normal) y mandar a zona de agotadas
+    const di = p.discard.lastIndexOf(card.id);
+    if(di >= 0) p.discard.splice(di, 1);
+    if(!G._exhaustedZone) G._exhaustedZone = [];
+    G._exhaustedZone.push(card.id);
+    if(card.powerEffect === 'mana_per_turn') {
+      addLog('✦ Pacto de Medianoche: +1 energía por turno activado','sta');
+    } else if(card.powerEffect === 'mana_on_spend') {
+      G._manaSpentSinceLastTick = 0;
+      addLog('✦ Ojo del Relojero: por cada 4 energía gastada ganas 1 energía','sta');
+    } else if(card.powerEffect === 'free_cards') {
+      G._freecards = (G._freecards || 0) + 2;
+      addLog('✦ Pacto del Vacío: las próximas 2 cartas son gratuitas. Turno terminado.','sta');
+      renderHand(); renderEnemies(); renderPS(); updMana();
+      renderPowersHUD();
+      setTimeout(() => endTurn(), 320);
+      return;
+    } else if(card.powerEffect === 'invisibilitis') {
+      G._playerInvisNextTurn = true;
+      addLog('✦ Invisibilitis: los enemigos no podrán atacarte el próximo turno','sta');
+    }
+    renderHand(); renderEnemies(); renderPS(); updMana();
+    renderPowersHUD();
+    return;
+  }
+
+  // ── CARTA: Tributo de Sangre (cuesta HP, no maná) ──────────────────────
+  if(card.hpCost) {
+    // El coste real ya fue 0 en maná, ahora pagamos HP
+    const hpLost = Math.min(p.hp - 1, card.hpCost); // no puede matarte
+    p.hp = Math.max(1, p.hp - card.hpCost);
+    if(card.manaGain) {
+      p.mana = Math.min(p.maxMana + 2, p.mana + card.manaGain);
+      addLog(`Tributo de Sangre: -${hpLost} HP · +${card.manaGain} energía 🩸`, 'sta');
+    }
+    renderHand(); renderEnemies(); renderPS(); updMana();
+    return;
+  }
+
+  // ── CARTA: Velo de Tormenta (bloqueo + maná próximo turno) ────────────
 
   if(card.dmg){
     // Gunslinger passive: every 3 attacks → next attack deals double
@@ -3168,6 +3339,8 @@ function playCard(hi){
       target.hp=Math.max(0,target.hp-nd);
       totalDmgDealt+=nd;
       animateAttack(G.targetIdx, nd);
+      // Sangrado: daño extra igual al sangrado del objetivo al recibir golpe
+      if(nd > 0) triggerBleedOnHit(target, G.player, nd);
       if(target.hp<=0)break;
     }
     msg+=` · ${totalDmgDealt} daño${hits>1?' (×'+hits+')':''}`;
@@ -3187,8 +3360,37 @@ function playCard(hi){
     }
   }
   if(card.blk){p.block+=card.blk;msg+=` · +${card.blk} bloqueo`;spawnN(card.blk,'bk');sfxBlock();}
-  if(card.bleed){target.bleed+=card.bleed;msg+=` · ${card.bleed} sangrado`;}
-  if(card.psn){let ps=card.psn;if(G.charId==='hechicera')ps++;if(hasRelic('tomo_envenenado'))ps+=1;target.poison+=ps;msg+=` · ${ps} veneno`;}
+  if(card.burn){
+    const burnTargets = card.id === 'solar_rain'
+      ? G.enemies.filter(en => !en.dead)
+      : (G.enemies[G.targetIdx] && !G.enemies[G.targetIdx].dead ? [G.enemies[G.targetIdx]] : []);
+    if(burnTargets.length > 0){
+      const bv = card.burn;
+      burnTargets.forEach(ebt => { ebt.burn = (ebt.burn || 0) + bv; });
+      msg += ` · 🔥 ${bv} quemadura${burnTargets.length > 1 ? ' (x'+burnTargets.length+')' : ''}`;
+    }
+  }
+  if(card.nextTurnMana){
+    G._nextTurnManaBonus = (G._nextTurnManaBonus || 0) + card.nextTurnMana;
+    msg += ` · +1 energía próximo turno`;
+  }
+  if(card.bleed){
+    target.bleed += card.bleed;
+    msg += ` · ${card.bleed} sangrado`;
+    checkBleedExplosion(target);
+  }
+  if(card.psn){
+    const psnTargets = card.id === 'poison_pool'
+      ? G.enemies.filter(en => !en.dead)
+      : (target && !target.dead ? [target] : []);
+    if(psnTargets.length > 0){
+      let ps = card.psn;
+      if(G.charId === 'hechicera') ps++;
+      if(hasRelic('tomo_envenenado')) ps += 1;
+      psnTargets.forEach(en => { en.poison = (en.poison || 0) + ps; });
+      msg += ` · ☠ ${ps} veneno${psnTargets.length > 1 ? ' (x'+psnTargets.length+')' : ''}`;
+    }
+  }
   if(card.heal){
     const h=Math.min(p.maxHp,p.hp+card.heal)-p.hp;
     p.hp+=h;
@@ -3282,6 +3484,73 @@ function animateHeal(amount) {
   spawnN(amount, 'hl');
 }
 
+
+// ─── SANGRADO: daño extra al recibir golpe + explosión a 5 stacks ────────────
+// caster: quien infligió el sangrado (G.player o un enemy) — para la curación
+// victim: quien tiene el sangrado (enemy o G.player)
+// dmgDealt: daño directo ya aplicado en este golpe
+// Retorna daño extra aplicado
+// ── Comprueba si la víctima ha acumulado ≥5 sangrado y dispara la explosión ──
+// Llámalo siempre que se aplique sangrado a cualquier objetivo (jugador o enemigo).
+function checkBleedExplosion(victim){
+  if(!victim || victim.bleed < 5 || victim.dead) return;
+  const p = G.player;
+  const explDmg = 10;
+  const ab = Math.min(victim.block, explDmg);
+  victim.block = Math.max(0, victim.block - explDmg);
+  const nd = explDmg - ab;
+  victim.hp = Math.max(0, victim.hp - nd);
+  // Curar 10 al jugador, siempre, capado al máximo
+  const got = Math.min(p.maxHp, p.hp + 10) - p.hp;
+  p.hp += got;
+  if(got > 0) animateHeal(got);
+  // Resetear sangrado a 0
+  victim.bleed = 0;
+  addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd}${ab>0?' ('+ab+' bloq)':''} · jugador +${got} HP · sangrado→0`, 'ene');
+  if(nd > 0){
+    if(victim === p){ spawnN(nd,'pl'); animatePlayerHit(); }
+    else { spawnN(nd,'en'); const idx=G.enemies.indexOf(victim); if(idx>=0) animateAttack(idx,nd); }
+  }
+  if(victim.hp <= 0 && victim !== p){ victim.dead = true; sfxEnemyDeath(); }
+  else if(victim === p && victim.hp <= 0){ sfxPlayerDeath(); }
+}
+
+function triggerBleedOnHit(victim, caster, dmgDealt){
+  // victim: quien recibe el golpe (tiene sangrado)
+  // caster: quien golpea (se cura si hay explosión)
+  if(!victim || victim.bleed <= 0 || dmgDealt <= 0) return 0;
+
+  // ── Daño extra igual al nivel de sangrado ──
+  const extra = victim.bleed;
+  const ab = Math.min(victim.block, extra);
+  victim.block = Math.max(0, victim.block - extra);
+  const nd = extra - ab;
+  victim.hp = Math.max(0, victim.hp - nd);
+  if(nd > 0) addLog(`🩸 Sangrado: -${nd} daño extra${ab>0?' ('+ab+' bloq)':''}`, 'ene');
+
+  // ── Explosión: al llegar a 5+ stacks ──
+  if(victim.bleed >= 5){
+    const explDmg = 10;
+    const ab2 = Math.min(victim.block, explDmg);
+    victim.block = Math.max(0, victim.block - explDmg);
+    const nd2 = explDmg - ab2;
+    victim.hp = Math.max(0, victim.hp - nd2);
+
+    // Curar 10 al JUGADOR siempre (sea víctima o atacante)
+    const p = G.player;
+    const got = Math.min(p.maxHp, p.hp + 10) - p.hp;
+    p.hp += got;
+    if(got > 0) animateHeal(got);
+
+    // Resetear sangrado de la víctima a 0
+    victim.bleed = 0;
+
+    addLog(`💥 ¡EXPLOSIÓN DE SANGRE! -${nd2}${ab2>0?' ('+ab2+' bloq)':''} · jugador +${got} HP 🩸→0`, 'ene');
+  }
+
+  return nd;
+}
+
 // ═══════════════════════════════════════════════
 //  END TURN — healer actions included
 // ═══════════════════════════════════════════════
@@ -3292,14 +3561,33 @@ function endTurn(){
 
   // DoTs on enemies
   aliveEnemies.forEach(e=>{
-    if(e.bleed>0){const d=2;e.hp=Math.max(0,e.hp-d);e.bleed--;addLog(`${e.name} sangra (-${d})`,'ene');animateHit(e);}
+    if(e.bleed>0){
+      const d=2;
+      const ab=Math.min(e.block,d); e.block=Math.max(0,e.block-d);
+      const nd=d-ab; e.hp=Math.max(0,e.hp-nd);
+      e.bleed--;
+      addLog(`${e.name} sangra (-${nd}${ab>0?' bloq '+ab:''})`,'ene');
+      animateHit(e);
+    }
     if(e.poison>0){
       const poisBonus=(G.charId==='hechicera'||hasRelic('tomo_envenenado'))?1:0;
       const d=e.poison+poisBonus;
-      e.hp=Math.max(0,e.hp-d);
-      // Tomo Envenenado: el veneno no decae
+      const ab=Math.min(e.block,d); e.block=Math.max(0,e.block-d);
+      const nd=d-ab; e.hp=Math.max(0,e.hp-nd);
+      // El veneno decae en 1 por turno (salvo Tomo Envenenado que no decae)
       if(!hasRelic('tomo_envenenado')) e.poison=Math.max(0,e.poison-1);
-      addLog(`${e.name} envenena (-${d})`,'ene');animateHit(e);
+      addLog(`${e.name} sufre veneno (☠${e.poison+1}→${e.poison}) (-${nd}${ab>0?' bloq '+ab:''})`,'ene');
+      animateHit(e);
+    }
+    if(e.burn > 0){
+      const burnAb = Math.min(e.block, e.burn);
+      e.block = Math.max(0, e.block - e.burn);
+      const burnDmg = e.burn - burnAb;
+      e.hp = Math.max(0, e.hp - burnDmg);
+      const prevBurn = e.burn;
+      e.burn = Math.floor(e.burn / 2);
+      addLog(`${e.name} 🔥 quemadura: -${burnDmg}${burnAb>0?' ('+burnAb+' bloq)':''} · ${prevBurn}→${e.burn}`, 'ene');
+      animateHit(e);
     }
     if(e.hp<=0){ e.dead=true; sfxEnemyDeath(); }
   });
@@ -3341,6 +3629,8 @@ function endTurn(){
       }
       // ── Enemigo genérico (sin flag) ───────────────────────────
       else if(!e._hidden) {
+        if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); }
+        else {
         let actualDmg=e.dmg;
         const hasFirstHitEffect = (G.charId==='espectro') || hasRelic('espejo_espectral');
         if(hasFirstHitEffect && !G.firstHitUsed){
@@ -3361,6 +3651,7 @@ function endTurn(){
           runDmgTanked += nd;
           animatePlayerHit();
         }
+        } // end else invis
       }
     }
   });
@@ -3382,9 +3673,17 @@ function endTurn(){
 
   combatTurn++;
 
-  // Player DoTs
-  if(p.bleed>0){p.hp=Math.max(0,p.hp-2);p.bleed--;}
-  if(p.poison>0){p.hp=Math.max(0,p.hp-p.poison);p.poison=Math.max(0,p.poison-1);}
+  // Player DoTs (respetan escudo)
+  if(p.bleed>0){
+    const d=2; const ab=Math.min(p.block,d); p.block=Math.max(0,p.block-d);
+    const nd=d-ab; p.hp=Math.max(0,p.hp-nd); p.bleed--;
+    if(nd>0){spawnN(nd,'pl'); animatePlayerHit();}
+  }
+  if(p.poison>0){
+    const d=p.poison; const ab=Math.min(p.block,d); p.block=Math.max(0,p.block-d);
+    const nd=d-ab; p.hp=Math.max(0,p.hp-nd); p.poison=Math.max(0,p.poison-1);
+    if(nd>0){spawnN(nd,'pl'); animatePlayerHit();}
+  }
 
   if(p.hp<=0){
     sfxPlayerDeath();
@@ -3410,7 +3709,20 @@ function endTurn(){
   if(G._playerDmgReduction > 0){
     G._playerDmgReduction = 0;
   }
+  // Invisibilitis: activar si estaba pendiente, desactivar si ya duró su turno
+  if(G._playerInvis){ G._playerInvis = false; addLog('Invisibilitis: efecto terminado — ya puedes ser atacado','sta'); }
+  if(G._playerInvisNextTurn){ G._playerInvis = true; G._playerInvisNextTurn = false; addLog('Invisibilitis: estás oculto este turno — los enemigos no pueden atacarte','sta'); }
   p.mana=p.maxMana;
+  if(G._activePowers && G._activePowers['midnight_pact']) {
+    p.mana = Math.min(p.maxMana + 3, p.mana + 1);
+    addLog('Pacto de Medianoche: +1 energía ✦','sta');
+  }
+  // Velo de Tormenta: bono de maná del turno anterior
+  if(G._nextTurnManaBonus && G._nextTurnManaBonus > 0) {
+    p.mana = Math.min(p.maxMana + 3, p.mana + G._nextTurnManaBonus);
+    addLog(`Velo de Tormenta: +${G._nextTurnManaBonus} energía ⚡`,'sta');
+    G._nextTurnManaBonus = 0;
+  }
   drawUpTo(getMaxHand());
 
   document.getElementById('turnLbl').textContent=`Turno ${G.turn}`;
@@ -3456,10 +3768,12 @@ function doHealerAction(healer) {
     } else {
       p.bleed += 2;
       addLog(`${healer.name} lanza una maldición · +2 sangrado`, 'ene');
+      checkBleedExplosion(p);
     }
     spawnN(2, 'pl');
   } else {
     // Weak attack
+    if(G._playerInvis){ addLog(`${healer.name} no puede atacar (eres invisible)`, 'sta'); return; }
     let actualDmg = healer.dmg;
     if(G.charId==='espectro'&&!G.firstHitUsed){
       G.firstHitUsed=true; actualDmg=0;
@@ -3469,7 +3783,7 @@ function doHealerAction(healer) {
     p.block = Math.max(0, p.block - actualDmg);
     const nd = actualDmg - ab;
     p.hp = Math.max(0, p.hp - nd);
-    if(nd>0){
+    if(nd>0){ triggerBleedOnHit(p, healer, nd);
       addLog(`${healer.name} ataca débilmente por ${nd}`,'ene');
       spawnN(nd,'pl');
       runDmgTanked += nd;
@@ -3483,6 +3797,7 @@ function doHealerAction(healer) {
 function doVampiroAction(e) {
   const p = G.player;
   if(e._hidden) return;
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); return; }
   let actualDmg = e.dmg;
   const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
   if(hasFirstHit && !G.firstHitUsed){
@@ -3497,7 +3812,7 @@ function doVampiroAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){
+  if(nd > 0){ triggerBleedOnHit(p, e, nd);
     addLog(`${e.name} golpea por ${nd}`,'ene');
     spawnN(nd,'pl');
     runDmgTanked += nd;
@@ -3528,6 +3843,7 @@ function vampiroAllyDeathHeal(vampiro) {
 // Cada turno alterna: ataque → defensa → veneno → repite
 function doCondesaAction(e) {
   const p = G.player;
+  if(G._playerInvis && e.condensaTurn % 3 === 0){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); e.condensaTurn = (e.condensaTurn||0)+1; return; }
   const mode = e.condensaTurn % 3;
   e.condensaTurn = (e.condensaTurn || 0) + 1;
 
@@ -3562,7 +3878,7 @@ function doCondesaAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){
+  if(nd > 0){ triggerBleedOnHit(p, e, nd);
     addLog(`${e.name} cambia de forma · ataca por ${nd}`,'ene');
     spawnN(nd,'pl'); runDmgTanked += nd; animatePlayerHit();
   }
@@ -3588,6 +3904,7 @@ function doGuardianAction(e) {
   }
 
   // phase === 0: ataque normal + aplica debuff de daño
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible) · aun aplica reducción de daño 🕯`, 'sta'); G._playerDmgReduction = Math.min((G._playerDmgReduction || 0) + 2, 6); return; }
   let actualDmg = e.dmg;
   const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
   if(hasFirstHit && !G.firstHitUsed){
@@ -3602,7 +3919,7 @@ function doGuardianAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){ addLog(`${e.name} ataca por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  if(nd > 0){ triggerBleedOnHit(p, e, nd); addLog(`${e.name} ataca por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
   G._playerDmgReduction = Math.min((G._playerDmgReduction || 0) + 2, 6);
   addLog(`${e.name} reduce tu daño en 2 (total -${G._playerDmgReduction}) 🕯`,'ene');
 }
@@ -3612,6 +3929,7 @@ function doGuardianAction(e) {
 function doMurcielagoAction(e) {
   const p = G.player;
   if(e._hidden || e.dead) return;
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); return; }
   let actualDmg = e.dmg;
   const dmgRed = G._playerDmgReduction || 0;
   actualDmg = Math.max(1, actualDmg - dmgRed);
@@ -3619,7 +3937,7 @@ function doMurcielagoAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){ addLog(`${e.name} ataca por ${nd} 🦇`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  if(nd > 0){ triggerBleedOnHit(p, e, nd); addLog(`${e.name} ataca por ${nd} 🦇`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
 }
 
 // ─── GOBLIN NORMAL — Enfurecimiento ──────────────────────────────────────────
@@ -3628,6 +3946,7 @@ function doMurcielagoAction(e) {
 function doGoblinNormalAction(e) {
   const p = G.player;
   if(e._hidden) return;
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); return; }
 
   // Turno 2: ya estaba _enraged (cargado el turno anterior) → atacar con +50%
   if(e._enraged) {
@@ -3681,7 +4000,7 @@ function doGoblinNormalAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){ addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  if(nd > 0){ triggerBleedOnHit(p, e, nd); addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
 }
 
 // ─── GOBLIN ÉLITE — Escudo, Enfurecimiento y Ataque ──────────────────────────
@@ -3691,6 +4010,7 @@ function doGoblinNormalAction(e) {
 function doGoblinEliteAction(e) {
   const p = G.player;
   if(e._hidden) return;
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); return; }
 
   // Estado: escudandose (intent mostro 🛡) → poner escudo, NO atacar
   if(e._shielding) {
@@ -3784,7 +4104,7 @@ function doGoblinEliteAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){ addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  if(nd > 0){ triggerBleedOnHit(p, e, nd); addLog(`${e.name} golpea por ${nd}`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
 }
 
 // ─── POP-UP VISUAL SOBRE EL ENEMIGO ───────────────────────────────────────────
@@ -3893,6 +4213,7 @@ function doBaronAction(e) {
 
   // attack
   if(e._hidden) return;
+  if(G._playerInvis){ addLog(`${e.name} no puede atacar (eres invisible)`, 'sta'); return; }
   let actualDmg = e.dmg;
   const hasFirstHit = (G.charId==='espectro') || hasRelic('espejo_espectral');
   if(hasFirstHit && !G.firstHitUsed){
@@ -3907,7 +4228,7 @@ function doBaronAction(e) {
   p.block = Math.max(0, p.block - actualDmg);
   const nd = actualDmg - ab;
   p.hp = Math.max(0, p.hp - nd);
-  if(nd > 0){ addLog(`${e.name} golpea por ${nd} 💀`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
+  if(nd > 0){ triggerBleedOnHit(p, e, nd); addLog(`${e.name} golpea por ${nd} 💀`,'ene'); spawnN(nd,'pl'); runDmgTanked+=nd; animatePlayerHit(); }
 }
 
 // ─── HELPER: animación de curación en enemigo ────
@@ -3996,6 +4317,8 @@ function renderPS(){
   }
   if(p.bleed)st.innerHTML+=`<span class="si si-bl">🩸 ${p.bleed}</span>`;
   if(p.poison)st.innerHTML+=`<span class="si si-ps">☠ ${p.poison}</span>`;
+  if(G._playerInvis)st.innerHTML+=`<span class="si" style="background:#1a2a3a44;border:1px solid #4a8aaa88;color:#80c8ee">👻 Oculto</span>`;
+  if(G._playerInvisNextTurn)st.innerHTML+=`<span class="si" style="background:#1a2a3a22;border:1px solid #4a8aaa44;color:#4a8aaa">👻 Oculto (próx.)</span>`;
 
   const shieldDisp = document.getElementById('shieldDisplay');
   if(shieldDisp){
@@ -4052,12 +4375,19 @@ function buildCardHTML(card, w, h, showDesc){
   if(card.bleed)fx+=`<span class="fx fx-bl">🩸 ${card.bleed}</span>`;
   if(card.psn)fx+=`<span class="fx fx-p">☠ ${card.psn}</span>`;
   if(card.heal)fx+=`<span class="fx fx-hl">❤ ${card.heal}</span>`;
-  const rc = RARITY_COLORS[card.rarity]||'#a0a0b0';
-  const rl = RARITY_LABELS[card.rarity]||'';
+  if(card.burn)fx+=`<span class="fx fx-br">🔥 ${card.burn}</span>`;
+  if(card.manaGain)fx+=`<span class="fx" style="color:#60aaee">◆+${card.manaGain}</span>`;
+  if(card.nextTurnMana)fx+=`<span class="fx" style="color:#60aaee88">◆+${card.nextTurnMana}▶</span>`;
+  const isSpecialCard = card.isSpecial || card.type === 'power';
+  const rc = isSpecialCard ? '#9a60ee' : (RARITY_COLORS[card.rarity]||'#a0a0b0');
+  const rl = isSpecialCard ? '✦ ESPECIAL' : (RARITY_LABELS[card.rarity]||'');
+  const costDisplay = card.hpCost
+    ? `<div style="position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#1a0a14;border:1px solid #c0304a88;display:flex;align-items:center;justify-content:center;font-size:8px;color:#ff7080;font-family:'Cinzel',serif;z-index:2">🩸${card.hpCost}</div>`
+    : `<div class="c-cost">${card.cost}</div>`;
   const desc = showDesc ? `<div style="font-size:11px;color:var(--dim);padding:2px 5px 6px;text-align:center;line-height:1.5;font-style:italic">${card.desc}</div>` : '';
   return `<div class="gcard ${card.type} playable" style="width:${w}px;height:${h}px;cursor:pointer;position:relative;border-top:2px solid ${rc}">
     <div class="c-bar"></div>
-    <div class="c-cost">${card.cost}</div>
+    ${costDisplay}
     <div style="position:absolute;bottom:${h-16}px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:1.5px;color:${rc};font-family:'Cinzel',serif;opacity:.95;text-shadow:0 0 6px ${rc}44">${rl}</div>
     <div class="c-art" style="padding:9px 5px 3px">${getCArt(card)}</div>
     <div class="c-name">${card.name}</div>
@@ -4485,6 +4815,10 @@ function chestMimic(){
 // ═══════════════════════════════════════════════
 function showBestiary() {
   playUI();
+  // Guardar posición actual de la música para que el bestiario la retome
+  if(_bgAudio && !_bgAudio.paused) {
+    try { localStorage.setItem('noctis_music_pos', _bgAudio.currentTime); } catch(e) {}
+  }
   window.location.href = 'bestiario.html';
 }
 
@@ -4707,6 +5041,31 @@ const DEV = {
   winCombat(){if(!G.enemies){console.warn('[DEV] No hay combate activo.');return;}G.enemies.forEach(e=>e.hp=0);combatWin();},
   addGold(n=999){G.gold+=(n|0);if(document.getElementById('goldN'))document.getElementById('goldN').textContent=G.gold;saveG();console.log(`%c[DEV] +${n} oro → Total: ${G.gold}`,'color:#e8b460;font-weight:bold');},
   skipNode(){if(!G.path){console.warn('[DEV] No hay run activo.');return;}if(G.infiniteMode)advanceInfinite();else advance();},
+  giveCard(...ids){
+    if(!G.player){console.warn('[DEV] No hay run activo.');return;}
+    const added=[];
+    const notFound=[];
+    ids.forEach(id=>{
+      const card=CARDS.find(c=>c.id===id);
+      if(card){G.player.deck.push(id);added.push(card.name);}
+      else notFound.push(id);
+    });
+    if(added.length) console.log(`%c[DEV] Cartas añadidas al mazo: ${added.join(', ')}`,'color:#cc80ff;font-weight:bold');
+    if(notFound.length) console.warn('[DEV] IDs no encontrados:',notFound,'\n[DEV] IDs disponibles:',CARDS.map(c=>c.id).join(', '));
+    saveG();
+    if(typeof renderHand==='function')renderHand();
+  },
+  listCards(){
+    const groups={common:[],uncommon:[],rare:[],legendary:[],special:[]};
+    CARDS.forEach(c=>{const r=c.isSpecial?'special':c.rarity;(groups[r]||groups.common).push(`${c.id} (${c.name})`);});
+    console.log('%c[DEV] ═══ CARTAS DISPONIBLES ═══','color:#d4a843;font-size:13px;font-weight:bold');
+    Object.entries(groups).forEach(([r,list])=>{
+      if(!list.length)return;
+      const colors={common:'#a0a0b0',uncommon:'#60aaee',rare:'#cc80ff',legendary:'#ffcc44',special:'#9a60ee'};
+      console.log(`%c${r.toUpperCase()}:`,'color:'+colors[r]+';font-weight:bold',list.join('  |  '));
+    });
+    console.log('%cUso: DEV.giveCard("fireball","void_pact")','color:#7a6888;font-style:italic');
+  },
   status(){console.log('%c[DEV] Estado actual:','color:#c9984a;font-weight:bold');console.table({Personaje:G.charId,Héroe:G.heroName,HP:`${G.player?.hp}/${G.player?.maxHp}`,Maná:`${G.player?.mana}/${G.player?.maxMana}`,Oro:G.gold,ModoInfinito:G.infiniteMode,Encuentros:G.infiniteEncounters,Multiplicador:getInfiniteMultiplier()});}
 };
 const _origEndTurn=endTurn;
@@ -4715,6 +5074,7 @@ window.endTurn=function(){
   else{_origEndTurn();}
 };
 console.log('%c[NOCTIS DECK] Herramientas de desarrollador → escribe DEV en la consola.','color:#c9984a;font-style:italic');
+console.log('%c  DEV.giveCard("fireball","void_pact")  → añade cartas al mazo\n  DEV.listCards()  → ver todos los IDs disponibles','color:#9a60ee;font-style:italic');
 
 // ═══════════════════════════════════════════════
 //  MOBILE ENHANCEMENTS
@@ -5031,6 +5391,9 @@ window.show = function(id) {
   if(id !== 'game') {
     const cdb = document.getElementById('combatDeckBtn');
     if(cdb) cdb.remove();
+    // Ocultar powers HUD fuera del combate
+    const phud = document.getElementById('powersHUD');
+    if(phud) phud.innerHTML = '';
   }
   // Remove old deck view button
   const dvb = document.getElementById('deckViewBtn');
@@ -5221,7 +5584,7 @@ function buildTutorialPage(ov, idx){
 // 1. Ve a: console.anthropic.com → API Keys → crear key
 // 2. Pega la key aquí abajo (empieza por sk-ant-...)
 // Tiene $5 de crédito gratis al registrarte
-const GEMINI_API_KEY = 'PON_AQUI_TU_API_KEY_GROQ';
+const GEMINI_API_KEY = '';
 // ─────────────────────────────────────────────
 
 const ORACULO_SYSTEM = `Eres el Oráculo de la Torre Obscura, el espíritu anciano que habita en Noctis Deck, un juego roguelike de cartas de ambientación gótico-victoriana. Hablas con un tono misterioso, poético y solemne, propio de la ambientación. Puedes usar metáforas oscuras y referencias a la noche, la niebla y el pacto antiguo. Eres sabio y útil, respondes preguntas sobre el juego con precisión.
@@ -5601,7 +5964,46 @@ function injectStatsButton() {
 }
 
 // ═══════════════════════════════════════════════
-//  INTENT ICON CSS + DECK VIEWER + GUNSLINGER FIX
+//  POWERS HUD — muestra powers activos en combate
+// ═══════════════════════════════════════════════
+function renderPowersHUD() {
+  let hud = document.getElementById('powersHUD');
+  if(!hud) {
+    hud = document.createElement('div');
+    hud.id = 'powersHUD';
+    hud.style.cssText = `
+      position:fixed;top:8px;right:8px;z-index:490;
+      display:flex;flex-direction:column;gap:5px;pointer-events:none;
+    `;
+    document.body.appendChild(hud);
+  }
+  hud.innerHTML = '';
+  if(!G._activePowers) return;
+  const labels = {
+    midnight_pact: { icon:'🕯', name:'Pacto de Medianoche', desc:'+1 energía/turno', color:'#9a60ee' },
+    clockwork_eye: { icon:'⚙', name:'Ojo del Relojero',    desc:'4 gastados = +1 energía', color:'#d4a843' },
+    void_pact:     { icon:'❖', name:'Pacto del Vacío',    desc:`${G._freecards||0} cartas gratis`, color:'#cc80ff' },
+    invisibilitis: { icon:'👻', name:'Invisibilitis',       desc:'oculto este turno',         color:'#4a8aaa' },
+  };
+  Object.keys(G._activePowers).forEach(pid => {
+    const info = labels[pid]; if(!info) return;
+    const pill = document.createElement('div');
+    pill.style.cssText = `
+      display:flex;align-items:center;gap:6px;
+      background:linear-gradient(135deg,#1a1228dd,#2a1a3add);
+      border:1px solid ${info.color}66;border-radius:20px;
+      padding:4px 10px 4px 7px;
+      font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;
+      color:${info.color};pointer-events:none;
+      box-shadow:0 0 10px ${info.color}33;
+      backdrop-filter:blur(4px);
+    `;
+    pill.innerHTML = `<span style="font-size:13px">${info.icon}</span><span>${info.name}</span><span style="color:#7a6888;font-size:8px;margin-left:2px">${info.desc}</span>`;
+    hud.appendChild(pill);
+  });
+}
+
+
 // ═══════════════════════════════════════════════
 (function injectGameStyles(){
   const s = document.createElement('style');
@@ -5749,6 +6151,50 @@ function injectStatsButton() {
       font-family:Arial,sans-serif !important;
       font-size:13px !important;
       line-height:1.55 !important;
+    }
+
+    /* ── Cartas Especiales (Power) ── */
+    .gcard.power {
+      border-top-color: #9a60ee !important;
+      background: linear-gradient(160deg, #1a1030, #0e0b18) !important;
+    }
+    .gcard.power .c-bar {
+      background: linear-gradient(90deg, #9a60ee, #cc80ff, #9a60ee) !important;
+    }
+    .gcard.power .c-name {
+      color: #cc80ff !important;
+    }
+    .gcard.power.exhausted-power {
+      opacity: 0.38 !important;
+      filter: grayscale(0.7) !important;
+    }
+    .gcard.power.exhausted-power::after {
+      content: '✦ ACTIVADA ✦';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: #9a60ee;
+      background: #080610aa;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* ── Carta Tributo de Sangre (coste HP) ── */
+    .gcard .c-cost-hp {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #1a0a14;
+      border: 1px solid #c0304a88;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; color: #ff7080;
+      font-family: 'Cinzel', serif;
     }
   `;
   document.head.appendChild(s);
